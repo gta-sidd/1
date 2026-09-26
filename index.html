@@ -845,6 +845,213 @@
   #btnNitro     { right: 128px; bottom: 14px; background: rgba(6, 182, 212, 0.45); border-color: rgba(103, 232, 249, 0.55); }
   #btnEnter     { right: 128px; bottom: 66px; background: rgba(245, 158, 11, 0.48); border-color: rgba(253, 224, 71, 0.65); color: #fef08a; }
   #btnExitMobile { right: 14px; bottom: 134px; width: 42px; height: 34px; border-radius: 9px; font-size: 13px; }
+
+  /* ---------- Real-Time Multiplayer UI ---------- */
+  #mpOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 8, 15, 0.78);
+    backdrop-filter: blur(8px);
+    z-index: 95;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+  }
+  #mpOverlay.open { display: flex; }
+  #mpLiveBadge {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10, 15, 28, 0.85);
+    border: 1px solid rgba(16, 185, 129, 0.55);
+    color: #e2e8f0;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    z-index: 24;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+    user-select: none;
+  }
+  body.show-mobile #mpLiveBadge {
+    top: 48px;
+    left: 10px;
+    transform: none;
+    padding: 3px 9px;
+    font-size: 10px;
+  }
+  .mpDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981;
+  }
+  .mpDot.offline {
+    background: #f59e0b;
+    box-shadow: 0 0 8px #f59e0b;
+  }
+  .mpGrid {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: 14px;
+    margin-top: 10px;
+  }
+  @media (max-width: 720px) {
+    .mpGrid { grid-template-columns: 1fr; }
+  }
+  .mpBox {
+    background: rgba(15, 23, 42, 0.78);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .mpChatLog {
+    height: 195px;
+    overflow-y: auto;
+    background: rgba(5, 8, 16, 0.65);
+    border: 1px solid rgba(56, 189, 248, 0.22);
+    border-radius: 8px;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 12px;
+  }
+  .mpChatMsg {
+    line-height: 1.4;
+    color: #e2e8f0;
+    word-break: break-word;
+  }
+  .mpChatMsg.sys {
+    color: #fde047;
+    font-weight: 700;
+  }
+  .mpInput {
+    background: rgba(9, 13, 22, 0.9);
+    border: 1px solid rgba(148, 163, 184, 0.38);
+    color: #fff;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    outline: none;
+  }
+  .mpInput:focus {
+    border-color: #38bdf8;
+  }
+  .mpQuickRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .mpQuickBtn {
+    background: rgba(30, 41, 59, 0.85);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    color: #bae6fd;
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .mpQuickBtn:hover {
+    background: rgba(56, 189, 248, 0.22);
+    color: #fff;
+  }
+  .mpCodeBanner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.16), rgba(56, 189, 248, 0.14));
+    border: 1px solid rgba(16, 185, 129, 0.5);
+    padding: 10px 14px;
+    border-radius: 10px;
+  }
+  .mpCodeValue {
+    font-family: monospace;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 2.5px;
+    color: #fde047;
+    background: rgba(5, 8, 16, 0.75);
+    border: 1px dashed rgba(253, 224, 71, 0.6);
+    padding: 3px 12px;
+    border-radius: 6px;
+  }
+  .mpMapGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(142px, 1fr));
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .mpMapCard {
+    background: rgba(9, 14, 26, 0.88);
+    border: 1.5px solid rgba(148, 163, 184, 0.28);
+    border-radius: 8px;
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .mpMapCard:hover {
+    border-color: #38bdf8;
+    transform: translateY(-1px);
+  }
+  .mpMapCard.active {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.16);
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.28);
+  }
+  .mpMapCardTitle {
+    font-size: 12px;
+    font-weight: 800;
+    color: #fff;
+  }
+  .mpMapCardSub {
+    font-size: 10px;
+    color: #94a3b8;
+    line-height: 1.3;
+  }
+  #mpArenaHud {
+    position: fixed;
+    top: 48px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(9, 14, 26, 0.9);
+    border: 1.5px solid rgba(56, 189, 248, 0.55);
+    border-radius: 10px;
+    padding: 7px 14px;
+    z-index: 23;
+    display: none;
+    align-items: center;
+    gap: 12px;
+    color: #f8fafc;
+    font-size: 12px;
+    font-weight: 800;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  body.show-mobile #mpArenaHud {
+    top: 80px;
+    padding: 5px 10px;
+    font-size: 10.5px;
+    max-width: 94vw;
+  }
 </style>
 </head>
 <body>
@@ -854,6 +1061,20 @@
 <div id="vignette"></div>
 <div id="lightningFlashOverlay"></div>
 <div id="rainOverlay"></div>
+
+<!-- Live Multiplayer Status Pill -->
+<div id="mpLiveBadge" title="Click to open Karachi Multiplayer Hub [U]">
+  <span class="mpDot" id="mpStatusDot"></span>
+  <span id="mpStatusText">KARACHI ONLINE · 1 OP</span>
+</div>
+
+<!-- Live Multiplayer Arena Telemetry HUD (F1 Lap Timer / Firing Range Scoreboard / Arena Status) -->
+<div id="mpArenaHud">
+  <span id="mpArenaTitle" style="color:#fde047;">🏎️ KARACHI F1 CIRCUIT</span>
+  <span id="mpArenaStats" style="color:#38bdf8;">LAP 1/3 · TIME: 0.0s · BEST: --</span>
+  <button id="mpArenaActionBtn" class="mpQuickBtn" style="background:#10b981;color:#052e16;border:none;font-weight:900;">🔄 Reset / Respawn</button>
+  <button id="mpArenaHubBtn" class="mpQuickBtn">🗺️ Switch Map / Room</button>
+</div>
 
 <!-- Compact Single-Line Top Bar for Mobile Mode -->
 <div id="mobileTopBar">
@@ -865,12 +1086,14 @@
   <span id="mobWantedStars"></span>
   <div class="mobTopSpacer"></div>
   <button class="mobTopBtn" id="mobWeaponBtn">🔫 Fists</button>
+  <button class="mobTopBtn" id="mobMpBtn" style="border-color:rgba(16,185,129,0.6);color:#6ee7b7;">🌐 Multi</button>
   <button class="mobTopBtn accent" id="mobOpsBtn">🎬 Ops</button>
   <button class="mobTopBtn" id="mobMenuBtn">☰ Menu</button>
 </div>
 
 <!-- Collapsible Quick Drawer for Mobile Mode -->
 <div id="mobileDrawer">
+  <button class="mobDrawerBtn" id="mobDrwMp">🌐 Multiplayer</button>
   <button class="mobDrawerBtn" id="mobDrwBldg">🏛 Enter Bldg</button>
   <button class="mobDrawerBtn" id="mobDrwGarage">🔧 Garage</button>
   <button class="mobDrawerBtn" id="mobDrwShop">🧥 Disguise</button>
@@ -966,7 +1189,7 @@
 <div id="pauseOverlay">
   <div id="pausePanel">
     <h2>OPERATION PAUSED</h2>
-    <div class="pauseStat"><span>Dhurandhar Story</span><span id="statStory">0 / 8</span></div>
+    <div class="pauseStat"><span>Dhurandhar Story</span><span id="statStory">0 / 16</span></div>
     <div class="pauseStat"><span>Operations Completed</span><span id="statMissions">0</span></div>
     <div class="pauseStat"><span>Hostiles Eliminated</span><span id="statKills">0</span></div>
     <div class="pauseStat"><span>Times Compromised</span><span id="statBusted">0</span></div>
@@ -991,7 +1214,8 @@
 </div>
 
 <div id="toolbar">
-  <button class="toolBtn" id="missionsBtn">🎬 Dhurandhar Ops</button>
+  <button class="toolBtn" id="missionsBtn">🎬 Dhurandhar Ops &amp; Lore</button>
+  <button class="toolBtn" id="mpBtn" style="border-color:rgba(16,185,129,0.55);color:#6ee7b7;">🌐 Multiplayer [U]</button>
   <button class="toolBtn" id="enterBldgBtn">🏛 Enter Building [E]</button>
   <button class="toolBtn" id="garageBtn">🔧 Safehouse Garage</button>
   <button class="toolBtn" id="shopBtn">🧥 Disguise</button>
@@ -1002,17 +1226,136 @@
   <button class="toolBtn" id="mobileToggle">📱 Touch</button>
 </div>
 
+<div id="mpOverlay">
+  <div id="mpPanel" class="shopLikePanel" style="width: min(880px, 96vw); max-height: 92vh; overflow-y: auto;">
+    <div class="headerStripe" style="background: linear-gradient(90deg, #10b981, #38bdf8, #f59e0b);"></div>
+    <div class="garageBody">
+      <div class="garageTitleRow">
+        <h2 style="color:#6ee7b7;">🌐 DHURANDHAR MULTIPLAYER · ROOMS &amp; ARENA MAPS</h2>
+        <button id="closeMpBtn" class="ghostBtn">Close ✕</button>
+      </div>
+
+      <!-- Shareable Room Code & Create Room Banner -->
+      <div class="mpCodeBanner">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:10px;font-weight:800;color:#6ee7b7;letter-spacing:1px;">SHARE THIS ROOM CODE WITH FRIENDS</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+              <span class="mpCodeValue" id="mpCurrentCodeDisplay">KARACHI-1</span>
+              <span id="mpCurrentMapBadge" style="font-size:11px;font-weight:800;color:#38bdf8;background:rgba(56,189,248,0.14);border:1px solid rgba(56,189,248,0.4);padding:4px 9px;border-radius:6px;">🏙️ Karachi Open World</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;">
+          <button id="mpCreateRoomBtn" class="buyBtn" style="background:#f59e0b;color:#1c1917;font-weight:900;">➕ Create New Room &amp; Code</button>
+          <button id="mpCopyCodeBtn" class="buyBtn" style="background:#10b981;color:#052e16;">📋 Copy Code</button>
+          <button id="mpCopyLinkBtn" class="buyBtn" style="background:#1e293b;color:#38bdf8;border:1px solid rgba(56,189,248,0.45);">🔗 Copy Link</button>
+        </div>
+      </div>
+
+      <!-- 5 Multiplayer Maps Selector -->
+      <div class="mpBox" style="margin-top:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
+          <div style="font-size:11px;font-weight:800;color:#fde047;letter-spacing:0.8px;text-transform:uppercase;">
+            🗺️ Select Multiplayer Map (Click any map to switch your room or create a room on it)
+          </div>
+          <button id="mpWarpSupplyBtn" class="mpQuickBtn" style="border-color:#10b981;color:#6ee7b7;">📦 Warp to Supply Drop</button>
+        </div>
+        <div class="mpMapGrid" id="mpMapGrid">
+          <div class="mpMapCard active" data-map="karachi_city">
+            <div class="mpMapCardTitle">🏙️ Karachi Open World</div>
+            <div class="mpMapCardSub">Full Lyari &amp; Clifton City · Enterable Buildings, Co-Op Supply Drops &amp; Street PvP</div>
+          </div>
+          <div class="mpMapCard" data-map="f1_circuit">
+            <div class="mpMapCardTitle">🏎️ F1 Grand Prix Circuit</div>
+            <div class="mpMapCardSub">Formula 1 Stadium Track · Open-Wheel Apex F1 Race Cars, Kerbs, Grandstands &amp; Lap Timer</div>
+          </div>
+          <div class="mpMapCard" data-map="firing_range">
+            <div class="mpMapCardTitle">🎯 IB Firing Range</div>
+            <div class="mpMapCardSub">Live-Fire Ballistic Lanes &amp; CQB Killhouse · All Weapons 999 Ammo, Moving Targets &amp; High Scores</div>
+          </div>
+          <div class="mpMapCard" data-map="kemari_docks">
+            <div class="mpMapCardTitle">⚓ Kemari Container PvP</div>
+            <div class="mpMapCardSub">Tactical Shipping Container Maze · Sniper Catwalk, Armor Crates &amp; Close-Quarters Deathmatch</div>
+          </div>
+          <div class="mpMapCard" data-map="derby_dome">
+            <div class="mpMapCardTitle">💥 Destruction Derby Bowl</div>
+            <div class="mpMapCardSub">High-Speed Vehicle Ramming Colosseum · 4 Nitro Launch Ramps &amp; King-of-the-Ring</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mpGrid">
+        <!-- Left Column: Join by Room Code, Operative Identity, Active Rooms & Players -->
+        <div class="mpBox">
+          <div style="font-size:11px;font-weight:800;color:#38bdf8;letter-spacing:0.8px;text-transform:uppercase;">1. Join Friend's Room Code &amp; Identity</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <label style="font-size:11px;color:#cbd5e1;display:flex;flex-direction:column;gap:4px;">
+              Callsign
+              <input id="mpNameInput" class="mpInput" type="text" maxlength="18" value="Hamza-IB" placeholder="Your Callsign">
+            </label>
+            <label style="font-size:11px;color:#cbd5e1;display:flex;flex-direction:column;gap:4px;">
+              Faction Role
+              <select id="mpRoleSelect" class="mpInput">
+                <option value="IB Deep-Cover (Hamza)">IB Deep-Cover (Hamza)</option>
+                <option value="Ajay Sanyal's Unit">Ajay Sanyal's Unit</option>
+                <option value="Rehman Dakait's Baloch Gang">Rehman Dakait's Baloch Gang</option>
+                <option value="S.P. Aslam Lyari Task Force">S.P. Aslam Lyari Task Force</option>
+                <option value="Major Iqbal's Syndicate">Major Iqbal's Syndicate</option>
+              </select>
+            </label>
+          </div>
+          <div style="display:flex;gap:8px;align-items:flex-end;">
+            <label style="flex:1;font-size:11px;color:#cbd5e1;display:flex;flex-direction:column;gap:4px;">
+              Enter Room Code to Join (e.g. F1X-842 orRNG-519)
+              <input id="mpRoomInput" class="mpInput" style="text-transform:uppercase;font-weight:800;letter-spacing:1px;" type="text" maxlength="16" value="KARACHI-1" placeholder="ENTER CODE">
+            </label>
+            <button id="mpJoinRoomBtn" class="buyBtn" style="height:33px;">➡️ Join Code</button>
+          </div>
+
+          <div style="font-size:11px;font-weight:800;color:#fde047;letter-spacing:0.8px;text-transform:uppercase;margin-top:4px;">
+            Operatives in Room (<span id="mpPlayerCount">1</span>)
+          </div>
+          <div id="mpPlayersList" class="shopItemsList" style="max-height:130px;"></div>
+
+          <div style="font-size:11px;font-weight:800;color:#6ee7b7;letter-spacing:0.8px;text-transform:uppercase;margin-top:4px;">
+            Live Public Rooms Directory (Click to Join)
+          </div>
+          <div id="mpRoomsList" class="shopItemsList" style="max-height:110px;"></div>
+        </div>
+
+        <!-- Right Column: Live Encrypted Satellite Comms Chat & Quick Pings -->
+        <div class="mpBox">
+          <div style="font-size:11px;font-weight:800;color:#38bdf8;letter-spacing:0.8px;text-transform:uppercase;">2. Room Comms &amp; Live Telemetry Feed</div>
+          <div id="mpChatLog" class="mpChatLog" style="height:240px;"></div>
+          <div class="mpQuickRow">
+            <button class="mpQuickBtn" data-ping="🏎 Join my F1 Grand Prix race — lights out!">🏎 F1 Race</button>
+            <button class="mpQuickBtn" data-ping="🎯 Beat my score on the IB Firing Range!">🎯 Firing Range</button>
+            <button class="mpQuickBtn" data-ping="⚓ 1v1 me at Kemari Container Arena!">⚓ Container 1v1</button>
+            <button class="mpQuickBtn" data-ping="💥 Destruction Derby — full nitro ramming!">💥 Derby Bowl</button>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <input id="mpChatInput" class="mpInput" style="flex:1;" type="text" maxlength="160" placeholder="Send message to room...">
+            <button id="mpChatSendBtn" class="buyBtn">Transmit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="missionsOverlay">
-  <div id="missionsPanel" class="shopLikePanel">
+  <div id="missionsPanel" class="shopLikePanel" style="width: min(760px, 96vw);">
     <div class="headerStripe stripe-blue"></div>
     <div class="garageBody">
       <div class="garageTitleRow">
-        <h2 style="color:#5ad9ff;">DHURANDHAR · INTELLIGENCE DOSSIER</h2>
+        <h2 style="color:#5ad9ff;">DHURANDHAR · INTELLIGENCE DOSSIER &amp; LORE</h2>
         <button id="closeMissionsBtn" class="ghostBtn">Close ✕</button>
       </div>
-      <div class="missionTabs">
-        <button id="tabStoryBtn" class="missionTabBtn active">🎬 Dhurandhar Campaign (8 Ops)</button>
-        <button id="tabJobsBtn" class="missionTabBtn">⚡ Karachi Field Ops (Repeatable)</button>
+      <div class="missionTabs" style="flex-wrap: wrap;">
+        <button id="tabStoryBtn" class="missionTabBtn active">🎬 Story Campaign (16 Ops)</button>
+        <button id="tabJobsBtn" class="missionTabBtn">⚡ Karachi Field Ops (12)</button>
+        <button id="tabLoreBtn" class="missionTabBtn">📜 Lore &amp; IB Files (10)</button>
       </div>
       <div id="missionsList" class="shopItemsList"></div>
     </div>
@@ -1023,9 +1366,10 @@
   <div class="kicker">INDIAN INTELLIGENCE DEEP-COVER SPY THRILLER · KARACHI</div>
   <h1>DHURANDHAR</h1>
   <p>Recruited by Intelligence Bureau Chief <b>Ajay Sanyal</b>, operative <b>Jaskirat Singh Rangi</b> is sent across the border into Karachi, Pakistan under the cover identity <b>Hamza Ali Mazari</b>. Infiltrate <b>Rehman Dakait's</b> feared Lyari Baloch gang, outmaneuver <b>S.P. Chaudhary Aslam's</b> Lyari Task Force, and dismantle ISI handler <b>Major Iqbal's</b> terror syndicate from within.</p>
-  <div class="titleBtnRow">
+  <div class="titleBtnRow" style="flex-wrap:wrap;justify-content:center;">
     <button id="startBtn">▶ Begin Operation Dhurandhar</button>
     <button id="freeRoamBtn">🚗 Karachi Free Roam</button>
+    <button id="titleMpBtn" style="background:linear-gradient(135deg,#10b981,#0284c7); color:#fff; border:none; border-radius:8px; padding:14px 22px; font-size:15px; font-weight:800; cursor:pointer; box-shadow:0 6px 20px rgba(16,185,129,0.35);">🌐 Multiplayer Rooms &amp; Maps (F1 / Firing Range)</button>
     <button id="titleMobileBtn" style="background:rgba(16,185,129,0.22); color:#6ee7b7; border:1px solid #10b981; border-radius:8px; padding:14px 20px; font-size:14px; font-weight:700; cursor:pointer;">📱 Clean Mobile Mode: AUTO</button>
   </div>
 </div>
@@ -2656,7 +3000,11 @@
   }
 
   let lastPlayerCell = { i: null, j: null };
+  let currentMpMap = 'karachi_city';
+  let mpArenaHitboxes = [];
+
   function updateWorldStreaming(pos) {
+    if (currentMpMap !== 'karachi_city') return;
     const pi = Math.round(pos.x / BLOCK), pj = Math.round(pos.z / BLOCK);
     if (pi === lastPlayerCell.i && pj === lastPlayerCell.j) return;
     lastPlayerCell = { i: pi, j: pj };
@@ -2707,6 +3055,17 @@
   function collides(nx, nz, bufX, bufZ, heading) {
     bufX = bufX === undefined ? 0.92 : bufX;
     bufZ = bufZ === undefined ? 2.05 : bufZ;
+    if (currentMpMap !== 'karachi_city') {
+      for (let i = 0; i < mpArenaHitboxes.length; i++) {
+        const b = mpArenaHitboxes[i];
+        if (heading !== undefined) {
+          if (obbIntersectsAABB(nx, nz, bufX, bufZ, heading, b)) return true;
+        } else {
+          if (nx > b.minX - bufX && nx < b.maxX + bufX && nz > b.minZ - bufZ && nz < b.maxZ + bufZ) return true;
+        }
+      }
+      return false;
+    }
     for (const cell of loadedCells.values()) {
       const b = cell.box;
       if (!b) continue;
@@ -2724,6 +3083,7 @@
   // ===================================================================
   const CAR_MODELS = [
     { id: 'speedster', name: 'Speedster GT', kind: 'sport',   length: 4.3, width: 1.95, height: 2.4, wheelRadius: 0.42, speedFactor: 1.25, accelFactor: 1.15, defaultColor: '#c21f1f', defaultRim: '#d8d8d8', rimStyle: 'sport',   spoiler: true,  stripes: false, stripeColor: '#ffffff', hoodStyle: 'wedge', hoodLenFactor: 0.30, clearance: -0.02 },
+    { id: 'f1',        name: 'Apex F1 GP',   kind: 'hyper',   length: 4.8, width: 2.00, height: 1.08,wheelRadius: 0.36, speedFactor: 1.58, accelFactor: 1.52, defaultColor: '#dc2626', defaultRim: '#facc15', rimStyle: 'sport',   spoiler: true,  stripes: true,  stripeColor: '#ffffff', hoodStyle: 'wedge', hoodLenFactor: 0,    clearance: -0.06 },
     { id: 'muscle',    name: 'Muscle Roar',  kind: 'muscle',  length: 4.9, width: 2.00, height: 2.5, wheelRadius: 0.48, speedFactor: 1.15, accelFactor: 1.20, defaultColor: '#2255cc', defaultRim: '#222222', rimStyle: 'sport',   spoiler: false, stripes: true,  stripeColor: '#ffffff', hoodStyle: 'flat',  hoodLenFactor: 0.40, clearance: 0.00 },
     { id: 'hatch',     name: 'City Hatch',   kind: 'hatch',   length: 3.8, width: 1.80, height: 2.5, wheelRadius: 0.40, speedFactor: 0.85, accelFactor: 0.95, defaultColor: '#57b06a', defaultRim: '#cccccc', rimStyle: 'sport',   spoiler: false, stripes: false, stripeColor: '#000000', hoodStyle: 'flat',  hoodLenFactor: 0.14, clearance: 0.02 },
     { id: 'suv',       name: 'Trail SUV',    kind: 'suv',     length: 4.7, width: 2.05, height: 3.2, wheelRadius: 0.50, speedFactor: 0.95, accelFactor: 0.90, defaultColor: '#5a5f66', defaultRim: '#111111', rimStyle: 'offroad', spoiler: false, stripes: false, stripeColor: '#ffffff', hoodStyle: 'flat',  hoodLenFactor: 0.20, clearance: 0.14 },
@@ -2817,6 +3177,117 @@
     group.userData.chassis = chassis;
   }
 
+  function buildFormula1Car(group, modelDef, custom, M) {
+    const chassis = new THREE.Group();
+    // 1. Central carbon-fiber & painted monocoque tub + tapered needle nose cone
+    const tub = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.36, 2.45), M.paintMat);
+    tub.position.set(0, 0.34, -0.15);
+    tub.castShadow = true;
+    chassis.add(tub);
+
+    const nose = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.22, 1.45), M.paintMat);
+    nose.position.set(0, 0.25, 1.62);
+    nose.rotation.x = 0.08;
+    nose.castShadow = true;
+    chassis.add(nose);
+
+    // 2. Sculpted F1 Aerodynamic Sidepods + Floor Ground-Effect Plank
+    const floor = new THREE.Mesh(new THREE.BoxGeometry(1.65, 0.05, 3.1), M.trimMat);
+    floor.position.set(0, 0.14, -0.2);
+    chassis.add(floor);
+    [-1, 1].forEach(side => {
+      const pod = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.32, 1.65), M.paintMat);
+      pod.position.set(side * 0.52, 0.32, -0.25);
+      pod.castShadow = true;
+      chassis.add(pod);
+    });
+
+    // 3. Multi-Element Front Wing + Endplates
+    const frontWing = new THREE.Mesh(new THREE.BoxGeometry(1.86, 0.05, 0.42), M.paintMat);
+    frontWing.position.set(0, 0.14, 2.24);
+    chassis.add(frontWing);
+    const frontFlap = new THREE.Mesh(new THREE.BoxGeometry(1.82, 0.04, 0.22), M.stripeMat);
+    frontFlap.position.set(0, 0.19, 2.18);
+    chassis.add(frontFlap);
+    [-0.93, 0.93].forEach(wx => {
+      const plate = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.22, 0.48), M.paintMat);
+      plate.position.set(wx, 0.22, 2.22);
+      chassis.add(plate);
+    });
+
+    // 4. Open Cockpit + Driver Helmet + Titanium Halo Safety Bar + Airbox Shark Fin
+    const cockpitRecess = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.12, 0.78), M.trimMat);
+    cockpitRecess.position.set(0, 0.50, 0.08);
+    chassis.add(cockpitRecess);
+    const helmet = new THREE.Mesh(new THREE.SphereGeometry(0.17, 14, 14), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.2, metalness: 0.6 }));
+    helmet.position.set(0, 0.64, 0.05);
+    chassis.add(helmet);
+    const haloLoop = new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.032, 8, 18, Math.PI), M.trimMat);
+    haloLoop.rotation.x = Math.PI / 2 - 0.15;
+    haloLoop.position.set(0, 0.68, 0.15);
+    chassis.add(haloLoop);
+    const haloPillar = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.22, 8), M.trimMat);
+    haloPillar.position.set(0, 0.59, 0.45);
+    chassis.add(haloPillar);
+
+    const airbox = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.36, 0.95), M.paintMat);
+    airbox.position.set(0, 0.66, -0.62);
+    chassis.add(airbox);
+    const sharkFin = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.34, 0.85), M.stripeMat);
+    sharkFin.position.set(0, 0.72, -1.25);
+    chassis.add(sharkFin);
+
+    // 5. High-Downforce DRS Rear Wing + FIA Rain Light
+    const rearWingMain = new THREE.Mesh(new THREE.BoxGeometry(1.56, 0.06, 0.38), M.paintMat);
+    rearWingMain.position.set(0, 0.88, -2.12);
+    chassis.add(rearWingMain);
+    const rearWingDRS = new THREE.Mesh(new THREE.BoxGeometry(1.52, 0.05, 0.24), M.stripeMat);
+    rearWingDRS.position.set(0, 0.98, -2.18);
+    chassis.add(rearWingDRS);
+    [-0.78, 0.78].forEach(wx => {
+      const endplate = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.48, 0.52), M.paintMat);
+      endplate.position.set(wx, 0.82, -2.12);
+      chassis.add(endplate);
+    });
+    const rainLight = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.18, 0.08), M.taillightMat);
+    rainLight.position.set(0, 0.32, -2.25);
+    chassis.add(rainLight);
+
+    // 6. Exposed Carbon Suspension Wishbones
+    [1.42, -1.52].forEach(wz => {
+      const arm = new THREE.Mesh(new THREE.BoxGeometry(1.78, 0.04, 0.14), M.trimMat);
+      arm.position.set(0, 0.32, wz);
+      chassis.add(arm);
+    });
+
+    group.add(chassis);
+    attachDoorAndFlames(group, chassis, 2.0, 1.08, 4.8, M.paintMat);
+
+    const wheelR = modelDef.wheelRadius;
+    const wheelPositions = [
+      [-0.95, wheelR, 1.42], [0.95, wheelR, 1.42],
+      [-0.98, wheelR, -1.52], [0.98, wheelR, -1.52]
+    ];
+    const wheels = wheelPositions.map((p, idx) => {
+      const grp = new THREE.Group();
+      const tireWidth = idx >= 2 ? 0.42 : 0.35;
+      const tire = new THREE.Mesh(new THREE.CylinderGeometry(wheelR, wheelR, tireWidth, 24), M.tireMat);
+      tire.rotation.z = Math.PI / 2;
+      tire.castShadow = true;
+      grp.add(tire);
+      const rim = new THREE.Mesh(new THREE.CylinderGeometry(wheelR * 0.58, wheelR * 0.58, tireWidth + 0.02, 16), M.rimMat);
+      rim.rotation.z = Math.PI / 2;
+      grp.add(rim);
+      grp.position.set(p[0], p[1], p[2]);
+      group.add(grp);
+      return grp;
+    });
+
+    addUnderglow(group, custom, 1.85, 4.4);
+    group.userData.wheels = wheels;
+    return group;
+  }
+
   function buildMantisCar(group, modelDef, custom, M) {
     const chassis = new THREE.Group();
     const shapeGroup = new THREE.Group();
@@ -2904,6 +3375,7 @@
     const chassis = new THREE.Group();
     group.add(chassis);
     const M = createCarMaterials(custom);
+    if (modelDef.id === 'f1') return buildFormula1Car(group, modelDef, custom, M);
     if (modelDef.id === 'mantis') return buildMantisCar(group, modelDef, custom, M);
     const L = modelDef.length, W = modelDef.width, H = modelDef.height;
     const CL = modelDef.clearance || 0;
@@ -3725,7 +4197,7 @@
   let pauseOpen = false;
   function openPause() {
     pauseOpen = true;
-    document.getElementById('statStory').textContent = Math.min(8, statsTracking.storyIndex) + ' / 8';
+    document.getElementById('statStory').textContent = Math.min(STORY_MISSIONS.length, statsTracking.storyIndex) + ' / ' + STORY_MISSIONS.length;
     document.getElementById('statMissions').textContent = statsTracking.missionsCompleted;
     document.getElementById('statKills').textContent = statsTracking.kills;
     document.getElementById('statBusted').textContent = statsTracking.bustedCount;
@@ -3923,7 +4395,7 @@
     let bestPed = null, bestDist = Infinity;
 
     // Prioritize hostile mission enemies with generous auto-aim cone (especially for drive-by or action combat)
-    const allTargets = missionEnemies.concat(peds);
+    const allTargets = currentMpMap === 'karachi_city' ? missionEnemies.concat(peds) : missionEnemies;
     allTargets.forEach(p => {
       if (!p.alive) return;
       const dx = p.x - originX, dz = p.z - originZ;
@@ -3950,7 +4422,34 @@
           tx = missionVehicleTarget.x; tz = missionVehicleTarget.z;
         }
       }
-      spawnBulletTracer(originX + Math.sin(heading) * 0.6, 1.2, originZ + Math.cos(heading) * 0.6, tx, 1.1, tz, 0xfde047);
+      // Check if aiming at a 3D Firing Range Ballistic Target
+      const rangeHit = checkFiringRangeShot(originX, originZ, heading, Math.max(range, 85));
+      if (rangeHit) {
+        tx = rangeHit.x;
+        tz = rangeHit.z;
+      }
+      // Check if aiming at a remote multiplayer operative
+      const mpTarget = findBestMultiplayerTarget(originX, originZ, heading, range, activeWd.isMelee ? 0.9 : 0.55);
+      if (mpTarget && (!bestPed || mpTarget.dist < bestDist)) {
+        tx = mpTarget.op.x;
+        tz = mpTarget.op.z;
+        sendMpHit(mpTarget.op.id, dmg, activeWd.name);
+        for (let s = 0; s < 6; s++) {
+          spawnParticle(tx, 1.1, tz, (Math.random() - 0.5) * 5, 1.5 + Math.random() * 3, (Math.random() - 0.5) * 5, 0x38bdf8, 0.16, 0.38);
+        }
+      }
+      const ox = originX + Math.sin(heading) * 0.6;
+      const oz = originZ + Math.cos(heading) * 0.6;
+      spawnBulletTracer(ox, 1.2, oz, tx, 1.1, tz, 0xfde047);
+      sendMpShoot(activeWd.id, ox, 1.2, oz, tx, 1.1, tz);
+    } else {
+      const mpMelee = findBestMultiplayerTarget(originX, originZ, heading, range + 1.2, 1.0);
+      if (mpMelee) {
+        sendMpHit(mpMelee.op.id, dmg, activeWd.name);
+        for (let s = 0; s < 5; s++) {
+          spawnParticle(mpMelee.op.x, 1.1, mpMelee.op.z, (Math.random() - 0.5) * 4, 1 + Math.random() * 3, (Math.random() - 0.5) * 4, 0x38bdf8, 0.14, 0.35);
+        }
+      }
     }
 
     if (bestPed) {
@@ -5812,56 +6311,49 @@
     },
     {
       id: 'story_4',
-      act: 'ACT II · THE ANGEL OF DEATH (MAJOR IQBAL)',
-      title: '4. Major Iqbal\'s Arms Deal',
-      contact: 'Ajay Sanyal',
-      role: 'IB Chief · Encrypted Comms',
-      avatarColor: '#ffd54a',
-      reward: 1800,
-      respect: 15,
-      startPos: { x: GUNSHOP_DOOR.x, z: GUNSHOP_DOOR.z + 5 },
-      phoneText: '"Hamza! Satellite intel confirms ISI handler Major Iqbal is supplying military rifles to terror cells at North Plaza (3, 3). Grab a 9mm at the Armory and crash that deal!"',
+      act: 'ACT I · DHURANDHAR: LYARI INFILTRATION',
+      title: '4. The Chakiwara Jirga Blood Oath',
+      contact: 'Rehman Dakait',
+      role: 'Baloch Gang Kingpin · Lyari',
+      avatarColor: '#ef4444',
+      reward: 1500,
+      respect: 10,
+      startPos: { x: GARAGE_DOOR.x, z: GARAGE_DOOR.z + 5 },
+      phoneText: '"Hamza! Rival Arshad Pappu gunmen just attacked our Chakiwara Jirga court at (-2, 2). Grab a piece, wipe out those 3 invaders, and bring the Baloch war chest to Clifton!"',
       introShots: [
         {
-          speaker: 'AJAY SANYAL · HEAD OF INTELLIGENCE BUREAU',
-          text: 'Your infiltration worked, Hamza. Rehman Dakait just connected his smuggling routes with ISI handler Major Iqbal — the man they call the Angel of Death.',
-          duration: 3.7,
-          actor: { color: '#334155', x: GUNSHOP_DOOR.x + 1.5, z: GUNSHOP_DOOR.z + 3, heading: -0.2 },
-          camStart: { x: GUNSHOP_DOOR.x - 5, y: 2.2, z: GUNSHOP_DOOR.z + 10 },
-          camEnd: { x: GUNSHOP_DOOR.x + 5, y: 2.2, z: GUNSHOP_DOOR.z + 8 },
-          lookAt: { x: GUNSHOP_DOOR.x + 1, y: 1.3, z: GUNSHOP_DOOR.z + 3 }
+          speaker: 'REHMAN DAKAIT · LYARI KINGPIN',
+          text: 'For ten years my Baloch gang has ruled Chakiwara. Now rival gunmen think they can ambush our Jirga elders in broad daylight!',
+          duration: 3.6,
+          actor: { color: '#7f1d1d', x: GARAGE_DOOR.x + 2, z: GARAGE_DOOR.z + 3, heading: -0.3 },
+          camStart: { x: GARAGE_DOOR.x - 5, y: 2.3, z: GARAGE_DOOR.z + 10 },
+          camEnd: { x: GARAGE_DOOR.x + 5, y: 2.0, z: GARAGE_DOOR.z + 8 },
+          lookAt: { x: GARAGE_DOOR.x, y: 1.2, z: GARAGE_DOOR.z + 3 }
         },
         {
-          speaker: 'AJAY SANYAL · HEAD OF INTELLIGENCE BUREAU',
-          text: 'Major Iqbal\'s cell is transferring RDX and rifles at North Plaza (3, 3) right now. Eliminate all 4 operatives and seize their target dossier!',
-          duration: 3.7,
-          camStart: { x: GUNSHOP_DOOR.x + 3, y: 3.5, z: GUNSHOP_DOOR.z + 11 },
-          camEnd: { x: GUNSHOP_DOOR.x - 3, y: 2.0, z: GUNSHOP_DOOR.z + 9 },
-          lookAt: { x: GUNSHOP_DOOR.x, y: 1.2, z: GUNSHOP_DOOR.z + 4 }
+          speaker: 'HAMZA ALI MAZARI (JASKIRAT SINGH RANGI)',
+          text: 'Give the word, Sardar Rehman. Anyone who crosses into Chakiwara won\'t leave alive.',
+          duration: 3.3,
+          camStart: { x: GARAGE_DOOR.x + 4, y: 2.9, z: GARAGE_DOOR.z + 11 },
+          camEnd: { x: GARAGE_DOOR.x - 2, y: 1.9, z: GARAGE_DOOR.z + 8 },
+          lookAt: { x: GARAGE_DOOR.x, y: 1.2, z: GARAGE_DOOR.z + 4 }
         }
       ],
-      onStartBonus: () => {
-        playerStats.owned.pistol = true;
-        playerStats.ammo.pistol = Math.max(playerStats.ammo.pistol, 36);
-        playerStats.weapon = 'pistol';
-        updateHeldWeaponMesh();
-        updateStatsHud();
-      },
       stages: [
-        { type: 'goto', x: 3 * BLOCK, z: 3 * BLOCK + 12, radius: 9, label: 'Travel to North Plaza (3, 3) where Major Iqbal\'s arms transfer is underway', timeLimit: 150 },
-        { type: 'kill_all', x: 3 * BLOCK, z: 3 * BLOCK + 12, count: 4, label: 'Eliminate all 4 of Major Iqbal\'s militant operatives (Click to shoot or ram)' },
-        { type: 'goto', x: GUNSHOP_DOOR.x, z: GUNSHOP_DOOR.z + 5, radius: 8, label: 'Transmit the seized terror dossier from the Lyari Underground Armory' }
+        { type: 'goto', x: -2 * BLOCK, z: 2 * BLOCK + 12, radius: 9, label: 'Race to the Chakiwara Jirga court at (-2, 2)', timeLimit: 140 },
+        { type: 'kill_all', x: -2 * BLOCK, z: 2 * BLOCK + 12, count: 3, label: 'Eliminate all 3 rival Arshad gang gunmen' },
+        { type: 'goto', x: SHOP_DOOR.x, z: SHOP_DOOR.z + 5, radius: 8, label: 'Deliver the Baloch Jirga tribute chest to Clifton Safe House' }
       ]
     },
     {
       id: 'story_5',
-      act: 'ACT II · THE ANGEL OF DEATH (MAJOR IQBAL)',
+      act: 'ACT II · THE LYARI TASK FORCE & KEAMARI SYNDICATE',
       title: '5. S.P. Chaudhary Aslam\'s Crossfire',
       contact: 'S.P. Chaudhary Aslam',
       role: 'Lyari Task Force · Sindh Police',
       avatarColor: '#38bdf8',
-      reward: 2200,
-      respect: 15,
+      reward: 1900,
+      respect: 10,
       startPos: { x: RESTAURANT_DOOR.x, z: RESTAURANT_DOOR.z + 5 },
       phoneText: '"Listen up, Hamza! I know you\'re playing Rehman Dakait\'s gang from the inside. Dakait\'s hitmen have surrounded a witness outside Karachi Civil Hospital — get there now!"',
       introShots: [
@@ -5903,13 +6395,131 @@
     },
     {
       id: 'story_6',
-      act: 'ACT II · THE ANGEL OF DEATH (MAJOR IQBAL)',
-      title: '6. Hawala Convoy Takedown',
+      act: 'ACT II · THE LYARI TASK FORCE & KEAMARI SYNDICATE',
+      title: '6. Keamari Port Contraband Burn',
+      contact: 'Ajay Sanyal',
+      role: 'IB Chief · Encrypted Comms',
+      avatarColor: '#ffd54a',
+      reward: 2100,
+      respect: 10,
+      startPos: { x: MARKET_DOOR.x, z: MARKET_DOOR.z + 5 },
+      phoneText: '"Hamza, a sea container packed with RDX and counterfeit currency just docked at Keamari Port (3, -3). Wipe out the dock guards and seize the transport van!"',
+      introShots: [
+        {
+          speaker: 'AJAY SANYAL · HEAD OF INTELLIGENCE BUREAU',
+          text: 'Since the 1999 Kandahar hijacking and the 2001 Parliament attack, this same Keamari Port corridor has funded cross-border strikes.',
+          duration: 3.8,
+          actor: { color: '#334155', x: MARKET_DOOR.x + 1.5, z: MARKET_DOOR.z + 3, heading: -0.2 },
+          camStart: { x: MARKET_DOOR.x - 5, y: 2.3, z: MARKET_DOOR.z + 10 },
+          camEnd: { x: MARKET_DOOR.x + 4, y: 2.0, z: MARKET_DOOR.z + 8 },
+          lookAt: { x: MARKET_DOOR.x, y: 1.2, z: MARKET_DOOR.z + 3 }
+        },
+        {
+          speaker: 'HAMZA ALI MAZARI (JASKIRAT SINGH RANGI)',
+          text: 'Not anymore, Sanyal Sir. Tonight we sever their Arabian Sea supply line at Keamari Docks.',
+          duration: 3.4,
+          camStart: { x: MARKET_DOOR.x + 4, y: 3.0, z: MARKET_DOOR.z + 11 },
+          camEnd: { x: MARKET_DOOR.x - 2, y: 2.0, z: MARKET_DOOR.z + 8 },
+          lookAt: { x: MARKET_DOOR.x, y: 1.2, z: MARKET_DOOR.z + 4 }
+        }
+      ],
+      stages: [
+        { type: 'goto', x: 3 * BLOCK, z: -3 * BLOCK + 12, radius: 9, label: 'Drive to Keamari Port Container Yard at (3, -3)', timeLimit: 140 },
+        { type: 'kill_all', x: 3 * BLOCK, z: -3 * BLOCK + 12, count: 3, label: 'Eliminate the 3 Keamari Port syndicate guards' },
+        { type: 'steal_car', x: 3 * BLOCK, z: -3 * BLOCK + 16, carId: 'van', label: 'Seize the RDX & Counterfeit Currency Cargo Van' },
+        { type: 'goto', x: GARAGE_DOOR.x, z: GARAGE_DOOR.z + 5, radius: 8, clearWanted: true, label: 'Deliver the seized Cargo Van to the Lyari IB Safehouse Garage' }
+      ]
+    },
+    {
+      id: 'story_7',
+      act: 'ACT II · THE LYARI TASK FORCE & KEAMARI SYNDICATE',
+      title: '7. Shadows Over Saddar Bazaar',
+      contact: 'S.P. Chaudhary Aslam',
+      role: 'Lyari Task Force · Sindh Police',
+      avatarColor: '#38bdf8',
+      reward: 2300,
+      respect: 10,
+      startPos: { x: RESTAURANT_DOOR.x, z: RESTAURANT_DOOR.z + 5 },
+      phoneText: '"Hamza! An ISI courier carrying sleeper-cell codes is tearing through Saddar and Clifton. Tail his route through 4 checkpoints and neutralize his escort at (1, -3)!"',
+      introShots: [
+        {
+          speaker: 'S.P. CHAUDHARY ASLAM · LYARI TASK FORCE',
+          text: 'My Task Force tapped a rogue phone call in Saddar Bazaar. Major Iqbal\'s courier is moving the Mumbai & Delhi target files right now.',
+          duration: 3.6,
+          actor: { color: '#1e3a8a', x: RESTAURANT_DOOR.x + 1.5, z: RESTAURANT_DOOR.z + 3, heading: -0.2 },
+          camStart: { x: RESTAURANT_DOOR.x - 5, y: 2.4, z: RESTAURANT_DOOR.z + 9 },
+          camEnd: { x: RESTAURANT_DOOR.x + 4, y: 2.0, z: RESTAURANT_DOOR.z + 8 },
+          lookAt: { x: RESTAURANT_DOOR.x, y: 1.2, z: RESTAURANT_DOOR.z + 3 }
+        }
+      ],
+      stages: [
+        {
+          type: 'checkpoints',
+          timeLimit: 105,
+          spawnRival: true,
+          label: 'Pursue the ISI courier across 4 Saddar & Clifton checkpoints',
+          points: [
+            { x: 1 * BLOCK, z: 0 * BLOCK },
+            { x: 2 * BLOCK, z: -1 * BLOCK },
+            { x: 2 * BLOCK, z: -3 * BLOCK },
+            { x: 1 * BLOCK, z: -3 * BLOCK + 12 }
+          ]
+        },
+        { type: 'kill_all', x: 1 * BLOCK, z: -3 * BLOCK + 12, count: 3, label: 'Eliminate the courier\'s 3 armed ISI escorts at (1, -3)' }
+      ]
+    },
+    {
+      id: 'story_8',
+      act: 'ACT II · THE LYARI TASK FORCE & KEAMARI SYNDICATE',
+      title: '8. Major Iqbal\'s Arms Deal',
+      contact: 'Ajay Sanyal',
+      role: 'IB Chief · Encrypted Comms',
+      avatarColor: '#ffd54a',
+      reward: 2500,
+      respect: 12,
+      startPos: { x: GUNSHOP_DOOR.x, z: GUNSHOP_DOOR.z + 5 },
+      phoneText: '"Hamza! Satellite intel confirms ISI handler Major Iqbal is supplying military rifles to terror cells at North Plaza (3, 3). Grab a 9mm at the Armory and crash that deal!"',
+      introShots: [
+        {
+          speaker: 'AJAY SANYAL · HEAD OF INTELLIGENCE BUREAU',
+          text: 'Your infiltration worked, Hamza. Rehman Dakait just connected his smuggling routes with ISI handler Major Iqbal — the man they call the Angel of Death.',
+          duration: 3.7,
+          actor: { color: '#334155', x: GUNSHOP_DOOR.x + 1.5, z: GUNSHOP_DOOR.z + 3, heading: -0.2 },
+          camStart: { x: GUNSHOP_DOOR.x - 5, y: 2.2, z: GUNSHOP_DOOR.z + 10 },
+          camEnd: { x: GUNSHOP_DOOR.x + 5, y: 2.2, z: GUNSHOP_DOOR.z + 8 },
+          lookAt: { x: GUNSHOP_DOOR.x + 1, y: 1.3, z: GUNSHOP_DOOR.z + 3 }
+        },
+        {
+          speaker: 'AJAY SANYAL · HEAD OF INTELLIGENCE BUREAU',
+          text: 'Major Iqbal\'s cell is transferring RDX and rifles at North Plaza (3, 3) right now. Eliminate all 4 operatives and seize their target dossier!',
+          duration: 3.7,
+          camStart: { x: GUNSHOP_DOOR.x + 3, y: 3.5, z: GUNSHOP_DOOR.z + 11 },
+          camEnd: { x: GUNSHOP_DOOR.x - 3, y: 2.0, z: GUNSHOP_DOOR.z + 9 },
+          lookAt: { x: GUNSHOP_DOOR.x, y: 1.2, z: GUNSHOP_DOOR.z + 4 }
+        }
+      ],
+      onStartBonus: () => {
+        playerStats.owned.pistol = true;
+        playerStats.ammo.pistol = Math.max(playerStats.ammo.pistol, 36);
+        playerStats.weapon = 'pistol';
+        updateHeldWeaponMesh();
+        updateStatsHud();
+      },
+      stages: [
+        { type: 'goto', x: 3 * BLOCK, z: 3 * BLOCK + 12, radius: 9, label: 'Travel to North Plaza (3, 3) where Major Iqbal\'s arms transfer is underway', timeLimit: 150 },
+        { type: 'kill_all', x: 3 * BLOCK, z: 3 * BLOCK + 12, count: 4, label: 'Eliminate all 4 of Major Iqbal\'s militant operatives (Click to shoot or ram)' },
+        { type: 'goto', x: GUNSHOP_DOOR.x, z: GUNSHOP_DOOR.z + 5, radius: 8, label: 'Transmit the seized terror dossier from the Lyari Underground Armory' }
+      ]
+    },
+    {
+      id: 'story_9',
+      act: 'ACT III · THE ANGEL OF DEATH (MAJOR IQBAL)',
+      title: '9. Hawala Convoy Takedown',
       contact: 'Ajay Sanyal',
       role: 'IB Chief · Encrypted Comms',
       avatarColor: '#ffd54a',
       reward: 3000,
-      respect: 15,
+      respect: 12,
       startPos: { x: GUNSHOP_DOOR.x, z: GUNSHOP_DOOR.z + 5 },
       phoneText: '"Hamza! Major Iqbal and Rehman Dakait are moving ₹200 Crore in terror hawala cash inside an Armored Van on West Avenue. Smash or blast that van!"',
       introShots: [
@@ -5944,20 +6554,85 @@
       ]
     },
     {
-      id: 'story_7',
-      act: 'ACT III · DHURANDHAR: THE REVENGE',
-      title: '7. Lyari Task Force Siege',
+      id: 'story_10',
+      act: 'ACT III · THE ANGEL OF DEATH (MAJOR IQBAL)',
+      title: '10. The Clifton bunker Wiretap',
+      contact: 'Ajay Sanyal',
+      role: 'IB Chief · Encrypted Comms',
+      avatarColor: '#ffd54a',
+      reward: 3300,
+      respect: 12,
+      startPos: { x: SHOP_DOOR.x, z: SHOP_DOOR.z + 5 },
+      phoneText: '"Hamza, Major Iqbal is holding a secret war-room meeting with handlers at the Clifton Enclave (-3, 2). Eliminate his perimeter guard and plant our satellite tap!"',
+      introShots: [
+        {
+          speaker: 'AJAY SANYAL · HEAD OF INTELLIGENCE BUREAU',
+          text: 'Major Iqbal operates from an unlisted safe house in Clifton (-3, 2). If we tap his satellite uplink, New Delhi gets every sleeper cell\'s coordinates.',
+          duration: 3.7,
+          actor: { color: '#334155', x: SHOP_DOOR.x + 1.5, z: SHOP_DOOR.z + 3, heading: -0.2 },
+          camStart: { x: SHOP_DOOR.x - 5, y: 2.3, z: SHOP_DOOR.z + 10 },
+          camEnd: { x: SHOP_DOOR.x + 4, y: 2.0, z: SHOP_DOOR.z + 8 },
+          lookAt: { x: SHOP_DOOR.x, y: 1.2, z: SHOP_DOOR.z + 3 }
+        }
+      ],
+      stages: [
+        { type: 'goto', x: -3 * BLOCK, z: 2 * BLOCK + 12, radius: 9, label: 'Infiltrate Major Iqbal\'s Clifton Enclave bunker at (-3, 2)', timeLimit: 150 },
+        { type: 'kill_all', x: -3 * BLOCK, z: 2 * BLOCK + 12, count: 4, label: 'Neutralize the 4 ISI counter-intelligence guards outside the bunker' },
+        { type: 'goto', x: RESTAURANT_DOOR.x, z: RESTAURANT_DOOR.z + 5, radius: 8, clearWanted: true, label: 'Exfiltrate to Cafe Clifton Informant House to sync the wiretap' }
+      ]
+    },
+    {
+      id: 'story_11',
+      act: 'ACT III · THE ANGEL OF DEATH (MAJOR IQBAL)',
+      title: '11. Blood Feud in Chakiwara',
+      contact: 'Rehman Dakait',
+      role: 'Baloch Gang Kingpin · Lyari',
+      avatarColor: '#ef4444',
+      reward: 3600,
+      respect: 12,
+      startPos: { x: GARAGE_DOOR.x, z: GARAGE_DOOR.z + 5 },
+      phoneText: '"Hamza! Someone burned our Hawala van and raided Keamari! Meet my lieutenants at Saddar Bazaar — wait, it\'s an ambush!"',
+      introShots: [
+        {
+          speaker: 'REHMAN DAKAIT · LYARI KINGPIN',
+          text: 'Major Iqbal told me there is an Indian Intelligence mole inside my Baloch gang... and every trail points straight to you, Hamza!',
+          duration: 3.8,
+          actor: { color: '#7f1d1d', x: GARAGE_DOOR.x + 1.8, z: GARAGE_DOOR.z + 3, heading: -0.2 },
+          camStart: { x: GARAGE_DOOR.x - 5, y: 2.4, z: GARAGE_DOOR.z + 10 },
+          camEnd: { x: GARAGE_DOOR.x + 5, y: 2.0, z: GARAGE_DOOR.z + 8 },
+          lookAt: { x: GARAGE_DOOR.x, y: 1.2, z: GARAGE_DOOR.z + 3 }
+        },
+        {
+          speaker: 'HAMZA ALI MAZARI (JASKIRAT SINGH RANGI)',
+          text: 'Then you shouldn\'t have sent only four men, Rehman. Tell Major Iqbal I\'m coming for both of you!',
+          duration: 3.6,
+          camStart: { x: GARAGE_DOOR.x + 4, y: 3.1, z: GARAGE_DOOR.z + 11 },
+          camEnd: { x: GARAGE_DOOR.x - 2, y: 2.0, z: GARAGE_DOOR.z + 8 },
+          lookAt: { x: GARAGE_DOOR.x, y: 1.2, z: GARAGE_DOOR.z + 4 }
+        }
+      ],
+      stages: [
+        { type: 'goto', x: MARKET_DOOR.x, z: MARKET_DOOR.z + 6, radius: 9, label: 'Drive to Saddar Bazaar where Rehman Dakait\'s death squad awaits', timeLimit: 140 },
+        { type: 'kill_all', x: MARKET_DOOR.x, z: MARKET_DOOR.z + 6, count: 4, label: 'Survive the betrayal & eliminate Rehman Dakait\'s 4 Baloch enforcers' },
+        { type: 'steal_car', x: MARKET_DOOR.x + 6, z: MARKET_DOOR.z + 8, carId: 'muscle', label: 'Commandeer the Baloch Lieutenant\'s Muscle GT' },
+        { type: 'goto', x: GARAGE_DOOR.x, z: GARAGE_DOOR.z + 5, radius: 8, clearWanted: true, label: 'Return to the Lyari IB Safehouse Garage' }
+      ]
+    },
+    {
+      id: 'story_12',
+      act: 'ACT III · THE ANGEL OF DEATH (MAJOR IQBAL)',
+      title: '12. Lyari Task Force Siege',
       contact: 'Ajay Sanyal',
       role: 'IB Chief · Emergency Alert',
       avatarColor: '#ef4444',
-      reward: 3800,
-      respect: 15,
+      reward: 4000,
+      respect: 12,
       startPos: { x: GARAGE_DOOR.x, z: GARAGE_DOOR.z + 5 },
       phoneText: '"RED ALERT, HAMZA! Major Iqbal discovered your Indian Intelligence identity and tipped off the entire Karachi Police & Lyari Task Force! Survive the ambush!"',
       introShots: [
         {
           speaker: 'AJAY SANYAL · HEAD OF INTELLIGENCE BUREAU',
-          text: 'Hamza, your cover is blown! Major Iqbal found the encrypted transmitter and alerted Rehman Dakait and the Sindh Police!',
+          text: 'Hamza, your cover is blown! Major Iqbal found the encrypted transmitter and put a citywide shoot-on-sight order across Karachi!',
           duration: 3.6,
           actor: { color: '#334155', x: GARAGE_DOOR.x + 2, z: GARAGE_DOOR.z + 2, heading: -0.3 },
           camStart: { x: GARAGE_DOOR.x - 5, y: 2.5, z: GARAGE_DOOR.z + 11 },
@@ -5966,7 +6641,7 @@
         },
         {
           speaker: 'HAMZA ALI MAZARI (JASKIRAT SINGH RANGI)',
-          text: 'Let them know an Indian Dhurandhar stands in Karachi! I\'ll draw their forces across the city and strike Major Iqbal\'s stronghold when the dust clears!',
+          text: 'Let them know an Indian Dhurandhar stands in Karachi! I\'ll draw their forces across the city and strike back when the dust clears!',
           duration: 3.8,
           camStart: { x: GARAGE_DOOR.x + 4, y: 3.2, z: GARAGE_DOOR.z + 12 },
           camEnd: { x: GARAGE_DOOR.x - 3, y: 2.0, z: GARAGE_DOOR.z + 8 },
@@ -5987,20 +6662,93 @@
       ]
     },
     {
-      id: 'story_8',
-      act: 'ACT III · DHURANDHAR: THE REVENGE',
-      title: '8. Dhurandhar: The Revenge',
+      id: 'story_13',
+      act: 'ACT IV · DHURANDHAR: THE REVENGE',
+      title: '13. Fall of the Kingpin: Rehman Dakait',
+      contact: 'S.P. Chaudhary Aslam',
+      role: 'Lyari Task Force · Sindh Police',
+      avatarColor: '#38bdf8',
+      reward: 5000,
+      respect: 15,
+      startPos: { x: GUNSHOP_DOOR.x, z: GUNSHOP_DOOR.z + 5 },
+      phoneText: '"Jaskirat! Rehman Dakait sold out Karachi to Major Iqbal\'s terror cells. My Task Force has him cornered at South Lyari (-1, -3) — let\'s finish the Kingpin of Lyari!"',
+      introShots: [
+        {
+          speaker: 'S.P. CHAUDHARY ASLAM · LYARI TASK FORCE',
+          text: 'Hamza — or should I call you Jaskirat Singh Rangi? I don\'t care which flag you serve as long as Rehman Dakait goes down tonight!',
+          duration: 3.8,
+          actor: { color: '#1e3a8a', x: GUNSHOP_DOOR.x + 1.5, z: GUNSHOP_DOOR.z + 3, heading: -0.2 },
+          camStart: { x: GUNSHOP_DOOR.x - 5, y: 2.4, z: GUNSHOP_DOOR.z + 10 },
+          camEnd: { x: GUNSHOP_DOOR.x + 5, y: 2.0, z: GUNSHOP_DOOR.z + 8 },
+          lookAt: { x: GUNSHOP_DOOR.x, y: 1.2, z: GUNSHOP_DOOR.z + 3 }
+        },
+        {
+          speaker: 'REHMAN DAKAIT · KINGPIN OF LYARI',
+          text: 'Lyari belongs to Rehman Dakait! Come take my crown in blood, Hamza!',
+          duration: 3.5,
+          camStart: { x: GUNSHOP_DOOR.x + 4, y: 3.1, z: GUNSHOP_DOOR.z + 11 },
+          camEnd: { x: GUNSHOP_DOOR.x - 2, y: 2.0, z: GUNSHOP_DOOR.z + 8 },
+          lookAt: { x: GUNSHOP_DOOR.x, y: 1.2, z: GUNSHOP_DOOR.z + 4 }
+        }
+      ],
+      stages: [
+        { type: 'goto', x: -1 * BLOCK, z: -3 * BLOCK + 12, radius: 9, label: 'Storm Rehman Dakait\'s fortress at South Lyari (-1, -3)', timeLimit: 160 },
+        { type: 'kill_all', x: -1 * BLOCK, z: -3 * BLOCK + 12, count: 4, label: 'Eliminate Rehman Dakait\'s 4 personal Baloch bodyguards' },
+        { type: 'destroy_vehicle', x: -1 * BLOCK, z: -3 * BLOCK + 16, carId: 'suv', color: '#7f1d1d', hp: 230, label: 'Rehman Dakait is escaping in his Crimson Armored SUV! Destroy it!' }
+      ]
+    },
+    {
+      id: 'story_14',
+      act: 'ACT IV · DHURANDHAR: THE REVENGE',
+      title: '14. Burning the Sleeper Cells',
+      contact: 'Ajay Sanyal',
+      role: 'IB Chief · Encrypted Comms',
+      avatarColor: '#ffd54a',
+      reward: 6500,
+      respect: 15,
+      startPos: { x: HOSPITAL_DOOR.x, z: HOSPITAL_DOOR.z + 5 },
+      phoneText: '"Jaskirat! With Rehman Dakait dead, Major Iqbal activated 4 RDX relay transmitters across Karachi. Jam all 4 relays before the countdown expires and wipe out his demolition cell!"',
+      introShots: [
+        {
+          speaker: 'AJAY SANYAL · HEAD OF INTELLIGENCE BUREAU',
+          text: 'Major Iqbal is desperate. He just armed four remote detonator relays across Karachi to destroy the evidence and trigger coastal strikes.',
+          duration: 3.7,
+          actor: { color: '#334155', x: HOSPITAL_DOOR.x + 1.5, z: HOSPITAL_DOOR.z + 3, heading: -0.2 },
+          camStart: { x: HOSPITAL_DOOR.x - 5, y: 2.3, z: HOSPITAL_DOOR.z + 10 },
+          camEnd: { x: HOSPITAL_DOOR.x + 4, y: 2.0, z: HOSPITAL_DOOR.z + 8 },
+          lookAt: { x: HOSPITAL_DOOR.x, y: 1.2, z: HOSPITAL_DOOR.z + 3 }
+        }
+      ],
+      stages: [
+        {
+          type: 'checkpoints',
+          timeLimit: 115,
+          label: 'Race through all 4 RDX Relay Jamming Zones across Karachi!',
+          points: [
+            { x: -1 * BLOCK, z: 1 * BLOCK },
+            { x: 1 * BLOCK, z: 2 * BLOCK },
+            { x: 2 * BLOCK, z: 0 * BLOCK },
+            { x: 2 * BLOCK, z: 2 * BLOCK + 12 }
+          ]
+        },
+        { type: 'kill_all', x: 2 * BLOCK, z: 2 * BLOCK + 12, count: 4, label: 'Eliminate Major Iqbal\'s 4-man RDX Demolition Cell at (2, 2)' }
+      ]
+    },
+    {
+      id: 'story_15',
+      act: 'ACT IV · DHURANDHAR: THE REVENGE',
+      title: '15. The Angel of Death: Major Iqbal',
       contact: 'Ajay Sanyal & SP Aslam',
-      role: 'Final Showdown · Karachi Port',
+      role: 'Showdown · South Harbor Tower',
       avatarColor: '#eab308',
-      reward: 12000,
-      respect: 30,
+      reward: 10000,
+      respect: 20,
       startPos: { x: GARAGE_DOOR.x, z: GARAGE_DOOR.z + 5 },
-      phoneText: '"This is the endgame, Jaskirat! Major Iqbal and Rehman Dakait are fortified at South Harbor Tower (0, -4) preparing to flee. Finish Operation Dhurandhar!"',
+      phoneText: '"This is the reckoning, Jaskirat! Major Iqbal ("The Angel of Death") is fortified at South Harbor Tower (0, -4). Hunt him down and avenge every fallen soul!"',
       introShots: [
         {
           speaker: 'MAJOR IQBAL · ISI ("THE ANGEL OF DEATH")',
-          text: 'Jaskirat Singh Rangi! You walked into Karachi alone thinking you could dismantle my network? Rehman — finish this Indian spy!',
+          text: 'Jaskirat Singh Rangi! You walked into Karachi alone thinking you could dismantle my network? Guards — bury this Indian spy!',
           duration: 3.8,
           actor: { color: '#eab308', x: 0, z: -4 * BLOCK + 10, heading: 0 },
           camStart: { x: -6, y: 2.8, z: -4 * BLOCK + 18 },
@@ -6009,7 +6757,7 @@
         },
         {
           speaker: 'HAMZA ALI MAZARI / JASKIRAT SINGH RANGI',
-          text: 'For every innocent life your terror network took — today Karachi remembers the name DHURANDHAR!',
+          text: 'For Kandahar, for Parliament, for Mumbai — today the Angel of Death meets the DHURANDHAR of India!',
           duration: 3.7,
           camStart: { x: 5, y: 3.6, z: -4 * BLOCK + 20 },
           camEnd: { x: -4, y: 2.0, z: -4 * BLOCK + 14 },
@@ -6017,8 +6765,8 @@
         }
       ],
       stages: [
-        { type: 'goto', x: 0, z: -4 * BLOCK + 14, radius: 10, label: 'Storm Major Iqbal & Rehman Dakait\'s South Harbor Tower stronghold (0, -4)', timeLimit: 180 },
-        { type: 'kill_all', x: 0, z: -4 * BLOCK + 14, count: 4, label: 'Eliminate Rehman Dakait & Major Iqbal\'s 4 Elite Guard Commandos' },
+        { type: 'goto', x: 0, z: -4 * BLOCK + 14, radius: 10, label: 'Storm Major Iqbal\'s South Harbor Tower stronghold (0, -4)', timeLimit: 180 },
+        { type: 'kill_all', x: 0, z: -4 * BLOCK + 14, count: 4, label: 'Eliminate Major Iqbal\'s 4 Elite ISI Commandos' },
         { type: 'destroy_vehicle', x: 0, z: -4 * BLOCK + 18, carId: 'mantis', color: '#eab308', hp: 260, label: 'Major Iqbal is fleeing in his Gold Armored Mantis! Chase & destroy his car!' }
       ],
       onCompleteBonus: () => {
@@ -6028,19 +6776,70 @@
         c.underglow = true;
         c.underglowColor = '#ffd54a';
         rebuildActiveCar();
+      }
+    },
+    {
+      id: 'story_16',
+      act: 'ACT IV · DHURANDHAR: THE REVENGE',
+      title: '16. Epilogue: Arabian Sea Extraction',
+      contact: 'Ajay Sanyal',
+      role: 'IB Director · Final Extraction',
+      avatarColor: '#10b981',
+      reward: 15000,
+      respect: 30,
+      startPos: { x: GARAGE_DOOR.x, z: GARAGE_DOOR.z + 5 },
+      phoneText: '"Major Iqbal is dead and his entire syndicate is ashes! An Indian Navy stealth extraction boat is waiting past the 5 coastal beacons. Bring Jaskirat Singh Rangi home!"',
+      introShots: [
+        {
+          speaker: 'AJAY SANYAL · HEAD OF INTELLIGENCE BUREAU',
+          text: 'Rehman Dakait\'s empire is gone. Major Iqbal is eliminated. Every terror ledger is in New Delhi\'s hands. Now get to the extraction point, Jaskirat!',
+          duration: 4.0,
+          actor: { color: '#334155', x: GARAGE_DOOR.x + 1.6, z: GARAGE_DOOR.z + 3, heading: -0.2 },
+          camStart: { x: GARAGE_DOOR.x - 5, y: 2.5, z: GARAGE_DOOR.z + 10 },
+          camEnd: { x: GARAGE_DOOR.x + 5, y: 2.0, z: GARAGE_DOOR.z + 8 },
+          lookAt: { x: GARAGE_DOOR.x, y: 1.2, z: GARAGE_DOOR.z + 3 }
+        },
+        {
+          speaker: 'JASKIRAT SINGH RANGI ("HAMZA ALI MAZARI")',
+          text: 'Hamza Ali Mazari stays in the shadows of Karachi... and Jaskirat Singh Rangi is ready for the next mission, Sir!',
+          duration: 3.8,
+          camStart: { x: GARAGE_DOOR.x + 4, y: 3.2, z: GARAGE_DOOR.z + 11 },
+          camEnd: { x: GARAGE_DOOR.x - 2, y: 2.0, z: GARAGE_DOOR.z + 8 },
+          lookAt: { x: GARAGE_DOOR.x, y: 1.2, z: GARAGE_DOOR.z + 4 }
+        }
+      ],
+      stages: [
+        {
+          type: 'checkpoints',
+          timeLimit: 115,
+          label: 'Blaze through the 5 Karachi extraction corridor beacons in your Gold Mantis!',
+          points: [
+            { x: 1 * BLOCK, z: -1 * BLOCK },
+            { x: 2 * BLOCK, z: -2 * BLOCK },
+            { x: 3 * BLOCK, z: -3 * BLOCK },
+            { x: 0 * BLOCK, z: -3 * BLOCK },
+            { x: GARAGE_DOOR.x, z: GARAGE_DOOR.z + 5 }
+          ]
+        }
+      ],
+      onCompleteBonus: () => {
+        playerStats.health = 100;
+        playerStats.armor = 100;
+        playerStats.respect = 100;
+        updateStatsHud();
         playCutscene([
           {
             speaker: 'AJAY SANYAL · HEAD OF INTELLIGENCE BUREAU',
-            text: 'Target neutralized! Rehman Dakait\'s syndicate is shattered and Major Iqbal\'s terror network is finished. Incredible work, Jaskirat!',
+            text: 'Welcome back, Dhurandhar. Because of what you did in the alleys of Lyari, millions of innocent lives across India will sleep in peace.',
             duration: 4.2,
             camStart: { x: state.x - 7, y: 3.0, z: state.z + 8 },
             camEnd: { x: state.x + 7, y: 2.4, z: state.z + 7 },
             lookAt: { x: state.x, y: 1.2, z: state.z }
           },
           {
-            speaker: 'DHURANDHAR · MISSION ACCOMPLISHED',
-            text: 'OPERATION DHURANDHAR COMPLETE! Unlocked Major Iqbal\'s Gold Mantis Supercar, +$12,000, and 100% Legend Status!',
-            duration: 4.4,
+            speaker: 'DHURANDHAR & DHURANDHAR: THE REVENGE — COMPLETE',
+            text: 'ALL 16 OPERATIONS ACCOMPLISHED! +$15,000 Bonus, 100% Armor, Gold Mantis Supercar, and Master of Karachi Status!',
+            duration: 4.5,
             camStart: { x: state.x, y: 6.0, z: state.z + 12 },
             camEnd: { x: state.x, y: 2.5, z: state.z + 6 },
             lookAt: { x: state.x, y: 1.0, z: state.z }
@@ -6143,6 +6942,264 @@
       stages: [
         { type: 'destroy_vehicle', x: 2 * BLOCK, z: -1 * BLOCK, carId: 'van', color: '#334155', hp: 180, label: 'Ram or shoot Rehman Dakait\'s Armored Munitions Van until it explodes!', timeLimit: 160 },
         { type: 'goto', x: SHOP_DOOR.x, z: SHOP_DOOR.z + 5, radius: 9, clearWanted: true, label: 'Exfiltrate to the Clifton Safe House' }
+      ]
+    },
+    {
+      id: 'job_wiretap',
+      title: '🕵️ ISI Safe House Bugging',
+      desc: 'Plant a covert IB listening bug outside the North Clifton Enclave (2, 3) and eliminate 2 ISI sentries.',
+      reward: 950,
+      respect: 9,
+      iconKind: 'job_courier',
+      color: '#14b8a6',
+      startPos: { x: 0 * BLOCK, z: 2 * BLOCK + 12 },
+      stages: [
+        { type: 'goto', x: 2 * BLOCK, z: 3 * BLOCK + 12, radius: 9, label: 'Reach the North Clifton Enclave at (2, 3)', timeLimit: 130 },
+        { type: 'kill_all', x: 2 * BLOCK, z: 3 * BLOCK + 12, count: 2, label: 'Eliminate the 2 ISI sentries guarding the transmitter' },
+        { type: 'goto', x: RESTAURANT_DOOR.x, z: RESTAURANT_DOOR.z + 5, radius: 9, label: 'Return to Cafe Clifton Informant House' }
+      ]
+    },
+    {
+      id: 'job_taskforce',
+      title: '🚓 S.P. Aslam\'s Most Wanted Sweep',
+      desc: 'Assist S.P. Chaudhary Aslam\'s Lyari Task Force by neutralizing 4 fugitive extortionists at (-3, 1).',
+      reward: 1100,
+      respect: 10,
+      iconKind: 'job_bounty',
+      color: '#60a5fa',
+      startPos: { x: -2 * BLOCK, z: 0 * BLOCK + 12 },
+      stages: [
+        { type: 'goto', x: -3 * BLOCK, z: 1 * BLOCK + 12, radius: 10, label: 'Locate the Most Wanted gang hideout at (-3, 1)', timeLimit: 140 },
+        { type: 'kill_all', x: -3 * BLOCK, z: 1 * BLOCK + 12, count: 4, label: 'Eliminate all 4 fugitive syndicate gunmen' }
+      ]
+    },
+    {
+      id: 'job_bullion',
+      title: '💎 Clifton Gold Smuggler Seizure',
+      desc: 'Intercept a smuggler\'s high-speed Police Interceptor at (2, -2) and deliver it to the Lyari Garage.',
+      reward: 1200,
+      respect: 11,
+      iconKind: 'job_boost',
+      color: '#eab308',
+      startPos: { x: 2 * BLOCK, z: 0 * BLOCK + 12 },
+      stages: [
+        { type: 'steal_car', x: 2 * BLOCK, z: -2 * BLOCK + 12, carId: 'interceptor', label: 'Head to (2, -2) and seize the Smuggler Interceptor', timeLimit: 140 },
+        { type: 'goto', x: GARAGE_DOOR.x, z: GARAGE_DOOR.z + 5, radius: 9, clearWanted: true, wantedOnStart: 2, label: 'Deliver the Interceptor to the Lyari Safehouse Garage' }
+      ]
+    },
+    {
+      id: 'job_turfwar',
+      title: '🔥 Chakiwara vs. Kharadar Turf War',
+      desc: 'Break up a 4-man arms syndicate ambush at East Harbor (3, 1) and secure their weapons cache.',
+      reward: 1250,
+      respect: 11,
+      iconKind: 'job_bounty',
+      color: '#ef4444',
+      startPos: { x: 2 * BLOCK, z: 2 * BLOCK + 12 },
+      stages: [
+        { type: 'goto', x: 3 * BLOCK, z: 1 * BLOCK + 12, radius: 10, label: 'Race to the East Harbor ambush zone at (3, 1)', timeLimit: 140 },
+        { type: 'kill_all', x: 3 * BLOCK, z: 1 * BLOCK + 12, count: 4, label: 'Eliminate all 4 rival syndicate fighters' },
+        { type: 'goto', x: GUNSHOP_DOOR.x, z: GUNSHOP_DOOR.z + 5, radius: 9, label: 'Deliver the captured weapons crate to the Underground Armory' }
+      ]
+    },
+    {
+      id: 'job_marinerace',
+      title: '🏎️ Clifton Marine Drive Sprint',
+      desc: 'Blaze through 5 high-speed coastal checkpoints across Karachi before the timer expires.',
+      reward: 900,
+      respect: 9,
+      iconKind: 'job_circuit',
+      color: '#ec4899',
+      startPos: { x: -1 * BLOCK, z: 2 * BLOCK + 12 },
+      stages: [
+        {
+          type: 'checkpoints',
+          timeLimit: 105,
+          spawnRival: true,
+          label: 'Hit all 5 Clifton Marine Drive sprint gates (Shift for Nitro!)',
+          points: [
+            { x: -2 * BLOCK, z: 2 * BLOCK },
+            { x: -3 * BLOCK, z: 0 * BLOCK },
+            { x: -2 * BLOCK, z: -2 * BLOCK },
+            { x: 1 * BLOCK, z: -2 * BLOCK },
+            { x: 0 * BLOCK, z: 0 * BLOCK + 12 }
+          ]
+        }
+      ]
+    },
+    {
+      id: 'job_rdxtruck',
+      title: '💥 RDX Munitions Truck Intercept',
+      desc: 'Track down and destroy an armored RDX transport van patrolling North-West Karachi (-2, 3).',
+      reward: 1400,
+      respect: 13,
+      iconKind: 'job_convoy',
+      color: '#fb923c',
+      startPos: { x: -2 * BLOCK, z: 1 * BLOCK + 12 },
+      stages: [
+        { type: 'destroy_vehicle', x: -2 * BLOCK, z: 3 * BLOCK, carId: 'van', color: '#475569', hp: 200, label: 'Ram or shoot the RDX Munitions Van until it detonates!', timeLimit: 160 },
+        { type: 'goto', x: GARAGE_DOOR.x, z: GARAGE_DOOR.z + 5, radius: 9, clearWanted: true, label: 'Return to the Lyari IB Safehouse Garage' }
+      ]
+    }
+  ];
+
+  // ===================================================================
+  // DHURANDHAR — Classified Intelligence Bureau Lore & Character Files
+  // ===================================================================
+  const DHURANDHAR_LORE = [
+    {
+      id: 'lore_hamza',
+      code: 'IB-FILE // 01-DHURANDHAR',
+      title: 'Jaskirat Singh Rangi / "Hamza Ali Mazari" (Ranveer Singh)',
+      category: 'PROTAGONIST · DEEP COVER OPERATIVE',
+      color: '#f59e0b',
+      summary: 'A fearless Indian intelligence operative recruited personally by IB Director Ajay Sanyal. Stripped of his official record in India, Jaskirat crosses into Karachi under the forged Baloch identity "Hamza Ali Mazari" — a lone-wolf street fighter with shoulder-length hair, a rugged beard, and nerves of steel who infiltrates Lyari\'s deadliest gang from the inside.',
+      cutscene: [
+        {
+          speaker: 'IB DOSSIER 01 · JASKIRAT SINGH RANGI ("HAMZA ALI MAZARI")',
+          text: 'Born in Punjab and forged in covert counter-insurgency, Jaskirat Singh Rangi volunteered for India\'s most perilous no-return mission in Karachi.',
+          duration: 4.0
+        },
+        {
+          speaker: 'HAMZA ALI MAZARI · DEEP COVER PROFILE',
+          text: '"When you walk through Lyari, you don\'t flinch. To take down Major Iqbal\'s terror empire, I had to become Karachi\'s most feared outlaw."',
+          duration: 4.0
+        }
+      ]
+    },
+    {
+      id: 'lore_sanyal',
+      code: 'IB-FILE // 02-CHANKYA',
+      title: 'Ajay Sanyal — Head of Intelligence Bureau (R. Madhavan)',
+      category: 'INTELLIGENCE MASTERMIND · NEW DELHI',
+      color: '#38bdf8',
+      summary: 'Inspired by India\'s legendary national security doctrine, Ajay Sanyal is the veteran Director of the Intelligence Bureau. Haunted by the 1999 IC-814 hijacking and 2001 Parliament attack, Sanyal initiates "Operation Dhurandhar" — sending a single deep-cover operative into Karachi to turn Pakistan\'s underworld and state handlers against each other.',
+      cutscene: [
+        {
+          speaker: 'IB DOSSIER 02 · DIRECTOR AJAY SANYAL',
+          text: 'AJAY SANYAL: "Defensive intelligence only counts the dead after an attack. Operation Dhurandhar strikes the syndicate in its own backyard."',
+          duration: 4.2
+        }
+      ]
+    },
+    {
+      id: 'lore_rehman',
+      code: 'IB-FILE // 03-LYARI-DON',
+      title: 'Sardar Abdul Rehman / "Rehman Dakait" (Akshaye Khanna)',
+      category: 'LYARI BALOCH SYNDICATE KINGPIN',
+      color: '#ef4444',
+      summary: 'The ruthless and charismatic ruler of Lyari\'s Chakiwara stronghold in Karachi. Rehman Dakait commands hundreds of armed Baloch loyalists, controls port smuggling, and enjoys political patronage across Sindh — until Hamza Ali Mazari rises through his ranks and exposes his lethal pact with ISI handler Major Iqbal.',
+      cutscene: [
+        {
+          speaker: 'IB DOSSIER 03 · REHMAN DAKAIT (KINGPIN OF LYARI)',
+          text: 'REHMAN DAKAIT: "Politicians beg for my votes in Clifton, and the police don\'t dare cross Chakiwara after dark. Lyari answers only to Rehman!"',
+          duration: 4.2
+        }
+      ]
+    },
+    {
+      id: 'lore_aslam',
+      code: 'IB-FILE // 04-TASK-FORCE',
+      title: 'S.P. Chaudhary Aslam — Lyari Task Force (Sanjay Dutt)',
+      category: 'SINDH POLICE ENCOUNTER SPECIALIST',
+      color: '#60a5fa',
+      summary: 'The larger-than-life Superintendent of Police heading the Sindh Police\'s Lyari Task Force. Famous for his open-collar bravado and relentless raids against Karachi\'s gang lords, Chaudhary Aslam realizes Hamza is no ordinary gangster and forms a deniable, high-stakes alliance to crush Rehman Dakait and Major Iqbal.',
+      cutscene: [
+        {
+          speaker: 'IB DOSSIER 04 · S.P. CHAUDHARY ASLAM (LYARI TASK FORCE)',
+          text: 'S.P. CHAUDHARY ASLAM: "These gangsters and handlers think Karachi is their playground. Tell them Chaudhary Aslam is coming with a full magazine!"',
+          duration: 4.2
+        }
+      ]
+    },
+    {
+      id: 'lore_iqbal',
+      code: 'IB-FILE // 05-ANGEL-OF-DEATH',
+      title: 'Major Iqbal — "The Angel of Death" (Arjun Rampal)',
+      category: 'PRIMARY ANTAGONIST · ISI HANDLER',
+      color: '#eab308',
+      summary: 'Known across intelligence circles as the "Angel of Death" (inspired by militant strategist Ilyas Kashmiri), Major Iqbal is the cold-blooded ISI handler who uses Rehman Dakait\'s Keamari port routes and Clifton hawala towers to finance RDX and arms shipments targeting Indian cities.',
+      cutscene: [
+        {
+          speaker: 'IB DOSSIER 05 · MAJOR IQBAL ("THE ANGEL OF DEATH")',
+          text: 'MAJOR IQBAL: "Empires aren\'t fought on borders anymore — they are fought from the shadows of Karachi\'s ports and hawala vaults."',
+          duration: 4.2
+        }
+      ]
+    },
+    {
+      id: 'lore_origins',
+      code: 'IB-FILE // 06-BLACK-SWAN',
+      title: 'The Geopolitical Spark: 1999 IC-814, 2001 & 2008',
+      category: 'HISTORICAL TIMELINE · OPERATION ORIGINS',
+      color: '#a855f7',
+      summary: 'Operation Dhurandhar traces its origins to three real-world flashpoints: the December 1999 hijacking of Flight IC-814 to Kandahar, the December 2001 Indian Parliament attack, and the 2008 Mumbai terror plot. IB Chief Ajay Sanyal discovered that the weapons, forged passports, and hawala funds all flowed through a single nexus in Lyari, Karachi.',
+      cutscene: [
+        {
+          speaker: 'IB DOSSIER 06 · GEOPOLITICAL ORIGINS (1999–2008)',
+          text: 'Every hijacking, every counterfeit note, every RDX crate led back to the same Karachi syndicate. That was the night Operation Dhurandhar was born.',
+          duration: 4.2
+        }
+      ]
+    },
+    {
+      id: 'lore_lyari',
+      code: 'IB-FILE // 07-CHAKIWARA',
+      title: 'The Lyari Gang Wars: Chakiwara, Kharadar & Napier Road',
+      category: 'KARACHI TERRITORY DOSSIER',
+      color: '#f97316',
+      summary: 'Lyari is Karachi\'s oldest and most densely packed quarter. Divided between warring Baloch syndicates, its narrow alleys hide underground armories, Jirga courts, and chop shops. By winning the Chakiwara street trials, Hamza gains access to the inner sanctum of Karachi\'s underworld.',
+      cutscene: [
+        {
+          speaker: 'IB DOSSIER 07 · THE STREETS OF LYARI',
+          text: 'In Lyari, loyalty is bought in blood and horsepower. Control Chakiwara, and you control the pulse of Karachi.',
+          duration: 4.0
+        }
+      ]
+    },
+    {
+      id: 'lore_keamari',
+      code: 'IB-FILE // 08-HAWALA-GRID',
+      title: 'Keamari Port & The Clifton Hawala Towers',
+      category: 'FINANCIAL & MARITIME NETWORK',
+      color: '#10b981',
+      summary: 'While Lyari provides the muscle, Clifton\'s glass skyscrapers and Keamari Port provide the money. Unmarked cargo vans shuttle billions in hawala currency and military hardware from Arabian Sea freighters directly into Major Iqbal\'s diplomatic safe houses.',
+      cutscene: [
+        {
+          speaker: 'IB DOSSIER 08 · KEAMARI & CLIFTON HAWALA GRID',
+          text: 'Behind Clifton\'s neon towers and Keamari\'s shipping cranes lies the financial bloodstream of Major Iqbal\'s syndicate.',
+          duration: 4.0
+        }
+      ]
+    },
+    {
+      id: 'lore_revenge',
+      code: 'IB-FILE // 09-PART-TWO',
+      title: 'Part II: Dhurandhar — The Revenge',
+      category: 'ACT III & IV · THE COUNTER-STRIKE',
+      color: '#f43f5e',
+      summary: 'When Major Iqbal uncovers Hamza\'s encrypted IB satellite link, he unleashes a citywide manhunt to bury Jaskirat Singh Rangi in Karachi. Instead of fleeing, Jaskirat goes on a relentless offensive — taking down Rehman Dakait, jamming the RDX relays, and storming South Harbor Tower.',
+      cutscene: [
+        {
+          speaker: 'IB DOSSIER 09 · DHURANDHAR: THE REVENGE',
+          text: 'They thought exposing his cover would make him run. They forgot that a true Dhurandhar is deadliest when surrounded.',
+          duration: 4.2
+        }
+      ]
+    },
+    {
+      id: 'lore_arsenal',
+      code: 'IB-FILE // 10-SAFEHOUSES',
+      title: 'Karachi Field Manual: 11 Enterable Safehouses & Covers',
+      category: 'OPERATIVE TACTICAL GUIDE',
+      color: '#14b8a6',
+      summary: 'Every building in Karachi has an active 3D entrance ([E] or ACT). Use the Lyari Safehouse Garage to tune vehicles and clear Wanted heat, Clifton Safe House to change disguises, Saddar Bazaar for hawala cash, and Habib Financial Towers to siphon syndicate funds.',
+      cutscene: [
+        {
+          speaker: 'IB DOSSIER 10 · KARACHI FIELD MANUAL',
+          text: 'Every safehouse, chai house, armory, and financial tower in Karachi is enterable. Use the city itself as your weapon, Hamza.',
+          duration: 4.0
+        }
       ]
     }
   ];
@@ -6719,12 +7776,14 @@
     updateMissionHud();
   }
 
-  // Story & Jobs Modal UI
+  // Story, Field Ops & Classified IB Lore Modal UI
   function refreshMissionsPanel() {
     const listEl = document.getElementById('missionsList');
     listEl.innerHTML = '';
     document.getElementById('tabStoryBtn').classList.toggle('active', activeMissionTab === 'story');
     document.getElementById('tabJobsBtn').classList.toggle('active', activeMissionTab === 'jobs');
+    const loreBtn = document.getElementById('tabLoreBtn');
+    if (loreBtn) loreBtn.classList.toggle('active', activeMissionTab === 'lore');
 
     if (activeMissionTab === 'story') {
       STORY_MISSIONS.forEach((m, idx) => {
@@ -6732,27 +7791,65 @@
         const isCurrent = idx === statsTracking.storyIndex;
         const row = document.createElement('div');
         row.className = 'shopItem';
-        row.style.borderColor = isCurrent ? '#ffd54a' : '#33353a';
-        const statusBadge = isDone ? '✓ Completed' : (isCurrent ? '★ Current Chapter' : 'Available');
-        row.innerHTML = `<div><b>${m.title}</b><div class="itemDesc">${m.act} · Contact: ${m.contact} · Reward: $${m.reward} · ${statusBadge}</div></div>`;
+        row.style.borderColor = isCurrent ? '#ffd54a' : (isDone ? '#10b981' : '#33353a');
+        const statusBadge = isDone ? '✓ Completed' : (isCurrent ? '★ Current Operation' : 'Available');
+        row.innerHTML = `<div><div style="font-size:10px;color:#38bdf8;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:2px;">${m.act} · ${m.stages.length} Stages</div><b>${m.title}</b><div class="itemDesc" style="margin-top:2px;">Handler: <b>${m.contact}</b> (${m.role}) · Reward: <span style="color:#4ade80;font-weight:700;">$${m.reward}</span> · ${statusBadge}</div><div class="itemDesc" style="color:#cbd5e1;margin-top:4px;font-style:italic;">"${m.phoneText}"</div></div>`;
         const btn = document.createElement('button');
         btn.className = 'buyBtn';
-        btn.textContent = isDone ? 'Replay' : '▶ Start';
+        btn.textContent = isDone ? '↺ Replay' : '▶ Launch';
         btn.addEventListener('click', () => startMission(m));
         row.appendChild(btn);
         listEl.appendChild(row);
       });
-    } else {
+    } else if (activeMissionTab === 'jobs') {
       STREET_JOBS.forEach(job => {
         const row = document.createElement('div');
         row.className = 'shopItem';
-        row.innerHTML = `<div><b>${job.title}</b><div class="itemDesc">${job.desc} · Reward: $${job.reward}</div></div>`;
+        row.innerHTML = `<div><div style="font-size:10px;color:#f59e0b;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:2px;">KARACHI FIELD OP · ${job.stages.length} STAGES</div><b>${job.title}</b><div class="itemDesc" style="margin-top:3px;">${job.desc}</div><div class="itemDesc" style="color:#4ade80;font-weight:700;margin-top:3px;">Reward: $${job.reward} + Respect</div></div>`;
         const btn = document.createElement('button');
         btn.className = 'buyBtn';
-        btn.textContent = '▶ Accept Job';
+        btn.textContent = '▶ Deploy';
         btn.addEventListener('click', () => startMission(job));
         row.appendChild(btn);
         listEl.appendChild(row);
+      });
+    } else if (activeMissionTab === 'lore') {
+      DHURANDHAR_LORE.forEach(doc => {
+        const card = document.createElement('div');
+        card.className = 'shopItem';
+        card.style.flexDirection = 'column';
+        card.style.alignItems = 'stretch';
+        card.style.gap = '8px';
+        card.style.borderColor = 'rgba(255, 213, 74, 0.35)';
+        card.style.background = 'rgba(15, 20, 32, 0.92)';
+        card.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span style="font-size:10px;font-weight:800;letter-spacing:1px;color:#ffd54a;background:rgba(255,213,74,0.14);border:1px solid rgba(255,213,74,0.4);padding:2px 8px;border-radius:4px;">${doc.classBadge}</span>
+            <span style="font-size:10px;font-weight:700;letter-spacing:0.8px;color:#38bdf8;text-transform:uppercase;">${doc.category}</span>
+          </div>
+          <div style="font-size:15px;font-weight:800;color:#fff;">${doc.title}</div>
+          <div style="font-size:12px;font-weight:700;color:#fde047;">${doc.summary}</div>
+          <div style="font-size:12px;line-height:1.55;color:#cbd5e1;background:rgba(0,0,0,0.35);padding:9px 11px;border-radius:6px;border-left:3px solid #ffd54a;">${doc.loreText}</div>
+        `;
+        if (doc.shots && doc.shots.length) {
+          const btnRow = document.createElement('div');
+          btnRow.style.display = 'flex';
+          btnRow.style.justifyContent = 'flex-end';
+          const btn = document.createElement('button');
+          btn.className = 'buyBtn';
+          btn.style.background = '#1e293b';
+          btn.style.color = '#38bdf8';
+          btn.style.border = '1px solid rgba(56,189,248,0.5)';
+          btn.textContent = '🎬 Play 3D Intelligence Briefing';
+          btn.addEventListener('click', () => {
+            closeMissions();
+            if (mode === 'interior') exitBuildingInterior();
+            playCutscene(doc.shots);
+          });
+          btnRow.appendChild(btn);
+          card.appendChild(btnRow);
+        }
+        listEl.appendChild(card);
       });
     }
   }
@@ -6763,6 +7860,10 @@
   document.getElementById('closeMissionsBtn').addEventListener('click', closeMissions);
   document.getElementById('tabStoryBtn').addEventListener('click', () => { activeMissionTab = 'story'; refreshMissionsPanel(); });
   document.getElementById('tabJobsBtn').addEventListener('click', () => { activeMissionTab = 'jobs'; refreshMissionsPanel(); });
+  const tabLoreBtnEl = document.getElementById('tabLoreBtn');
+  if (tabLoreBtnEl) {
+    tabLoreBtnEl.addEventListener('click', () => { activeMissionTab = 'lore'; refreshMissionsPanel(); });
+  }
 
   // ===================================================================
   // Day / Night Cycle + Dynamic Clear / Cloudy / Thunderstorm Weather + 3D Lightning & Rain
@@ -7843,11 +8944,118 @@
       return;
     }
 
+    // SPECIALIZED ARENA RADAR WHEN IN F1 CIRCUIT, FIRING RANGE, CONTAINER PVP, OR DERBY BOWL
+    if (currentMpMap !== 'karachi_city') {
+      if (currentMpMap === 'f1_circuit') {
+        mmCtx.strokeStyle = '#334155';
+        mmCtx.lineWidth = 14;
+        mmCtx.beginPath();
+        mmCtx.ellipse(-pos.x * MM_SCALE, -pos.z * MM_SCALE, 145 * MM_SCALE, 92 * MM_SCALE, 0, 0, Math.PI * 2);
+        mmCtx.stroke();
+        mmCtx.strokeStyle = '#ef4444';
+        mmCtx.lineWidth = 1.5;
+        mmCtx.beginPath();
+        mmCtx.ellipse(-pos.x * MM_SCALE, -pos.z * MM_SCALE, 145 * MM_SCALE, 92 * MM_SCALE, 0, 0, Math.PI * 2);
+        mmCtx.stroke();
+      } else if (currentMpMap === 'firing_range') {
+        mmCtx.strokeStyle = '#38bdf8';
+        mmCtx.lineWidth = 2;
+        mmCtx.strokeRect((-45 - pos.x) * MM_SCALE, (-85 - pos.z) * MM_SCALE, 90 * MM_SCALE, 115 * MM_SCALE);
+        firingRangeTargets.forEach(t => {
+          if (!t.active) return;
+          const tx = (t.mesh.position.x - pos.x) * MM_SCALE;
+          const tz = (t.mesh.position.z - pos.z) * MM_SCALE;
+          if (Math.abs(tx) < MM_HALF - 4 && Math.abs(tz) < MM_HALF - 4) {
+            mmCtx.fillStyle = '#ef4444';
+            mmCtx.beginPath();
+            mmCtx.arc(tx, tz, 3.5, 0, Math.PI * 2);
+            mmCtx.fill();
+          }
+        });
+      } else {
+        mmCtx.strokeStyle = '#f59e0b';
+        mmCtx.lineWidth = 2;
+        mmCtx.strokeRect((-90 - pos.x) * MM_SCALE, (-90 - pos.z) * MM_SCALE, 180 * MM_SCALE, 180 * MM_SCALE);
+      }
+
+      remoteOperatives.forEach(op => {
+        if (op.mode === 'interior') return;
+        const opProj = projectToMinimap(op.x, op.z, pos, 8);
+        mmCtx.save();
+        mmCtx.translate(opProj.x, opProj.y);
+        mmCtx.rotate(op.heading || 0);
+        mmCtx.fillStyle = '#10b981';
+        mmCtx.strokeStyle = '#ffffff';
+        mmCtx.lineWidth = 1.4;
+        mmCtx.beginPath();
+        mmCtx.moveTo(0, -6.2); mmCtx.lineTo(4.4, 5.2); mmCtx.lineTo(0, 3.0); mmCtx.lineTo(-4.4, 5.2); mmCtx.closePath();
+        mmCtx.fill(); mmCtx.stroke();
+        mmCtx.restore();
+      });
+
+      mmCtx.fillStyle = mode === 'walk' ? '#38bdf8' : '#ffffff';
+      mmCtx.strokeStyle = '#090d16';
+      mmCtx.lineWidth = 1.8;
+      mmCtx.save();
+      mmCtx.rotate(mode === 'drive' ? state.heading : walkState.heading);
+      mmCtx.beginPath();
+      mmCtx.moveTo(0, -7.2); mmCtx.lineTo(5.0, 5.8); mmCtx.lineTo(0, 3.4); mmCtx.lineTo(-5.0, 5.8); mmCtx.closePath();
+      mmCtx.fill(); mmCtx.stroke();
+      mmCtx.restore();
+      mmCtx.restore();
+      return;
+    }
+
     const pi = pos.x / BLOCK, pj = pos.z / BLOCK;
     const cellPx = BLOCK * MM_SCALE;
     const swPx = CELL_INNER * MM_SCALE;
 
-    // 1. Draw City Blocks, Sidewalks, Roads, Parks, and Realistic Proportional Building Footprints
+    // 1. Draw Custom Arena Map Radar OR City Blocks
+    if (currentMpMap !== 'karachi_city') {
+      mmCtx.fillStyle = '#0f172a';
+      mmCtx.fillRect(-MM_HALF, -MM_HALF, MM_SIZE, MM_SIZE);
+      if (currentMpMap === 'f1_circuit') {
+        const rx = 165 * MM_SCALE, rz = 105 * MM_SCALE;
+        const ox = -pos.x * MM_SCALE, oz = -pos.z * MM_SCALE;
+        mmCtx.strokeStyle = '#334155';
+        mmCtx.lineWidth = 14 * MM_SCALE;
+        mmCtx.beginPath();
+        mmCtx.ellipse(ox, oz, rx, rz, 0, 0, Math.PI * 2);
+        mmCtx.stroke();
+        mmCtx.strokeStyle = '#ef4444';
+        mmCtx.lineWidth = 1.4;
+        mmCtx.beginPath();
+        mmCtx.ellipse(ox, oz, rx, rz, 0, 0, Math.PI * 2);
+        mmCtx.stroke();
+        if (f1Checkpoints.length) {
+          const cp = f1Checkpoints[f1NextGateIdx % f1Checkpoints.length];
+          const cpProj = projectToMinimap(cp.x, cp.z, pos, 8);
+          mmCtx.fillStyle = '#facc15';
+          mmCtx.beginPath();
+          mmCtx.arc(cpProj.x, cpProj.y, 5, 0, Math.PI * 2);
+          mmCtx.fill();
+        }
+      } else if (currentMpMap === 'firing_range') {
+        mmCtx.strokeStyle = '#f59e0b';
+        mmCtx.lineWidth = 1.5;
+        mmCtx.strokeRect((-45 - pos.x) * MM_SCALE, (-65 - pos.z) * MM_SCALE, 90 * MM_SCALE, 110 * MM_SCALE);
+        mpRangeTargets.forEach(t => {
+          if (!t.up) return;
+          const tx = (t.mesh.position.x - pos.x) * MM_SCALE;
+          const tz = (t.mesh.position.z - pos.z) * MM_SCALE;
+          if (Math.abs(tx) < MM_HALF - 4 && Math.abs(tz) < MM_HALF - 4) {
+            mmCtx.fillStyle = '#ef4444';
+            mmCtx.beginPath();
+            mmCtx.arc(tx, tz, 3.2, 0, Math.PI * 2);
+            mmCtx.fill();
+          }
+        });
+      } else {
+        mmCtx.strokeStyle = '#38bdf8';
+        mmCtx.lineWidth = 2;
+        mmCtx.strokeRect((-70 - pos.x) * MM_SCALE, (-70 - pos.z) * MM_SCALE, 140 * MM_SCALE, 140 * MM_SCALE);
+      }
+    } else {
     for (let di = -MM_RADIUS_CELLS; di <= MM_RADIUS_CELLS; di++) {
       for (let dj = -MM_RADIUS_CELLS; dj <= MM_RADIUS_CELLS; dj++) {
         const i = Math.round(pi) + di, j = Math.round(pj) + dj;
@@ -7974,6 +9182,41 @@
         mmCtx.strokeStyle = '#ffffff';
         mmCtx.lineWidth = 1;
         mmCtx.beginPath(); mmCtx.arc(wx, wz, 3.8, 0, Math.PI * 2); mmCtx.fill(); mmCtx.stroke();
+      }
+    });
+    }
+
+    // 6b. Draw Multiplayer Supply Drop & Remote Operatives on Radar
+    if (mpSupplyDrop) {
+      const sProj = projectToMinimap(mpSupplyDrop.x, mpSupplyDrop.z, pos, 10);
+      mmCtx.save();
+      mmCtx.translate(sProj.x, sProj.y);
+      mmCtx.fillStyle = '#10b981';
+      mmCtx.strokeStyle = '#fde047';
+      mmCtx.lineWidth = 1.6;
+      mmCtx.beginPath();
+      mmCtx.moveTo(0, -6); mmCtx.lineTo(6, 0); mmCtx.lineTo(0, 6); mmCtx.lineTo(-6, 0); mmCtx.closePath();
+      mmCtx.fill(); mmCtx.stroke();
+      mmCtx.restore();
+    }
+    remoteOperatives.forEach(op => {
+      if (op.mode === 'interior') return;
+      const opProj = projectToMinimap(op.x, op.z, pos, 8);
+      mmCtx.save();
+      mmCtx.translate(opProj.x, opProj.y);
+      mmCtx.rotate(op.heading || 0);
+      mmCtx.fillStyle = '#10b981';
+      mmCtx.strokeStyle = '#ffffff';
+      mmCtx.lineWidth = 1.4;
+      mmCtx.beginPath();
+      mmCtx.moveTo(0, -6.2); mmCtx.lineTo(4.4, 5.2); mmCtx.lineTo(0, 3.0); mmCtx.lineTo(-4.4, 5.2); mmCtx.closePath();
+      mmCtx.fill(); mmCtx.stroke();
+      mmCtx.restore();
+      if (opProj.visible) {
+        mmCtx.fillStyle = '#6ee7b7';
+        mmCtx.font = 'bold 8.5px sans-serif';
+        mmCtx.textAlign = 'center';
+        mmCtx.fillText((op.name || 'OP').slice(0, 10), opProj.x, opProj.y - 8);
       }
     });
 
@@ -8285,6 +9528,7 @@
     updateSpikeStrips(dt);
     updatePolice(dt);
     updateMissionSystem(dt);
+    updateMultiplayer(dt);
     updateCamera(pos);
     drawMinimap(pos);
 
@@ -8318,7 +9562,8 @@
       camera.position.set(state.x + Math.sin(t) * r, 2.5, state.z + Math.cos(t) * r);
       camera.lookAt(state.x, 1, state.z);
       drawMinimap(state);
-    } else if (shopOpen || marketOpen || gunshopOpen || restaurantOpen || missionsOpen) {
+    } else if (shopOpen || marketOpen || gunshopOpen || restaurantOpen || missionsOpen || mpOpen) {
+      updateMultiplayer(dt);
       const target = mode === 'drive' ? state : walkState;
       const baseY = mode === 'interior' ? INTERIOR_Y : 0;
       const r = 3.2;
@@ -8327,9 +9572,10 @@
       camera.lookAt(target.x, baseY + 1.0, target.z);
       drawMinimap(target);
     } else if (cutsceneActive) {
+      updateMultiplayer(dt);
       updateCutsceneDirector(dt);
     } else if (pauseOpen) {
-      // paused
+      updateMultiplayer(dt);
     } else {
       update(dt);
     }
@@ -8337,7 +9583,1382 @@
   }
 
   // ===================================================================
-  // Initialization & Campaign / Free Roam Launchers
+  // Real-Time WebSocket Multiplayer Engine + Shareable Room Codes + 5 Dedicated 3D Maps
+  // ===================================================================
+  let mpSocket = null;
+  let mpConnected = false;
+  let mpSelfId = null;
+  let mpOpen = false;
+  const urlParams = new URLSearchParams(window.location.search);
+  let mpRoomId = (urlParams.get('room') || 'KARACHI-1').trim().toUpperCase();
+  let mpSelectedMapForCreate = urlParams.get('map') || 'karachi_city';
+  let mpCallsign = 'Hamza-' + Math.floor(100 + Math.random() * 899);
+  let mpRole = 'IB Deep-Cover (Hamza)';
+  let mpSyncTimer = 0;
+  let mpRamCooldown = 0;
+  const remoteOperatives = new Map();
+  let mpChatHistory = [];
+  let mpSupplyDrop = null;
+  let mpPublicRooms = [];
+
+  const MP_MAP_META = {
+    karachi_city: { label: '🏙️ Karachi Open World', short: 'KARACHI CITY', color: '#38bdf8' },
+    f1_circuit:   { label: '🏎️ Karachi Grand Prix F1 Circuit', short: 'F1 CIRCUIT', color: '#ef4444' },
+    firing_range: { label: '🎯 IB Tactical Firing Range', short: 'FIRING RANGE', color: '#facc15' },
+    kemari_docks: { label: '⚓ Kemari Port Container PvP', short: 'CONTAINER PVP', color: '#f97316' },
+    derby_dome:   { label: '💥 Clifton Destruction Derby Bowl', short: 'DERBY BOWL', color: '#a855f7' }
+  };
+
+  // Dedicated 3D Arena Group & Interactive State
+  const mpArenaGroup = new THREE.Group();
+  scene.add(mpArenaGroup);
+  let firingRangeTargets = [];
+  let firingRangeScore = 0;
+  let firingRangeBest = 0;
+  let firingRangeHits = 0;
+
+  // F1 Circuit Telemetry State
+  const F1_RX = 145;
+  const F1_RZ = 92;
+  const F1_GATES = [
+    { x: 0, z: -F1_RZ, label: 'Sector 1 (North Straight)' },
+    { x: -F1_RX, z: 0, label: 'Sector 2 (West Hairpin)' },
+    { x: 0, z: F1_RZ, label: 'Sector 3 (South Pit Straight)' },
+    { x: F1_RX, z: 0, label: 'FINISH / START LINE (East Grandstand)' }
+  ];
+  let f1GateIdx = 0;
+  let f1LapCount = 1;
+  let f1LapStartMs = 0;
+  let f1BestLapMs = 0;
+  let f1GateMeshes = [];
+  let derbyRamps = [];
+
+  function clearCityCellsForArena() {
+    for (const [k, cell] of loadedCells.entries()) {
+      scene.remove(cell.group);
+      disposeObject3D(cell.group);
+      loadedCells.delete(k);
+    }
+    lastPlayerCell = { i: null, j: null };
+    peds.forEach(p => { if (p.mesh) p.mesh.visible = false; });
+    trafficCars.forEach(tc => { if (tc.mesh) tc.mesh.visible = false; });
+    despawnAllPolice();
+    despawnRoadblocks();
+    despawnHelicopter();
+    storyStartBeacon.visible = false;
+    streetJobBeacons.forEach(b => { b.visible = false; });
+  }
+
+  function restoreCityCellsFromArena() {
+    peds.forEach(p => { if (p.mesh && p.alive) p.mesh.visible = true; });
+    trafficCars.forEach(tc => { if (tc.mesh) tc.mesh.visible = true; });
+    lastPlayerCell = { i: null, j: null };
+    updateWorldStreaming(state);
+    updateChapterHud();
+  }
+
+  function clearMpArenaGeometry() {
+    while (mpArenaGroup.children.length > 0) {
+      const ch = mpArenaGroup.children[0];
+      mpArenaGroup.remove(ch);
+      disposeObject3D(ch);
+    }
+    mpArenaHitboxes = [];
+    firingRangeTargets = [];
+    f1GateMeshes = [];
+    derbyRamps = [];
+  }
+
+  function addArenaWall(x, y, z, w, h, d, mat, addCollision) {
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+    mesh.position.set(x, y, z);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    mpArenaGroup.add(mesh);
+    if (addCollision !== false) {
+      mpArenaHitboxes.push({
+        minX: x - w / 2,
+        maxX: x + w / 2,
+        minZ: z - d / 2,
+        maxZ: z + d / 2
+      });
+    }
+    return mesh;
+  }
+
+  function buildF1CircuitArena() {
+    // 1. Lush Stadium Infield Grass & Outer Tarmac Run-off
+    const grass = new THREE.Mesh(
+      new THREE.PlaneGeometry(520, 420),
+      new THREE.MeshStandardMaterial({ color: 0x14532d, roughness: 0.9 })
+    );
+    grass.rotation.x = -Math.PI / 2;
+    grass.position.y = 0.02;
+    grass.receiveShadow = true;
+    mpArenaGroup.add(grass);
+
+    // 2. Oval Grand Prix Track Segments + Red/White FIA Kerbs
+    const segs = 72;
+    const trackWidth = 22;
+    const asphaltMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.55, metalness: 0.15 });
+    const kerbRedMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.5 });
+    const kerbWhiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.5 });
+    const barrierBlueMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.4 });
+
+    for (let i = 0; i < segs; i++) {
+      const a0 = (i / segs) * Math.PI * 2;
+      const a1 = ((i + 1) / segs) * Math.PI * 2;
+      const am = (a0 + a1) * 0.5;
+      const cx = Math.cos(am) * F1_RX;
+      const cz = Math.sin(am) * F1_RZ;
+      const dx = Math.cos(a1) * F1_RX - Math.cos(a0) * F1_RX;
+      const dz = Math.sin(a1) * F1_RZ - Math.sin(a0) * F1_RZ;
+      const segLen = Math.sqrt(dx * dx + dz * dz) + 1.4;
+      const tang = Math.atan2(dx, dz);
+
+      const roadSeg = new THREE.Mesh(new THREE.BoxGeometry(trackWidth, 0.08, segLen), asphaltMat);
+      roadSeg.position.set(cx, 0.04, cz);
+      roadSeg.rotation.y = tang;
+      roadSeg.receiveShadow = true;
+      mpArenaGroup.add(roadSeg);
+
+      const kMat = i % 2 === 0 ? kerbRedMat : kerbWhiteMat;
+      const innerKerb = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.12, segLen), kMat);
+      innerKerb.position.set(Math.cos(am) * (F1_RX - trackWidth * 0.5), 0.06, Math.sin(am) * (F1_RZ - trackWidth * 0.5));
+      innerKerb.rotation.y = tang;
+      mpArenaGroup.add(innerKerb);
+
+      const outerKerb = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.12, segLen), kMat);
+      outerKerb.position.set(Math.cos(am) * (F1_RX + trackWidth * 0.5), 0.06, Math.sin(am) * (F1_RZ + trackWidth * 0.5));
+      outerKerb.rotation.y = tang;
+      mpArenaGroup.add(outerKerb);
+
+      // Tecpro Outer Safety Barriers every 2 segments
+      if (i % 2 === 0) {
+        const bar = new THREE.Mesh(new THREE.BoxGeometry(1.8, 1.4, segLen * 1.8), i % 4 === 0 ? kerbRedMat : barrierBlueMat);
+        bar.position.set(Math.cos(am) * (F1_RX + trackWidth * 0.5 + 6), 0.7, Math.sin(am) * (F1_RZ + trackWidth * 0.5 + 6));
+        bar.rotation.y = tang;
+        mpArenaGroup.add(bar);
+      }
+    }
+
+    // 3. Start / Finish Checkered Line & Overhead 5-Red-Light FIA Starting Gantry at (F1_RX, 0)
+    const startLine = new THREE.Mesh(
+      new THREE.BoxGeometry(trackWidth, 0.1, 3.2),
+      new THREE.MeshBasicMaterial({ color: 0xffffff })
+    );
+    startLine.position.set(F1_RX, 0.06, 0);
+    mpArenaGroup.add(startLine);
+
+    const gantryMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.7, roughness: 0.3 });
+    addArenaWall(F1_RX - 13, 4.5, 0, 1.2, 9, 1.2, gantryMat, false);
+    addArenaWall(F1_RX + 13, 4.5, 0, 1.2, 9, 1.2, gantryMat, false);
+    addArenaWall(F1_RX, 8.6, 0, 27.5, 1.4, 1.4, gantryMat, false);
+    for (let li = -2; li <= 2; li++) {
+      const lightPod = new THREE.Mesh(
+        new THREE.SphereGeometry(0.48, 12, 12),
+        new THREE.MeshBasicMaterial({ color: 0xef4444 })
+      );
+      lightPod.position.set(F1_RX + li * 2.2, 7.8, 0.8);
+      mpArenaGroup.add(lightPod);
+    }
+
+    // 4. Grandstands & Pit Garages
+    const standMat = new THREE.MeshStandardMaterial({ color: 0x1e3a8a, roughness: 0.6 });
+    const roofMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.4 });
+    addArenaWall(F1_RX + 26, 4.0, 0, 10, 8, 76, standMat, true);
+    addArenaWall(F1_RX + 25, 9.2, 0, 14, 0.8, 78, roofMat, false);
+    addArenaWall(0, 3.5, F1_RZ - 26, 68, 7, 10, new THREE.MeshStandardMaterial({ color: 0x334155 }), true);
+
+    // 5. Sector Timing Gates (Glowing Rings)
+    F1_GATES.forEach((g, idx) => {
+      const ring = new THREE.Mesh(
+        new THREE.RingGeometry(8.5, 10.2, 32),
+        new THREE.MeshBasicMaterial({
+          color: idx === 3 ? 0xfacc15 : 0x38bdf8,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.75
+        })
+      );
+      ring.rotation.x = -Math.PI / 2;
+      ring.position.set(g.x, 0.14, g.z);
+      mpArenaGroup.add(ring);
+      f1GateMeshes.push(ring);
+    });
+  }
+
+  function buildFiringRangeArena() {
+    // 1. Tactical Concrete Range Floor
+    const floor = new THREE.Mesh(
+      new THREE.PlaneGeometry(130, 160),
+      new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.82 })
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.set(0, 0.03, -25);
+    floor.receiveShadow = true;
+    mpArenaGroup.add(floor);
+
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.7 });
+    const boothMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.5 });
+    const woodMat = new THREE.MeshStandardMaterial({ color: 0x92400e, roughness: 0.8 });
+
+    // Outer ballistic containment walls
+    addArenaWall(-52, 4.5, -25, 2.5, 9, 145, wallMat, true);
+    addArenaWall(52, 4.5, -25, 2.5, 9, 145, wallMat, true);
+    addArenaWall(0, 5.5, -95, 106, 11, 3.0, wallMat, true);
+    addArenaWall(0, 4.5, 45, 106, 9, 2.5, wallMat, true);
+
+    // 2. Firing Line Shooting Booths & Table at z = 14
+    addArenaWall(0, 0.55, 12, 66, 1.1, 1.6, woodMat, true);
+    for (let bx = -30; bx <= 30; bx += 10) {
+      addArenaWall(bx, 1.8, 13.5, 0.35, 3.6, 3.2, boothMat, false);
+    }
+    // Overhead Firing Line Canopy
+    addArenaWall(0, 4.2, 15, 70, 0.4, 8, boothMat, false);
+
+    // Distance Lane Striping (15m, 30m, 45m, 60m)
+    [-8, -26, -46, -68].forEach((lz, idx) => {
+      const line = new THREE.Mesh(
+        new THREE.BoxGeometry(72, 0.06, 0.5),
+        new THREE.MeshBasicMaterial({ color: idx % 2 === 0 ? 0x38bdf8 : 0xfacc15 })
+      );
+      line.position.set(0, 0.05, lz);
+      mpArenaGroup.add(line);
+    });
+
+    // 3. CQB Killhouse Plywood Cover Walls on the East Wing (for PvP & tactical drills)
+    addArenaWall(36, 1.6, -15, 14, 3.2, 0.8, woodMat, true);
+    addArenaWall(32, 1.6, -35, 0.8, 3.2, 16, woodMat, true);
+    addArenaWall(40, 1.6, -52, 14, 3.2, 0.8, woodMat, true);
+
+    // 4. Spawn 14 Interactive Pop-Up & Moving Ballistic Bullseye Silhouette Targets
+    const targetCoords = [
+      { x: -24, z: -6,  speed: 0,   pts: 50 },
+      { x: -12, z: -8,  speed: 4.5, pts: 75 },
+      { x: 0,   z: -7,  speed: 0,   pts: 50 },
+      { x: 12,  z: -8,  speed: -4.5,pts: 75 },
+      { x: 24,  z: -6,  speed: 0,   pts: 50 },
+      { x: -22, z: -24, speed: 6.5, pts: 100 },
+      { x: -6,  z: -26, speed: -6.0,pts: 100 },
+      { x: 8,   z: -25, speed: 6.5, pts: 100 },
+      { x: 22,  z: -24, speed: 0,   pts: 100 },
+      { x: -18, z: -46, speed: 8.5, pts: 150 },
+      { x: 0,   z: -48, speed: -9.0,pts: 150 },
+      { x: 18,  z: -46, speed: 8.5, pts: 150 },
+      { x: -12, z: -68, speed: 11.0,pts: 250 },
+      { x: 12,  z: -68, speed: -11.0,pts: 250 }
+    ];
+
+    targetCoords.forEach((tc, idx) => {
+      const tGroup = new THREE.Group();
+      const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 1.2, 8), boothMat);
+      stand.position.y = 0.6;
+      tGroup.add(stand);
+
+      const board = new THREE.Mesh(
+        new THREE.BoxGeometry(1.35, 1.65, 0.14),
+        new THREE.MeshStandardMaterial({ color: 0xef4444, emissive: 0x7f1d1d, emissiveIntensity: 0.35 })
+      );
+      board.position.y = 1.65;
+      tGroup.add(board);
+
+      const ringW = new THREE.Mesh(
+        new THREE.RingGeometry(0.28, 0.45, 20),
+        new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide })
+      );
+      ringW.position.set(0, 1.7, 0.09);
+      tGroup.add(ringW);
+
+      const bull = new THREE.Mesh(
+        new THREE.CircleGeometry(0.22, 16),
+        new THREE.MeshBasicMaterial({ color: 0xfacc15, side: THREE.DoubleSide })
+      );
+      bull.position.set(0, 1.7, 0.1);
+      tGroup.add(bull);
+
+      tGroup.position.set(tc.x, 0, tc.z);
+      mpArenaGroup.add(tGroup);
+
+      firingRangeTargets.push({
+        id: idx,
+        mesh: tGroup,
+        baseX: tc.x,
+        z: tc.z,
+        speed: tc.speed,
+        pts: tc.pts,
+        active: true,
+        respawnTimer: 0,
+        phase: idx * 0.9
+      });
+    });
+  }
+
+  function buildKemariContainerArena() {
+    const floor = new THREE.Mesh(
+      new THREE.PlaneGeometry(190, 190),
+      new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.85 })
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = 0.03;
+    floor.receiveShadow = true;
+    mpArenaGroup.add(floor);
+
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.7 });
+    addArenaWall(-88, 5, 0, 3, 10, 180, wallMat, true);
+    addArenaWall(88, 5, 0, 3, 10, 180, wallMat, true);
+    addArenaWall(0, 5, -88, 180, 10, 3, wallMat, true);
+    addArenaWall(0, 5, 88, 180, 10, 3, wallMat, true);
+
+    const colors = [0xdc2626, 0x0284c7, 0xd97706, 0x059669, 0x4f46e5, 0xbe123c];
+    const containerLayout = [
+      { x: -32, z: -32, w: 7, d: 18, c: 0 },
+      { x: 32,  z: -32, w: 7, d: 18, c: 1 },
+      { x: -32, z: 32,  w: 7, d: 18, c: 2 },
+      { x: 32,  z: 32,  w: 7, d: 18, c: 3 },
+      { x: 0,   z: -48, w: 20, d: 7, c: 4 },
+      { x: 0,   z: 48,  w: 20, d: 7, c: 5 },
+      { x: -55, z: 0,   w: 7, d: 22, c: 1 },
+      { x: 55,  z: 0,   w: 7, d: 22, c: 0 },
+      { x: -16, z: 0,   w: 6, d: 14, c: 2 },
+      { x: 16,  z: 0,   w: 6, d: 14, c: 3 }
+    ];
+    containerLayout.forEach((b, idx) => {
+      const m = new THREE.MeshStandardMaterial({ color: colors[b.c % colors.length], roughness: 0.55, metalness: 0.35 });
+      addArenaWall(b.x, 2.2, b.z, b.w, 4.4, b.d, m, true);
+      if (idx % 2 === 0) {
+        const m2 = new THREE.MeshStandardMaterial({ color: colors[(b.c + 2) % colors.length], roughness: 0.55, metalness: 0.35 });
+        addArenaWall(b.x, 6.6, b.z, b.w, 4.4, b.d, m2, false);
+      }
+    });
+  }
+
+  function buildDerbyDomeArena() {
+    const floor = new THREE.Mesh(
+      new THREE.PlaneGeometry(210, 210),
+      new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.75 })
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = 0.03;
+    floor.receiveShadow = true;
+    mpArenaGroup.add(floor);
+
+    // Circular concrete colosseum perimeter
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0x7c3aed, roughness: 0.5 });
+    const segs = 32;
+    const rad = 88;
+    for (let i = 0; i < segs; i++) {
+      const a = (i / segs) * Math.PI * 2;
+      const wx = Math.cos(a) * rad;
+      const wz = Math.sin(a) * rad;
+      addArenaWall(wx, 3.0, wz, 12, 6, 12, wallMat, true);
+    }
+
+    // Central Ring of Fire & 4 Nitro Boost Pads
+    const centerRing = new THREE.Mesh(
+      new THREE.RingGeometry(12, 15, 32),
+      new THREE.MeshBasicMaterial({ color: 0xf97316, side: THREE.DoubleSide })
+    );
+    centerRing.rotation.x = -Math.PI / 2;
+    centerRing.position.y = 0.1;
+    mpArenaGroup.add(centerRing);
+
+    const padCoords = [
+      { x: 0, z: -38 },
+      { x: 0, z: 38 },
+      { x: -38, z: 0 },
+      { x: 38, z: 0 }
+    ];
+    padCoords.forEach(p => {
+      const pad = new THREE.Mesh(
+        new THREE.BoxGeometry(10, 0.18, 10),
+        new THREE.MeshBasicMaterial({ color: 0x10b981 })
+      );
+      pad.position.set(p.x, 0.09, p.z);
+      mpArenaGroup.add(pad);
+      derbyRamps.push(p);
+    });
+  }
+
+  function switchMultiplayerMap(mapId, silentToast) {
+    const valid = MP_MAP_META[mapId] ? mapId : 'karachi_city';
+    const prevMap = currentMpMap;
+    currentMpMap = valid;
+    mpSelectedMapForCreate = valid;
+
+    if (mode === 'interior') exitBuildingInterior();
+    clearMpArenaGeometry();
+
+    // Highlight active map card in UI
+    document.querySelectorAll('.mpMapCard').forEach(card => {
+      card.classList.toggle('active', card.getAttribute('data-map') === valid);
+    });
+    const mapBadgeEl = document.getElementById('mpCurrentMapBadge');
+    if (mapBadgeEl) mapBadgeEl.textContent = MP_MAP_META[valid].label;
+
+    const arenaHudEl = document.getElementById('mpArenaHud');
+    const arenaTitleEl = document.getElementById('mpArenaTitle');
+
+    if (valid === 'karachi_city') {
+      if (arenaHudEl) arenaHudEl.style.display = 'none';
+      if (prevMap !== 'karachi_city') {
+        state.x = SPAWN.x;
+        state.z = SPAWN.z;
+        state.speed = 0;
+        car.position.set(state.x, 0, state.z);
+        walkState.x = SPAWN.x + 2;
+        walkState.z = SPAWN.z;
+        restoreCityCellsFromArena();
+      }
+    } else {
+      clearCityCellsForArena();
+      if (arenaHudEl) arenaHudEl.style.display = 'flex';
+      if (arenaTitleEl) arenaTitleEl.textContent = MP_MAP_META[valid].label;
+
+      if (valid === 'f1_circuit') {
+        buildF1CircuitArena();
+        // Spawn on F1 Starting Grid in the Apex F1 GP car
+        selectCar('f1');
+        mode = 'drive';
+        character.visible = false;
+        state.x = F1_RX;
+        state.z = 12;
+        state.heading = Math.PI;
+        state.speed = 0;
+        playerStats.nitro = 100;
+        car.position.set(state.x, 0, state.z);
+        car.rotation.y = state.heading;
+        f1GateIdx = 0;
+        f1LapCount = 1;
+        f1LapStartMs = performance.now();
+      } else if (valid === 'firing_range') {
+        buildFiringRangeArena();
+        // Unlock all weapons with 999 ammo & place Hamza on foot at the firing booth
+        ['knife', 'bat', 'pistol', 'shotgun', 'rifle'].forEach(w => {
+          playerStats.owned[w] = true;
+          if (playerStats.ammo[w] !== undefined) playerStats.ammo[w] = 999;
+        });
+        playerStats.weapon = 'rifle';
+        updateHeldWeaponMesh();
+        mode = 'walk';
+        character.visible = true;
+        walkState.x = 0;
+        walkState.z = 15.5;
+        walkState.heading = Math.PI;
+        walkState.speed = 0;
+        character.position.set(walkState.x, 0, walkState.z);
+        character.rotation.y = walkState.heading;
+        state.x = -18;
+        state.z = 24;
+        car.position.set(state.x, 0, state.z);
+        firingRangeScore = 0;
+        firingRangeHits = 0;
+      } else if (valid === 'kemari_docks') {
+        buildKemariContainerArena();
+        ['knife', 'bat', 'pistol', 'shotgun', 'rifle'].forEach(w => {
+          playerStats.owned[w] = true;
+          if (playerStats.ammo[w] !== undefined) playerStats.ammo[w] = 999;
+        });
+        playerStats.weapon = 'rifle';
+        playerStats.health = 100;
+        playerStats.armor = 100;
+        updateHeldWeaponMesh();
+        mode = 'walk';
+        character.visible = true;
+        const ang = Math.random() * Math.PI * 2;
+        walkState.x = Math.cos(ang) * 38;
+        walkState.z = Math.sin(ang) * 38;
+        walkState.heading = ang + Math.PI;
+        character.position.set(walkState.x, 0, walkState.z);
+        state.x = walkState.x + 4;
+        state.z = walkState.z;
+        car.position.set(state.x, 0, state.z);
+      } else if (valid === 'derby_dome') {
+        buildDerbyDomeArena();
+        selectCar('enforcer');
+        mode = 'drive';
+        character.visible = false;
+        const ang = Math.random() * Math.PI * 2;
+        state.x = Math.cos(ang) * 45;
+        state.z = Math.sin(ang) * 45;
+        state.heading = ang + Math.PI;
+        state.speed = 0;
+        playerStats.nitro = 100;
+        playerStats.health = 100;
+        playerStats.armor = 100;
+        car.position.set(state.x, 0, state.z);
+        car.rotation.y = state.heading;
+      }
+      updateStatsHud();
+    }
+
+    if (!silentToast) {
+      showBuildingToast(`🗺️ Deployed to ${MP_MAP_META[valid].label}!`, '#10b981');
+    }
+    updateMpLiveBadge();
+  }
+
+  function checkFiringRangeShot(originX, originZ, heading, maxRange) {
+    if (currentMpMap !== 'firing_range' || firingRangeTargets.length === 0) return null;
+    let bestT = null;
+    let bestDist = Infinity;
+    firingRangeTargets.forEach(t => {
+      if (!t.active) return;
+      const tx = t.mesh.position.x;
+      const tz = t.mesh.position.z;
+      const dx = tx - originX;
+      const dz = tz - originZ;
+      const dist = Math.sqrt(dx * dx + dz * dz);
+      if (dist > maxRange) return;
+      const ang = Math.atan2(dx, dz);
+      let diff = ang - heading;
+      while (diff > Math.PI) diff -= Math.PI * 2;
+      while (diff < -Math.PI) diff += Math.PI * 2;
+      if (Math.abs(diff) < 0.24 && dist < bestDist) {
+        bestDist = dist;
+        bestT = t;
+      }
+    });
+
+    if (bestT) {
+      bestT.active = false;
+      bestT.respawnTimer = 2.4;
+      bestT.mesh.rotation.x = -Math.PI / 2.1;
+      firingRangeScore += bestT.pts;
+      firingRangeHits++;
+      playerStats.cash += 100;
+      updateStatsHud();
+      playSfx('explosion');
+      for (let s = 0; s < 10; s++) {
+        spawnParticle(
+          bestT.mesh.position.x, 1.6, bestT.mesh.position.z,
+          (Math.random() - 0.5) * 6, 2 + Math.random() * 4, (Math.random() - 0.5) * 6,
+          0xfacc15, 0.22, 0.42
+        );
+      }
+      if (firingRangeScore > firingRangeBest) {
+        firingRangeBest = firingRangeScore;
+        if (mpSocket && mpSocket.readyState === WebSocket.OPEN && firingRangeHits % 4 === 0) {
+          mpSocket.send(JSON.stringify({ type: 'map:score', kind: 'firing_range', value: firingRangeScore }));
+        }
+      }
+      return { x: bestT.mesh.position.x, z: bestT.mesh.position.z };
+    }
+    return null;
+  }
+
+  // 3D Multiplayer Supply Drop Beacon & Crate
+  const mpSupplyGroup = new THREE.Group();
+  const mpCrateMesh = new THREE.Mesh(
+    new THREE.BoxGeometry(1.7, 1.3, 1.7),
+    new THREE.MeshStandardMaterial({ color: 0x10b981, emissive: 0x065f46, emissiveIntensity: 0.55, roughness: 0.3, metalness: 0.5 })
+  );
+  mpCrateMesh.position.y = 0.85;
+  mpCrateMesh.castShadow = true;
+  mpSupplyGroup.add(mpCrateMesh);
+  const mpSupplyRing = new THREE.Mesh(
+    new THREE.RingGeometry(3.2, 4.2, 32),
+    new THREE.MeshBasicMaterial({ color: 0x10b981, side: THREE.DoubleSide, transparent: true, opacity: 0.75 })
+  );
+  mpSupplyRing.rotation.x = -Math.PI / 2;
+  mpSupplyRing.position.y = 0.12;
+  mpSupplyGroup.add(mpSupplyRing);
+  const mpSupplyPillar = new THREE.Mesh(
+    new THREE.CylinderGeometry(2.2, 2.2, 28, 20, 1, true),
+    new THREE.MeshBasicMaterial({ color: 0x34d399, transparent: true, opacity: 0.16, side: THREE.DoubleSide, depthWrite: false })
+  );
+  mpSupplyPillar.position.y = 14;
+  mpSupplyGroup.add(mpSupplyPillar);
+  mpSupplyGroup.visible = false;
+  scene.add(mpSupplyGroup);
+
+  const mpNameInputEl = document.getElementById('mpNameInput');
+  const mpRoleSelectEl = document.getElementById('mpRoleSelect');
+  const mpRoomInputEl = document.getElementById('mpRoomInput');
+  if (mpNameInputEl) mpNameInputEl.value = mpCallsign;
+  if (mpRoomInputEl) mpRoomInputEl.value = mpRoomId;
+
+  function buildOperativeNameplateSprite(name, role, health, armor) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 84;
+    const ctx = canvas.getContext('2d');
+    const tex = new THREE.CanvasTexture(canvas);
+    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
+    const sprite = new THREE.Sprite(mat);
+    sprite.scale.set(3.8, 1.25, 1);
+    sprite.renderOrder = 999;
+    sprite.userData = { canvas, ctx, tex };
+    updateOperativeNameplate(sprite, name, role, health, armor);
+    return sprite;
+  }
+
+  function updateOperativeNameplate(sprite, name, role, health, armor) {
+    if (!sprite || !sprite.userData || !sprite.userData.ctx) return;
+    const { canvas, ctx, tex } = sprite.userData;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'rgba(9, 14, 26, 0.85)';
+    ctx.strokeStyle = '#10b981';
+    ctx.lineWidth = 3;
+    ctx.fillRect(8, 6, 240, 70);
+    ctx.strokeRect(8, 6, 240, 70);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 20px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(String(name || 'Operative').slice(0, 18), 128, 30);
+
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 12px sans-serif';
+    ctx.fillText(String(role || 'IB Operative').slice(0, 26), 128, 47);
+
+    const hpPct = Math.max(0, Math.min(100, Number(health) || 100)) / 100;
+    const arPct = Math.max(0, Math.min(100, Number(armor) || 0)) / 100;
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(24, 55, 208, 9);
+    ctx.fillStyle = '#22c55e';
+    ctx.fillRect(24, 55, Math.round(208 * hpPct), 9);
+    if (arPct > 0) {
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillRect(24, 66, Math.round(208 * arPct), 4);
+    }
+    tex.needsUpdate = true;
+  }
+
+  function rebuildRemoteOperativeMeshes(op) {
+    if (op.rootGroup) {
+      scene.remove(op.rootGroup);
+      disposeObject3D(op.rootGroup);
+    }
+    const rootGroup = new THREE.Group();
+    const modelDef = CAR_MODELS.find(m => m.id === op.carId) || CAR_MODELS[0];
+    const carCustom = {
+      bodyColor: op.bodyColor || '#eab308',
+      rimColor: '#e5e7eb',
+      rimStyle: 'sport',
+      spoiler: true,
+      stripes: true,
+      stripeColor: '#111827',
+      underglow: true,
+      underglowColor: op.underglowColor || '#10b981',
+      tint: 0.45
+    };
+    const carMesh = buildCar(modelDef, carCustom);
+    const charMesh = buildCharacter({
+      skin: '#c68b59',
+      shirt: op.outfitColor || '#1e242b',
+      pants: '#151921',
+      shoes: '#0f1318',
+      hair: '#0a0c10',
+      hat: false,
+      hatColor: '#1e293b'
+    });
+    const labelSprite = buildOperativeNameplateSprite(op.name, op.role, op.health, op.armor);
+    labelSprite.position.set(0, 2.9, 0);
+
+    rootGroup.add(carMesh);
+    rootGroup.add(charMesh);
+    rootGroup.add(labelSprite);
+    scene.add(rootGroup);
+
+    op.rootGroup = rootGroup;
+    op.carMesh = carMesh;
+    op.charMesh = charMesh;
+    op.labelSprite = labelSprite;
+    op.builtCarId = op.carId;
+    op.builtBodyColor = op.bodyColor;
+    op.builtOutfitColor = op.outfitColor;
+  }
+
+  function upsertRemoteOperative(data) {
+    if (!data || !data.id || data.id === mpSelfId) return;
+    let op = remoteOperatives.get(data.id);
+    if (!op) {
+      op = {
+        id: data.id,
+        name: data.name || 'Operative',
+        role: data.role || 'IB Operative',
+        mode: data.mode || 'drive',
+        x: Number(data.x) || 0,
+        y: Number(data.y) || 0,
+        z: Number(data.z) || 0,
+        targetX: Number(data.x) || 0,
+        targetZ: Number(data.z) || 0,
+        heading: Number(data.heading) || 0,
+        targetHeading: Number(data.heading) || 0,
+        speed: Number(data.speed) || 0,
+        steerAngle: Number(data.steerAngle) || 0,
+        carId: data.carId || 'speedster',
+        bodyColor: data.bodyColor || '#eab308',
+        underglowColor: data.underglowColor || '#10b981',
+        outfitColor: data.outfitColor || '#1e242b',
+        weapon: data.weapon || 'pistol',
+        health: data.health !== undefined ? data.health : 100,
+        armor: data.armor !== undefined ? data.armor : 50,
+        kills: data.kills || 0,
+        bounty: data.bounty || 0,
+        bestLapMs: data.bestLapMs || 0,
+        rangeScore: data.rangeScore || 0
+      };
+      rebuildRemoteOperativeMeshes(op);
+      remoteOperatives.set(data.id, op);
+    } else {
+      op.name = data.name || op.name;
+      op.role = data.role || op.role;
+      op.mode = data.mode || op.mode;
+      if (typeof data.x === 'number') op.targetX = data.x;
+      if (typeof data.z === 'number') op.targetZ = data.z;
+      if (typeof data.heading === 'number') op.targetHeading = data.heading;
+      if (typeof data.speed === 'number') op.speed = data.speed;
+      if (typeof data.steerAngle === 'number') op.steerAngle = data.steerAngle;
+      if (data.carId) op.carId = data.carId;
+      if (data.bodyColor) op.bodyColor = data.bodyColor;
+      if (data.underglowColor) op.underglowColor = data.underglowColor;
+      if (data.outfitColor) op.outfitColor = data.outfitColor;
+      if (data.weapon) op.weapon = data.weapon;
+      if (typeof data.health === 'number') op.health = data.health;
+      if (typeof data.armor === 'number') op.armor = data.armor;
+      if (typeof data.kills === 'number') op.kills = data.kills;
+      if (typeof data.bounty === 'number') op.bounty = data.bounty;
+      if (typeof data.bestLapMs === 'number') op.bestLapMs = data.bestLapMs;
+      if (typeof data.rangeScore === 'number') op.rangeScore = data.rangeScore;
+
+      if (op.builtCarId !== op.carId || op.builtBodyColor !== op.bodyColor || op.builtOutfitColor !== op.outfitColor) {
+        rebuildRemoteOperativeMeshes(op);
+      } else {
+        updateOperativeNameplate(op.labelSprite, op.name, op.role, op.health, op.armor);
+      }
+    }
+  }
+
+  function removeRemoteOperative(id) {
+    const op = remoteOperatives.get(id);
+    if (!op) return;
+    if (op.rootGroup) {
+      scene.remove(op.rootGroup);
+      disposeObject3D(op.rootGroup);
+    }
+    remoteOperatives.delete(id);
+  }
+
+  function clearAllRemoteOperatives() {
+    for (const [id] of remoteOperatives) {
+      removeRemoteOperative(id);
+    }
+  }
+
+  function updateMpLiveBadge() {
+    const dotEl = document.getElementById('mpStatusDot');
+    const txtEl = document.getElementById('mpStatusText');
+    const countEl = document.getElementById('mpPlayerCount');
+    const codeDispEl = document.getElementById('mpCurrentCodeDisplay');
+    const totalOps = 1 + remoteOperatives.size;
+    const mapMeta = MP_MAP_META[currentMpMap] || MP_MAP_META.karachi_city;
+    if (dotEl) dotEl.classList.toggle('offline', !mpConnected);
+    if (codeDispEl) codeDispEl.textContent = mpRoomId.toUpperCase();
+    if (txtEl) {
+      txtEl.textContent = mpConnected
+        ? `CODE [${mpRoomId.toUpperCase()}] · ${mapMeta.short} · ${totalOps} OP${totalOps > 1 ? 'S' : ''}`
+        : 'KARACHI COMMS · RECONNECTING...';
+    }
+    if (countEl) countEl.textContent = String(totalOps);
+    if (mpOpen) {
+      renderMpPlayersList();
+      renderMpRoomsList();
+    }
+  }
+
+  function appendMpChatMessage(msg) {
+    if (!msg) return;
+    if (mpChatHistory.some(m => m.id === msg.id)) return;
+    mpChatHistory.push(msg);
+    if (mpChatHistory.length > 40) mpChatHistory.shift();
+    renderMpChatLog();
+    if (!mpOpen && msg.senderId !== mpSelfId) {
+      showBuildingToast(`📡 ${msg.senderName}: ${msg.text}`, msg.system ? '#fde047' : '#38bdf8');
+    }
+  }
+
+  function renderMpChatLog() {
+    const logEl = document.getElementById('mpChatLog');
+    if (!logEl) return;
+    logEl.innerHTML = '';
+    mpChatHistory.forEach(m => {
+      const div = document.createElement('div');
+      div.className = 'mpChatMsg' + (m.system ? ' sys' : '');
+      div.innerHTML = m.system
+        ? `<span>${m.text}</span>`
+        : `<b style="color:#38bdf8;">${m.senderName}:</b> <span>${m.text}</span>`;
+      logEl.appendChild(div);
+    });
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  function renderMpPlayersList() {
+    const listEl = document.getElementById('mpPlayersList');
+    if (!listEl) return;
+    listEl.innerHTML = '';
+
+    const myCarName = (CAR_MODELS.find(m => m.id === garage.selectedCarId) || CAR_MODELS[0]).name;
+    const extraSelf = currentMpMap === 'f1_circuit' && f1BestLapMs > 0
+      ? ` · Best Lap: ${(f1BestLapMs / 1000).toFixed(2)}s`
+      : (currentMpMap === 'firing_range' ? ` · Range: ${firingRangeBest} pts` : '');
+    const selfRow = document.createElement('div');
+    selfRow.className = 'shopItem';
+    selfRow.style.borderColor = '#10b981';
+    selfRow.innerHTML = `<div><b style="color:#6ee7b7;">★ ${mpCallsign} (You)</b><div class="itemDesc">${mpRole} · ${mode === 'drive' ? myCarName : 'On Foot'}${extraSelf}</div></div>`;
+    listEl.appendChild(selfRow);
+
+    remoteOperatives.forEach(op => {
+      const carDef = CAR_MODELS.find(m => m.id === op.carId) || CAR_MODELS[0];
+      const extraOp = op.bestLapMs > 0
+        ? ` · Best Lap: ${(op.bestLapMs / 1000).toFixed(2)}s`
+        : (op.rangeScore > 0 ? ` · Range: ${op.rangeScore} pts` : '');
+      const row = document.createElement('div');
+      row.className = 'shopItem';
+      row.innerHTML = `<div><b>${op.name}</b><div class="itemDesc">${op.role} · ${op.mode === 'drive' ? carDef.name : 'On Foot'} · Kills: ${op.kills || 0}${extraOp}</div></div>`;
+      const warpBtn = document.createElement('button');
+      warpBtn.className = 'buyBtn';
+      warpBtn.textContent = '⚡ Teleport';
+      warpBtn.addEventListener('click', () => {
+        warpToCoordinates(op.x + 3.5, op.z + 3.5, `⚡ Teleported to Operative ${op.name}!`);
+        closeMp();
+      });
+      row.appendChild(warpBtn);
+      listEl.appendChild(row);
+    });
+  }
+
+  function renderMpRoomsList() {
+    const listEl = document.getElementById('mpRoomsList');
+    if (!listEl) return;
+    listEl.innerHTML = '';
+    if (!mpPublicRooms || mpPublicRooms.length === 0) {
+      listEl.innerHTML = `<div class="itemDesc" style="padding:6px;">No other rooms active — click "➕ Create New Room & Code" above!</div>`;
+      return;
+    }
+    mpPublicRooms.forEach(r => {
+      const isCurrent = r.code.toUpperCase() === mpRoomId.toUpperCase();
+      const row = document.createElement('div');
+      row.className = 'shopItem';
+      row.style.borderColor = isCurrent ? '#10b981' : '#33353a';
+      row.innerHTML = `<div><b style="color:#fde047;font-family:monospace;font-size:13px;">[${r.code}]</b> <span style="font-size:12px;color:#fff;font-weight:700;">${r.mapLabel}</span><div class="itemDesc">Host: ${r.hostName} · ${r.playerCount} Operative(s) Online</div></div>`;
+      const btn = document.createElement('button');
+      btn.className = 'buyBtn';
+      btn.textContent = isCurrent ? '✓ Joined' : '➡️ Join';
+      btn.disabled = isCurrent;
+      btn.addEventListener('click', () => {
+        if (mpRoomInputEl) mpRoomInputEl.value = r.code;
+        mpRoomId = r.code;
+        if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
+          mpSocket.send(JSON.stringify(getLocalMpPayload('room:switch')));
+        }
+      });
+      row.appendChild(btn);
+      listEl.appendChild(row);
+    });
+  }
+
+  function warpToCoordinates(tx, tz, toastMsg) {
+    if (mode === 'interior') exitBuildingInterior();
+    state.x = tx;
+    state.z = tz;
+    state.speed = 0;
+    car.position.set(state.x, 0, state.z);
+    walkState.x = tx + 2;
+    walkState.z = tz;
+    character.position.set(walkState.x, 0, walkState.z);
+    if (currentMpMap === 'karachi_city') updateWorldStreaming(state);
+    playSfx('door');
+    showBuildingToast(toastMsg || '⚡ GPS Warped!', '#10b981');
+  }
+
+  function updateSupplyDropUI() {
+    if (!mpSupplyDrop) {
+      mpSupplyGroup.visible = false;
+      return;
+    }
+    mpSupplyGroup.visible = true;
+    mpSupplyGroup.position.set(mpSupplyDrop.x, 0, mpSupplyDrop.z);
+  }
+
+  function getLocalMpPayload(type, extra) {
+    const pos = mode === 'drive' ? state : (mode === 'interior' && insideBuilding ? { x: insideBuilding.cx, z: insideBuilding.cz, heading: walkState.heading } : walkState);
+    const c = getCustom(garage.selectedCarId);
+    return Object.assign({
+      type,
+      room: mpRoomId,
+      mapId: currentMpMap,
+      name: mpCallsign,
+      role: mpRole,
+      mode,
+      x: Number(pos.x.toFixed(2)),
+      y: 0,
+      z: Number(pos.z.toFixed(2)),
+      heading: Number((pos.heading || 0).toFixed(3)),
+      speed: Number((mode === 'drive' ? state.speed : walkState.speed).toFixed(2)),
+      steerAngle: Number((state.steerAngle || 0).toFixed(3)),
+      carId: garage.selectedCarId,
+      bodyColor: c.bodyColor,
+      underglowColor: c.underglowColor,
+      outfitColor: characterCustom.shirt,
+      weapon: playerStats.weapon,
+      health: Math.round(playerStats.health),
+      armor: Math.round(playerStats.armor)
+    }, extra || {});
+  }
+
+  function connectMultiplayerSocket() {
+    if (mpSocket) {
+      try { mpSocket.close(); } catch (_e) {}
+    }
+    const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${proto}//${window.location.host}/ws`;
+    const ws = new WebSocket(wsUrl);
+    mpSocket = ws;
+
+    ws.addEventListener('open', () => {
+      mpConnected = true;
+      ws.send(JSON.stringify(getLocalMpPayload('player:join', { mapId: mpSelectedMapForCreate })));
+      updateMpLiveBadge();
+    });
+
+    ws.addEventListener('message', ev => {
+      try {
+        const msg = JSON.parse(ev.data);
+        if (!msg || !msg.type) return;
+
+        if (msg.type === 'room:init') {
+          mpSelfId = msg.selfId;
+          mpRoomId = msg.room || mpRoomId;
+          if (mpRoomInputEl) mpRoomInputEl.value = mpRoomId;
+          if (msg.mapId && msg.mapId !== currentMpMap) {
+            switchMultiplayerMap(msg.mapId, false);
+          } else {
+            switchMultiplayerMap(msg.mapId || 'karachi_city', true);
+          }
+          clearAllRemoteOperatives();
+          if (Array.isArray(msg.players)) {
+            msg.players.forEach(p => upsertRemoteOperative(p));
+          }
+          if (Array.isArray(msg.roomsList)) {
+            mpPublicRooms = msg.roomsList;
+          }
+          mpChatHistory = Array.isArray(msg.chat) ? msg.chat : [];
+          renderMpChatLog();
+          mpSupplyDrop = msg.supplyDrop || null;
+          updateSupplyDropUI();
+          updateMpLiveBadge();
+        } else if (msg.type === 'room:map_changed') {
+          if (msg.mapId) switchMultiplayerMap(msg.mapId, false);
+          mpSupplyDrop = msg.supplyDrop || null;
+          updateSupplyDropUI();
+          if (msg.chatMessage) appendMpChatMessage(msg.chatMessage);
+          updateMpLiveBadge();
+        } else if (msg.type === 'rooms:list') {
+          if (Array.isArray(msg.roomsList)) {
+            mpPublicRooms = msg.roomsList;
+            renderMpRoomsList();
+          }
+        } else if (msg.type === 'map:score_broadcast') {
+          if (msg.chatMessage) appendMpChatMessage(msg.chatMessage);
+          const op = remoteOperatives.get(msg.playerId);
+          if (op) {
+            if (msg.bestLapMs) op.bestLapMs = msg.bestLapMs;
+            if (msg.rangeScore) op.rangeScore = msg.rangeScore;
+          }
+          if (mpOpen) renderMpPlayersList();
+        } else if (msg.type === 'player:joined') {
+          upsertRemoteOperative(msg.player);
+          if (msg.chatMessage) appendMpChatMessage(msg.chatMessage);
+          updateMpLiveBadge();
+        } else if (msg.type === 'player:moved') {
+          upsertRemoteOperative(msg);
+          if (mpOpen) renderMpPlayersList();
+        } else if (msg.type === 'player:left') {
+          removeRemoteOperative(msg.id);
+          if (msg.chatMessage) appendMpChatMessage(msg.chatMessage);
+          updateMpLiveBadge();
+        } else if (msg.type === 'player:shot') {
+          spawnBulletTracer(msg.ox, msg.oy || 1.2, msg.oz, msg.tx, msg.ty || 1.1, msg.tz, 0x38bdf8);
+          playSfx('shoot');
+        } else if (msg.type === 'player:damaged') {
+          if (msg.targetId === mpSelfId) {
+            playerStats.health = msg.health;
+            playerStats.armor = msg.armor;
+            const vig = document.getElementById('vignette');
+            if (vig) { vig.classList.add('damage'); setTimeout(() => vig.classList.remove('damage'), 220); }
+            updateStatsHud();
+            showBuildingToast(`⚠️ Hit by Operative ${msg.attackerName}! (-${msg.damage} HP)`, '#ef4444');
+          } else {
+            const op = remoteOperatives.get(msg.targetId);
+            if (op) {
+              op.health = msg.health;
+              op.armor = msg.armor;
+              updateOperativeNameplate(op.labelSprite, op.name, op.role, op.health, op.armor);
+            }
+          }
+        } else if (msg.type === 'combat:kill') {
+          if (msg.chatMessage) appendMpChatMessage(msg.chatMessage);
+          if (msg.attackerId === mpSelfId) {
+            playerStats.cash += msg.reward || 1500;
+            statsTracking.cashEarned += msg.reward || 1500;
+            statsTracking.kills++;
+            updateStatsHud();
+            showMissionBanner('OPERATIVE NEUTRALIZED!', `+$${msg.reward || 1500} BOUNTY · ${msg.victimName}`);
+          } else if (msg.victimId === mpSelfId) {
+            playerStats.health = 100;
+            playerStats.armor = 50;
+            switchMultiplayerMap(currentMpMap, true);
+            updateStatsHud();
+            showMissionBanner('NEUTRALIZED IN PVP', `By ${msg.attackerName} · Respawned`, true);
+          }
+          const attOp = remoteOperatives.get(msg.attackerId);
+          if (attOp) {
+            attOp.kills = msg.attackerKills;
+            attOp.bounty = msg.attackerBounty;
+          }
+          const vicOp = remoteOperatives.get(msg.victimId);
+          if (vicOp) {
+            vicOp.health = 100;
+            vicOp.armor = 50;
+            updateOperativeNameplate(vicOp.labelSprite, vicOp.name, vicOp.role, vicOp.health, vicOp.armor);
+          }
+          if (mpOpen) renderMpPlayersList();
+        } else if (msg.type === 'supply:claimed') {
+          mpSupplyDrop = msg.nextDrop || null;
+          updateSupplyDropUI();
+          if (msg.chatMessage) appendMpChatMessage(msg.chatMessage);
+          if (msg.winnerId === mpSelfId) {
+            playerStats.cash += msg.reward || 2000;
+            playerStats.respect = Math.min(100, playerStats.respect + 15);
+            statsTracking.cashEarned += msg.reward || 2000;
+            updateStatsHud();
+            playSfx('fanfare');
+            showMissionBanner('SUPPLY DROP SECURED!', `+$${msg.reward} · ${msg.claimedTitle}`);
+          }
+        } else if (msg.type === 'chat:message') {
+          appendMpChatMessage(msg.chatMessage);
+        }
+      } catch (_e) {}
+    });
+
+    ws.addEventListener('close', () => {
+      mpConnected = false;
+      updateMpLiveBadge();
+      setTimeout(() => {
+        if (!mpConnected) connectMultiplayerSocket();
+      }, 3000);
+    });
+  }
+
+  function sendMpShoot(weapon, ox, oy, oz, tx, ty, tz) {
+    if (!mpSocket || mpSocket.readyState !== WebSocket.OPEN) return;
+    mpSocket.send(JSON.stringify({ type: 'player:shoot', weapon, ox, oy, oz, tx, ty, tz }));
+  }
+
+  function sendMpHit(targetId, damage, weapon) {
+    if (!mpSocket || mpSocket.readyState !== WebSocket.OPEN) return;
+    mpSocket.send(JSON.stringify({ type: 'player:hit', targetId, damage, weapon }));
+  }
+
+  function findBestMultiplayerTarget(originX, originZ, heading, range, maxCone) {
+    let best = null;
+    let bestDist = Infinity;
+    remoteOperatives.forEach(op => {
+      if (op.mode === 'interior') return;
+      const dx = op.x - originX, dz = op.z - originZ;
+      const dist = Math.sqrt(dx * dx + dz * dz);
+      if (dist > range) return;
+      const angleToTarget = Math.atan2(dx, dz);
+      let diff = angleToTarget - heading;
+      while (diff > Math.PI) diff -= Math.PI * 2;
+      while (diff < -Math.PI) diff += Math.PI * 2;
+      if (Math.abs(diff) <= maxCone && dist < bestDist) {
+        bestDist = dist;
+        best = { op, dist };
+      }
+    });
+    return best;
+  }
+
+  function updateMultiplayer(dt) {
+    // 1. Broadcast local player state at ~15Hz
+    mpSyncTimer += dt;
+    if (mpSyncTimer >= 0.068 && mpSocket && mpSocket.readyState === WebSocket.OPEN) {
+      mpSyncTimer = 0;
+      mpSocket.send(JSON.stringify(getLocalMpPayload('player:update')));
+    }
+
+    // 2. Map-Specific Live Gameplay Logic (F1 Circuit Lap Timer, Firing Range Targets, Derby Nitro Pads)
+    const arenaStatsEl = document.getElementById('mpArenaStats');
+    const px = mode === 'drive' ? state.x : walkState.x;
+    const pz = mode === 'drive' ? state.z : walkState.z;
+
+    if (currentMpMap === 'f1_circuit') {
+      playerStats.nitro = Math.min(100, playerStats.nitro + dt * 18); // Continuous DRS/ERS recharge on F1 circuit
+      const activeGate = F1_GATES[f1GateIdx];
+      if (activeGate) {
+        const dx = px - activeGate.x, dz = pz - activeGate.z;
+        if (Math.sqrt(dx * dx + dz * dz) < 19.5) {
+          playSfx('door');
+          f1GateIdx++;
+          if (f1GateIdx >= F1_GATES.length) {
+            f1GateIdx = 0;
+            const lapTimeMs = Math.max(5000, Math.round(performance.now() - f1LapStartMs));
+            f1LapStartMs = performance.now();
+            if (f1BestLapMs === 0 || lapTimeMs < f1BestLapMs) f1BestLapMs = lapTimeMs;
+            playerStats.cash += 2500;
+            updateStatsHud();
+            playSfx('fanfare');
+            showMissionBanner(`🏁 LAP ${f1LapCount} COMPLETE!`, `${(lapTimeMs / 1000).toFixed(2)}s · +$2,500 F1 GP Bonus`);
+            if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
+              mpSocket.send(JSON.stringify({ type: 'map:score', kind: 'f1_lap', lap: f1LapCount, value: lapTimeMs }));
+            }
+            f1LapCount++;
+          } else {
+            showBuildingToast(`⏱ ${activeGate.label} Cleared!`, '#38bdf8');
+          }
+        }
+      }
+      f1GateMeshes.forEach((m, idx) => {
+        m.scale.setScalar(idx === f1GateIdx ? 1.18 + Math.sin(performance.now() * 0.008) * 0.12 : 0.85);
+      });
+      if (arenaStatsEl) {
+        const curSec = ((performance.now() - f1LapStartMs) / 1000).toFixed(1);
+        const bestStr = f1BestLapMs > 0 ? (f1BestLapMs / 1000).toFixed(2) + 's' : '--';
+        arenaStatsEl.textContent = `LAP ${f1LapCount} · GATE ${f1GateIdx + 1}/4 · TIME: ${curSec}s · BEST: ${bestStr}`;
+      }
+    } else if (currentMpMap === 'firing_range') {
+      const nowT = performance.now() * 0.001;
+      firingRangeTargets.forEach(t => {
+        if (!t.active) {
+          t.respawnTimer -= dt;
+          if (t.respawnTimer <= 0) {
+            t.active = true;
+            t.mesh.rotation.x = 0;
+          }
+        } else if (t.speed !== 0) {
+          t.mesh.position.x = t.baseX + Math.sin(nowT * (t.speed * 0.25) + t.phase) * 7.5;
+        }
+      });
+      if (arenaStatsEl) {
+        arenaStatsEl.textContent = `SCORE: ${firingRangeScore} PTS · BULLSEYES: ${firingRangeHits} · BEST: ${firingRangeBest} PTS (All Weapons 999 Ammo)`;
+      }
+    } else if (currentMpMap === 'derby_dome') {
+      derbyRamps.forEach(r => {
+        if (Math.sqrt(Math.pow(px - r.x, 2) + Math.pow(pz - r.z, 2)) < 6.5) {
+          playerStats.nitro = 100;
+          if (mode === 'drive') state.speed = Math.min(state.maxSpeed * 1.45, state.speed + 12 * dt);
+        }
+      });
+      if (arenaStatsEl) {
+        arenaStatsEl.textContent = `RAM RIVAL CARS AT HIGH SPEED FOR +$1,500 PVP BOUNTIES · GREEN PADS = FULL NITRO`;
+      }
+    } else if (currentMpMap === 'kemari_docks') {
+      if (arenaStatsEl) {
+        arenaStatsEl.textContent = `CLOSE-QUARTERS CONTAINER PVP · ALL WEAPONS UNLOCKED · KILLS: ${statsTracking.kills}`;
+      }
+    }
+
+    // 3. Animate 3D Multiplayer Supply Drop & check proximity claim
+    if (mpSupplyDrop && mpSupplyGroup.visible) {
+      const t = performance.now() * 0.003;
+      mpCrateMesh.rotation.y += dt * 1.6;
+      mpCrateMesh.position.y = 0.95 + Math.sin(t * 2) * 0.25;
+      mpSupplyRing.scale.setScalar(0.95 + Math.sin(t * 3) * 0.08);
+
+      if (mode !== 'interior') {
+        const dx = px - mpSupplyDrop.x, dz = pz - mpSupplyDrop.z;
+        if (Math.sqrt(dx * dx + dz * dz) < 9.5 && mpSocket && mpSocket.readyState === WebSocket.OPEN) {
+          mpSocket.send(JSON.stringify({ type: 'supply:claim', dropId: mpSupplyDrop.id }));
+        }
+      }
+    }
+
+    // 4. Smoothly interpolate & animate all remote 3D operatives
+    mpRamCooldown = Math.max(0, mpRamCooldown - dt);
+    const lerpFactor = Math.min(1, dt * 12);
+    remoteOperatives.forEach(op => {
+      if (!op.rootGroup) return;
+      if (op.mode === 'interior') {
+        op.rootGroup.visible = false;
+        return;
+      }
+      op.rootGroup.visible = true;
+      op.x += (op.targetX - op.x) * lerpFactor;
+      op.z += (op.targetZ - op.z) * lerpFactor;
+
+      let hDiff = op.targetHeading - op.heading;
+      while (hDiff > Math.PI) hDiff -= Math.PI * 2;
+      while (hDiff < -Math.PI) hDiff += Math.PI * 2;
+      op.heading += hDiff * lerpFactor;
+
+      op.rootGroup.position.set(op.x, 0, op.z);
+      op.rootGroup.rotation.y = op.heading;
+
+      if (op.mode === 'drive') {
+        op.carMesh.visible = true;
+        op.charMesh.visible = false;
+        op.labelSprite.position.set(0, 2.85, 0);
+        if (op.carMesh.userData && op.carMesh.userData.wheels) {
+          op.carMesh.userData.wheels.forEach(w => { w.rotation.x += op.speed * dt * 2; });
+        }
+      } else {
+        op.carMesh.visible = false;
+        op.charMesh.visible = true;
+        op.labelSprite.position.set(0, 2.45, 0);
+        const swing = Math.sin(performance.now() * 0.008) * Math.min(1, Math.abs(op.speed) / 4.0) * 0.55;
+        if (op.charMesh.userData && op.charMesh.userData.legs) {
+          op.charMesh.userData.legs[0].rotation.x = swing;
+          op.charMesh.userData.legs[1].rotation.x = -swing;
+          op.charMesh.userData.arms[0].rotation.x = -swing;
+          op.charMesh.userData.arms[1].rotation.x = -Math.PI / 2.3;
+        }
+      }
+
+      if (mode === 'drive' && Math.abs(state.speed) > 12 && mpRamCooldown <= 0) {
+        const dx = state.x - op.x, dz = state.z - op.z;
+        if (Math.sqrt(dx * dx + dz * dz) < 4.2) {
+          mpRamCooldown = 0.85;
+          sendMpHit(op.id, 28, 'Vehicle Ram');
+          playSfx('explosion');
+          spawnParticle(op.x, 1.0, op.z, (Math.random() - 0.5) * 6, 3, (Math.random() - 0.5) * 6, 0xf97316, 0.35, 0.45);
+        }
+      }
+    });
+  }
+
+  function openMp() {
+    mpOpen = true;
+    document.getElementById('mpOverlay').classList.add('open');
+    if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
+      mpSocket.send(JSON.stringify({ type: 'rooms:request' }));
+    }
+    renderMpPlayersList();
+    renderMpRoomsList();
+    renderMpChatLog();
+    updateSupplyDropUI();
+  }
+  function closeMp() {
+    mpOpen = false;
+    document.getElementById('mpOverlay').classList.remove('open');
+  }
+
+  document.getElementById('mpBtn').addEventListener('click', () => { if (!pauseOpen) mpOpen ? closeMp() : openMp(); });
+  document.getElementById('mpLiveBadge').addEventListener('click', () => { if (!pauseOpen) mpOpen ? closeMp() : openMp(); });
+  document.getElementById('mobMpBtn').addEventListener('click', () => { closeMobileDrawer(); mpOpen ? closeMp() : openMp(); });
+  document.getElementById('mobDrwMp').addEventListener('click', () => { closeMobileDrawer(); mpOpen ? closeMp() : openMp(); });
+  document.getElementById('closeMpBtn').addEventListener('click', closeMp);
+
+  // Arena HUD top bar buttons
+  document.getElementById('mpArenaActionBtn').addEventListener('click', () => {
+    switchMultiplayerMap(currentMpMap, false);
+  });
+  document.getElementById('mpArenaHubBtn').addEventListener('click', openMp);
+
+  // Map Cards click: switches the active room's map for everyone in the room
+  document.querySelectorAll('.mpMapCard').forEach(card => {
+    card.addEventListener('click', () => {
+      const chosenMap = card.getAttribute('data-map') || 'karachi_city';
+      mpSelectedMapForCreate = chosenMap;
+      document.querySelectorAll('.mpMapCard').forEach(c => c.classList.toggle('active', c === card));
+      if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
+        mpSocket.send(JSON.stringify({ type: 'room:change_map', mapId: chosenMap }));
+      } else {
+        switchMultiplayerMap(chosenMap, false);
+      }
+    });
+  });
+
+  // Create New Shareable Room & Code
+  document.getElementById('mpCreateRoomBtn').addEventListener('click', () => {
+    mpCallsign = (mpNameInputEl.value || 'Hamza-IB').trim().slice(0, 18) || 'Hamza-IB';
+    mpRole = mpRoleSelectEl.value || 'IB Deep-Cover (Hamza)';
+    if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
+      mpSocket.send(JSON.stringify(getLocalMpPayload('room:create', { mapId: mpSelectedMapForCreate })));
+      showBuildingToast('➕ Created New Room! Share your 6-character code with friends!', '#f59e0b');
+    } else {
+      connectMultiplayerSocket();
+    }
+  });
+
+  // Copy Room Code
+  document.getElementById('mpCopyCodeBtn').addEventListener('click', () => {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(mpRoomId.toUpperCase()).catch(() => {});
+    }
+    showBuildingToast(`📋 Room Code [${mpRoomId.toUpperCase()}] Copied! Send it to your friends!`, '#10b981');
+  });
+
+  // Copy Direct Join Link
+  document.getElementById('mpCopyLinkBtn').addEventListener('click', () => {
+    const shareUrl = `${window.location.origin}${window.location.pathname}?room=${encodeURIComponent(mpRoomId.toUpperCase())}&map=${encodeURIComponent(currentMpMap)}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(shareUrl).catch(() => {});
+    }
+    showBuildingToast(`🔗 Invite Link Copied for Room [${mpRoomId.toUpperCase()}]!`, '#38bdf8');
+  });
+
+  document.getElementById('mpWarpSupplyBtn').addEventListener('click', () => {
+    if (mpSupplyDrop) {
+      warpToCoordinates(mpSupplyDrop.x, mpSupplyDrop.z + 10, `⚡ Warped to ${mpSupplyDrop.title}!`);
+      closeMp();
+    }
+  });
+
+  document.getElementById('mpJoinRoomBtn').addEventListener('click', () => {
+    mpCallsign = (mpNameInputEl.value || 'Hamza-IB').trim().slice(0, 18) || 'Hamza-IB';
+    mpRole = mpRoleSelectEl.value || 'IB Deep-Cover (Hamza)';
+    const nextRoom = (mpRoomInputEl.value || 'KARACHI-1').trim().toUpperCase().slice(0, 16) || 'KARACHI-1';
+    mpRoomId = nextRoom;
+    if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
+      mpSocket.send(JSON.stringify(getLocalMpPayload('room:switch')));
+      showBuildingToast(`🌐 Joined Room [${mpRoomId}] as ${mpCallsign}!`, '#10b981');
+    } else {
+      connectMultiplayerSocket();
+    }
+  });
+
+  function sendMpChatFromInput() {
+    const inputEl = document.getElementById('mpChatInput');
+    if (!inputEl) return;
+    const text = inputEl.value.trim();
+    if (!text) return;
+    if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
+      mpSocket.send(JSON.stringify({ type: 'chat:send', text }));
+    }
+    inputEl.value = '';
+  }
+
+  document.getElementById('mpChatSendBtn').addEventListener('click', sendMpChatFromInput);
+  document.getElementById('mpChatInput').addEventListener('keydown', ev => {
+    ev.stopPropagation();
+    if (ev.key === 'Enter') sendMpChatFromInput();
+  });
+  [mpNameInputEl, mpRoomInputEl].forEach(el => {
+    if (el) el.addEventListener('keydown', ev => ev.stopPropagation());
+  });
+
+  document.querySelectorAll('.mpQuickBtn[data-ping]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const ping = btn.getAttribute('data-ping');
+      if (ping && mpSocket && mpSocket.readyState === WebSocket.OPEN) {
+        mpSocket.send(JSON.stringify({ type: 'chat:send', text: ping }));
+      }
+    });
+  });
+
+  window.addEventListener('keydown', ev => {
+    if (ev.code === 'KeyU' && !pauseOpen && !cutsceneActive) {
+      mpOpen ? closeMp() : openMp();
+    }
+  });
+
+  connectMultiplayerSocket();
+
+  // ===================================================================
+  // Initialization & Campaign / Free Roam / Multiplayer Launchers
   // ===================================================================
   selectCar('speedster');
   updateWorldStreaming(state);
@@ -8356,7 +10977,6 @@
       animate();
     }
     if (withPrologueStory) {
-      // Show Hamza standing face-to-face with IB Chief Ajay Sanyal during the intelligence briefing cutscene
       character.visible = true;
       character.position.set(-0.8, 0, 14.2);
       character.rotation.y = 0.65;
@@ -8400,13 +11020,20 @@
         character.visible = (mode === 'walk' || mode === 'interior');
         setTimeout(() => triggerPhoneCallForNextStory(), 900);
       });
-    } else {
+    } else if (currentMpMap === 'karachi_city') {
       setTimeout(() => triggerPhoneCallForNextStory(), 2500);
     }
   }
 
   document.getElementById('startBtn').addEventListener('click', () => beginGame(true));
   document.getElementById('freeRoamBtn').addEventListener('click', () => beginGame(false));
+  const titleMpBtnEl = document.getElementById('titleMpBtn');
+  if (titleMpBtnEl) {
+    titleMpBtnEl.addEventListener('click', () => {
+      beginGame(false);
+      openMp();
+    });
+  }
 })();
 </script>
 </body>
