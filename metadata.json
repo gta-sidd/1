@@ -1,0 +1,6 @@
+{
+  "name": "Vice & Verde: Open World GTA Story",
+  "description": "A 3D open-world action driving game featuring an 8-mission crime storyline, choreographed 3D cutscenes, carjacking animations, drift physics, nitro, and street jobs.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
