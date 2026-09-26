@@ -1031,26 +1031,146 @@
     top: 48px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(9, 14, 26, 0.9);
+    background: rgba(9, 14, 26, 0.92);
     border: 1.5px solid rgba(56, 189, 248, 0.55);
     border-radius: 10px;
     padding: 7px 14px;
     z-index: 23;
     display: none;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     color: #f8fafc;
     font-size: 12px;
     font-weight: 800;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
     flex-wrap: wrap;
     justify-content: center;
+    max-width: 96vw;
   }
   body.show-mobile #mpArenaHud {
     top: 80px;
     padding: 5px 10px;
     font-size: 10.5px;
-    max-width: 94vw;
+    max-width: 95vw;
+  }
+  #f1StartLightsHud {
+    position: fixed;
+    top: 112px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(5, 8, 16, 0.95);
+    border: 2px solid rgba(239, 68, 68, 0.75);
+    border-radius: 14px;
+    padding: 14px 24px;
+    z-index: 42;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+  }
+  .f1LightsRow {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+  }
+  .f1LightPod {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #1e293b;
+    border: 3px solid #334155;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.8);
+    transition: all 0.1s ease;
+  }
+  .f1LightPod.red {
+    background: #ef4444;
+    border-color: #fca5a5;
+    box-shadow: 0 0 22px #ef4444, inset 0 0 8px #ffffff;
+  }
+  .f1LightPod.green {
+    background: #10b981;
+    border-color: #6ee7b7;
+    box-shadow: 0 0 24px #10b981, inset 0 0 8px #ffffff;
+  }
+  #f1PitStopHud {
+    position: fixed;
+    bottom: 135px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(9, 14, 26, 0.94);
+    border: 2px solid #facc15;
+    border-radius: 12px;
+    padding: 12px 20px;
+    z-index: 40;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 310px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.75);
+  }
+  .f1PaddockBox {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(9, 14, 26, 0.96));
+    border: 1.5px solid rgba(239, 68, 68, 0.5);
+    border-radius: 10px;
+    padding: 12px;
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .f1SelectorGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 7px;
+  }
+  .f1OptionCard {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1.5px solid rgba(148, 163, 184, 0.25);
+    border-radius: 8px;
+    padding: 7px 9px;
+    cursor: pointer;
+    transition: all 0.14s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .f1OptionCard:hover {
+    border-color: #38bdf8;
+    transform: translateY(-1px);
+  }
+  .f1OptionCard.active {
+    border-color: #facc15;
+    background: rgba(250, 204, 21, 0.14);
+    box-shadow: 0 0 12px rgba(250, 204, 21, 0.25);
+  }
+  .f1ReadyBar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1.5px solid rgba(16, 185, 129, 0.55);
+    border-radius: 9px;
+    padding: 9px 12px;
+  }
+  .f1TireChip {
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    border: 1.5px solid rgba(148, 163, 184, 0.35);
+    background: rgba(15, 23, 42, 0.9);
+    color: #e2e8f0;
+  }
+  .f1TireChip.active {
+    border-color: #facc15;
+    background: rgba(250, 204, 21, 0.2);
+    color: #fff;
   }
 </style>
 </head>
@@ -1068,12 +1188,37 @@
   <span id="mpStatusText">KARACHI ONLINE · 1 OP</span>
 </div>
 
-<!-- Live Multiplayer Arena Telemetry HUD (F1 Lap Timer / Firing Range Scoreboard / Arena Status) -->
+<!-- Live Multiplayer Arena Telemetry HUD (F1 Lap Timer, Tire & Pit Stop Status, Ready Button, Firing Range Scoreboard) -->
 <div id="mpArenaHud">
   <span id="mpArenaTitle" style="color:#fde047;">🏎️ KARACHI F1 CIRCUIT</span>
-  <span id="mpArenaStats" style="color:#38bdf8;">LAP 1/3 · TIME: 0.0s · BEST: --</span>
-  <button id="mpArenaActionBtn" class="mpQuickBtn" style="background:#10b981;color:#052e16;border:none;font-weight:900;">🔄 Reset / Respawn</button>
-  <button id="mpArenaHubBtn" class="mpQuickBtn">🗺️ Switch Map / Room</button>
+  <span id="mpArenaStats" style="color:#38bdf8;font-variant-numeric:tabular-nums;">LAP 1/3 · TIME: 0.0s · BEST: --</span>
+  <span id="mpF1TireHud" style="display:none;color:#fca5a5;font-variant-numeric:tabular-nums;">🔴 SOFT 100% · PITS: 0</span>
+  <button id="mpF1ReadyQuickBtn" class="mpQuickBtn" style="display:none;background:#10b981;color:#052e16;border:none;font-weight:900;">✅ Ready for Race</button>
+  <button id="mpF1PitQuickBtn" class="mpQuickBtn" style="display:none;background:#facc15;color:#1c1917;border:none;font-weight:900;" title="Box in Pit Lane or Press [B]">🔧 Pit Stop / Tires [B]</button>
+  <button id="mpArenaActionBtn" class="mpQuickBtn" style="background:#38bdf8;color:#082f49;border:none;font-weight:900;">🔄 Reset / Grid</button>
+  <button id="mpArenaHubBtn" class="mpQuickBtn">🏎️ Paddock &amp; Maps [U]</button>
+</div>
+
+<!-- 5-Red-Light FIA Starting Gantry Overlay -->
+<div id="f1StartLightsHud">
+  <div style="font-size:11px;font-weight:900;letter-spacing:1.5px;color:#94a3b8;text-transform:uppercase;" id="f1GantryTrackTitle">FIA FORMULA 1 GRAND PRIX · STARTING GRID</div>
+  <div class="f1LightsRow">
+    <div class="f1LightPod" id="f1Light0"></div>
+    <div class="f1LightPod" id="f1Light1"></div>
+    <div class="f1LightPod" id="f1Light2"></div>
+    <div class="f1LightPod" id="f1Light3"></div>
+    <div class="f1LightPod" id="f1Light4"></div>
+  </div>
+  <div style="font-size:16px;font-weight:900;color:#fde047;letter-spacing:1px;" id="f1GantryStatusText">HOLD THROTTLE — AWAITING 5 RED LIGHTS...</div>
+</div>
+
+<!-- Live Pit Stop Service Progress Overlay -->
+<div id="f1PitStopHud">
+  <div style="font-size:13px;font-weight:900;color:#facc15;letter-spacing:0.8px;" id="f1PitStopTitle">🔧 F1 PIT CREW SERVICE · CHANGING TIRES &amp; FRONT WING</div>
+  <div style="width:100%;height:10px;background:#1e293b;border-radius:6px;overflow:hidden;border:1px solid rgba(250,204,21,0.4);">
+    <div id="f1PitStopBar" style="width:0%;height:100%;background:linear-gradient(90deg,#facc15,#10b981);transition:width 0.08s linear;"></div>
+  </div>
+  <div style="font-size:11px;color:#cbd5e1;font-weight:700;" id="f1PitStopSub">Wheel guns locked · Fitting fresh compound + 100% ERS...</div>
 </div>
 
 <!-- Compact Single-Line Top Bar for Mobile Mode -->
@@ -1253,11 +1398,11 @@
         </div>
       </div>
 
-      <!-- 5 Multiplayer Maps Selector -->
+      <!-- 6 Multiplayer Maps Selector -->
       <div class="mpBox" style="margin-top:8px;">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
           <div style="font-size:11px;font-weight:800;color:#fde047;letter-spacing:0.8px;text-transform:uppercase;">
-            🗺️ Select Multiplayer Map (Click any map to switch your room or create a room on it)
+            🗺️ Step 1: Select Multiplayer Map / F1 Grand Prix Circuit
           </div>
           <button id="mpWarpSupplyBtn" class="mpQuickBtn" style="border-color:#10b981;color:#6ee7b7;">📦 Warp to Supply Drop</button>
         </div>
@@ -1267,8 +1412,12 @@
             <div class="mpMapCardSub">Full Lyari &amp; Clifton City · Enterable Buildings, Co-Op Supply Drops &amp; Street PvP</div>
           </div>
           <div class="mpMapCard" data-map="f1_circuit">
-            <div class="mpMapCardTitle">🏎️ F1 Grand Prix Circuit</div>
-            <div class="mpMapCardSub">Formula 1 Stadium Track · Open-Wheel Apex F1 Race Cars, Kerbs, Grandstands &amp; Lap Timer</div>
+            <div class="mpMapCardTitle">🏎️ Karachi F1 Stadium GP</div>
+            <div class="mpMapCardSub">High-Speed F1 Stadium Oval &amp; Sweeper · 3D Pit Lane, Pit Crew Stops, Kerbs &amp; 5-Light Start</div>
+          </div>
+          <div class="mpMapCard" data-map="f1_marina">
+            <div class="mpMapCardTitle">🌃 Clifton Night Marina GP</div>
+            <div class="mpMapCardSub">Technical Street &amp; Waterfront F1 Circuit · S-Chicanes, Hairpin, Marina Pit Lane &amp; Pit Stops</div>
           </div>
           <div class="mpMapCard" data-map="firing_range">
             <div class="mpMapCardTitle">🎯 IB Firing Range</div>
@@ -1281,6 +1430,43 @@
           <div class="mpMapCard" data-map="derby_dome">
             <div class="mpMapCardTitle">💥 Destruction Derby Bowl</div>
             <div class="mpMapCardSub">High-Speed Vehicle Ramming Colosseum · 4 Nitro Launch Ramps &amp; King-of-the-Ring</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- F1 Grand Prix Paddock: Choose F1 Team, Race Car, Tire Compound & Click Ready -->
+      <div class="f1PaddockBox" id="f1PaddockSection">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div>
+            <div style="font-size:12px;font-weight:900;color:#fde047;letter-spacing:0.8px;">🏁 F1 GRAND PRIX PADDOCK · CHOOSE TEAM, CAR, TIRES &amp; READY UP</div>
+            <div style="font-size:10.5px;color:#94a3b8;">Select your Constructor Team, Open-Wheel F1 Chassis, and Tire Strategy. When all drivers click Ready, the 5-Red-Light Race Start begins!</div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <span style="font-size:10.5px;font-weight:800;color:#cbd5e1;">Pirelli Tire Compound:</span>
+            <button class="f1TireChip active" data-tire="soft" style="color:#fca5a5;">🔴 SOFT (Max Grip)</button>
+            <button class="f1TireChip" data-tire="medium" style="color:#fde047;">🟡 MEDIUM (Balanced)</button>
+            <button class="f1TireChip" data-tire="hard" style="color:#f8fafc;">⚪ HARD (Durable)</button>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:10.5px;font-weight:800;color:#38bdf8;margin-bottom:5px;text-transform:uppercase;">Step 2: Choose Constructor Team Livery (8 Official Teams)</div>
+          <div class="f1SelectorGrid" id="f1TeamGrid"></div>
+        </div>
+
+        <div>
+          <div style="font-size:10.5px;font-weight:800;color:#6ee7b7;margin-bottom:5px;text-transform:uppercase;">Step 3: Choose F1 / Grand Prix Race Car (8 Race Spec Machines)</div>
+          <div class="f1SelectorGrid" id="f1CarGrid"></div>
+        </div>
+
+        <div class="f1ReadyBar">
+          <div>
+            <div style="font-size:12px;font-weight:900;color:#fff;" id="f1LobbyStatusLabel">🚥 STARTING GRID LOBBY · 0 / 1 DRIVERS READY</div>
+            <div style="font-size:10.5px;color:#a7f3d0;" id="f1LobbySubLabel">All drivers click "READY FOR RACE" to line up on the Starting Grid &amp; trigger the 5-Light Countdown!</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <button id="f1ToggleReadyBtn" class="buyBtn" style="background:#10b981;color:#052e16;font-weight:900;font-size:13px;padding:8px 16px;">✅ CLICK READY FOR RACE</button>
+            <button id="f1ForceStartBtn" class="buyBtn" style="background:#ef4444;color:#fff;font-weight:900;font-size:12px;padding:8px 12px;" title="Immediately line up all drivers and start the 5-light countdown">🚥 Start Race Now</button>
           </div>
         </div>
       </div>
@@ -3082,25 +3268,31 @@
   // Car Models + Suspension Chassis + Animated Door + Nitro Exhaust
   // ===================================================================
   const CAR_MODELS = [
-    { id: 'speedster', name: 'Speedster GT', kind: 'sport',   length: 4.3, width: 1.95, height: 2.4, wheelRadius: 0.42, speedFactor: 1.25, accelFactor: 1.15, defaultColor: '#c21f1f', defaultRim: '#d8d8d8', rimStyle: 'sport',   spoiler: true,  stripes: false, stripeColor: '#ffffff', hoodStyle: 'wedge', hoodLenFactor: 0.30, clearance: -0.02 },
-    { id: 'f1',        name: 'Apex F1 GP',   kind: 'hyper',   length: 4.8, width: 2.00, height: 1.08,wheelRadius: 0.36, speedFactor: 1.58, accelFactor: 1.52, defaultColor: '#dc2626', defaultRim: '#facc15', rimStyle: 'sport',   spoiler: true,  stripes: true,  stripeColor: '#ffffff', hoodStyle: 'wedge', hoodLenFactor: 0,    clearance: -0.06 },
-    { id: 'muscle',    name: 'Muscle Roar',  kind: 'muscle',  length: 4.9, width: 2.00, height: 2.5, wheelRadius: 0.48, speedFactor: 1.15, accelFactor: 1.20, defaultColor: '#2255cc', defaultRim: '#222222', rimStyle: 'sport',   spoiler: false, stripes: true,  stripeColor: '#ffffff', hoodStyle: 'flat',  hoodLenFactor: 0.40, clearance: 0.00 },
-    { id: 'hatch',     name: 'City Hatch',   kind: 'hatch',   length: 3.8, width: 1.80, height: 2.5, wheelRadius: 0.40, speedFactor: 0.85, accelFactor: 0.95, defaultColor: '#57b06a', defaultRim: '#cccccc', rimStyle: 'sport',   spoiler: false, stripes: false, stripeColor: '#000000', hoodStyle: 'flat',  hoodLenFactor: 0.14, clearance: 0.02 },
-    { id: 'suv',       name: 'Trail SUV',    kind: 'suv',     length: 4.7, width: 2.05, height: 3.2, wheelRadius: 0.50, speedFactor: 0.95, accelFactor: 0.90, defaultColor: '#5a5f66', defaultRim: '#111111', rimStyle: 'offroad', spoiler: false, stripes: false, stripeColor: '#ffffff', hoodStyle: 'flat',  hoodLenFactor: 0.20, clearance: 0.14 },
-    { id: 'truck',     name: 'Pickup Max',   kind: 'truck',   length: 5.3, width: 2.05, height: 3.0, wheelRadius: 0.50, speedFactor: 0.90, accelFactor: 0.90, defaultColor: '#8a3b1e', defaultRim: '#cccccc', rimStyle: 'offroad', spoiler: false, stripes: false, stripeColor: '#ffffff', hoodStyle: 'flat',  hoodLenFactor: 0.28, clearance: 0.16 },
-    { id: 'hyper',     name: 'Hypercar X',   kind: 'hyper',   length: 4.4, width: 2.05, height: 1.95,wheelRadius: 0.42, speedFactor: 1.40, accelFactor: 1.35, defaultColor: '#f2c200', defaultRim: '#111111', rimStyle: 'chrome',  spoiler: true,  stripes: true,  stripeColor: '#111111', hoodStyle: 'wedge', hoodLenFactor: 0.34, clearance: -0.07 },
-    { id: 'classic',   name: 'Retro Classic',kind: 'classic', length: 4.5, width: 1.90, height: 2.6, wheelRadius: 0.42, speedFactor: 0.90, accelFactor: 0.85, defaultColor: '#8a1f2b', defaultRim: '#ffffff', rimStyle: 'classic', spoiler: false, stripes: false, stripeColor: '#ffffff', hoodStyle: 'flat',  hoodLenFactor: 0.32, clearance: 0.02 },
-    { id: 'van',       name: 'Cargo Van',    kind: 'van',     length: 5.0, width: 2.10, height: 3.4, wheelRadius: 0.46, speedFactor: 0.80, accelFactor: 0.75, defaultColor: '#e0dfd6', defaultRim: '#333333', rimStyle: 'sport',   spoiler: false, stripes: false, stripeColor: '#2255cc', hoodStyle: 'none',  hoodLenFactor: 0.00, clearance: 0.10 },
-    { id: 'crawler',   name: 'Rock Crawler', kind: 'offroad', length: 4.4, width: 2.15, height: 3.15,wheelRadius: 0.58, speedFactor: 0.85, accelFactor: 1.00, defaultColor: '#4c6b3a', defaultRim: '#222222', rimStyle: 'offroad', spoiler: false, stripes: false, stripeColor: '#ffffff', hoodStyle: 'flat',  hoodLenFactor: 0.24, clearance: 0.24 },
-    { id: 'lowrider',  name: 'Low Rider',    kind: 'sport',   length: 4.8, width: 2.00, height: 1.85,wheelRadius: 0.40, speedFactor: 1.00, accelFactor: 0.95, defaultColor: '#7a1fa2', defaultRim: '#ffe27a', rimStyle: 'chrome',  spoiler: false, stripes: true,  stripeColor: '#ffe27a', hoodStyle: 'wedge', hoodLenFactor: 0.30, clearance: -0.10 },
-    { id: 'mantis',    name: 'Verde Mantis', kind: 'hyper',   length: 4.3, width: 1.90, height: 1.10,wheelRadius: 0.35, speedFactor: 1.35, accelFactor: 1.30, defaultColor: '#66cc33', defaultRim: '#222222', rimStyle: 'chrome', spoiler: true, stripes: false, stripeColor: '#ffffff', hoodStyle: 'wedge', hoodLenFactor: 0, clearance: -0.05 }
+    { id: 'speedster', name: 'Speedster GT',          kind: 'sport',   length: 4.3, width: 1.95, height: 2.4, wheelRadius: 0.42, speedFactor: 1.25, accelFactor: 1.15, defaultColor: '#c21f1f', defaultRim: '#d8d8d8', rimStyle: 'sport',   spoiler: true,  stripes: false, stripeColor: '#ffffff', hoodStyle: 'wedge', hoodLenFactor: 0.30, clearance: -0.02 },
+    { id: 'f1',        name: 'Apex RB-26 F1',         kind: 'f1',      length: 4.85,width: 2.00, height: 1.08,wheelRadius: 0.36, speedFactor: 1.62, accelFactor: 1.56, defaultColor: '#1e3a8a', defaultRim: '#facc15', rimStyle: 'sport',   spoiler: true,  stripes: true,  stripeColor: '#ef4444', hoodStyle: 'wedge', hoodLenFactor: 0,    clearance: -0.06 },
+    { id: 'f1_sf',     name: 'Corsa SF-90 Monza F1',  kind: 'f1',      length: 4.90,width: 2.00, height: 1.06,wheelRadius: 0.36, speedFactor: 1.68, accelFactor: 1.52, defaultColor: '#dc2626', defaultRim: '#facc15', rimStyle: 'sport',   spoiler: true,  stripes: true,  stripeColor: '#ffffff', hoodStyle: 'wedge', hoodLenFactor: 0,    clearance: -0.06 },
+    { id: 'f1_w15',    name: 'Silver Arrow W-Zero F1',kind: 'f1',      length: 4.80,width: 1.98, height: 1.07,wheelRadius: 0.36, speedFactor: 1.59, accelFactor: 1.62, defaultColor: '#111827', defaultRim: '#10b981', rimStyle: 'chrome',  spoiler: true,  stripes: true,  stripeColor: '#10b981', hoodStyle: 'wedge', hoodLenFactor: 0,    clearance: -0.06 },
+    { id: 'f1_mcl',    name: 'Papaya MCL-Stealth F1', kind: 'f1',      length: 4.84,width: 2.00, height: 1.08,wheelRadius: 0.36, speedFactor: 1.63, accelFactor: 1.58, defaultColor: '#f97316', defaultRim: '#38bdf8', rimStyle: 'sport',   spoiler: true,  stripes: true,  stripeColor: '#0f172a', hoodStyle: 'wedge', hoodLenFactor: 0,    clearance: -0.06 },
+    { id: 'f1_v10',    name: '2004 V10 Screamer F1',  kind: 'f1',      length: 4.55,width: 1.92, height: 1.05,wheelRadius: 0.35, speedFactor: 1.65, accelFactor: 1.66, defaultColor: '#0284c7', defaultRim: '#fde047', rimStyle: 'sport',   spoiler: true,  stripes: true,  stripeColor: '#fde047', hoodStyle: 'wedge', hoodLenFactor: 0,    clearance: -0.06 },
+    { id: 'f1_proto',  name: 'Le Mans Hyper-LMP1',    kind: 'f1',      length: 4.75,width: 2.02, height: 1.14,wheelRadius: 0.37, speedFactor: 1.56, accelFactor: 1.54, defaultColor: '#065f46', defaultRim: '#a3e635', rimStyle: 'chrome',  spoiler: true,  stripes: true,  stripeColor: '#a3e635', hoodStyle: 'wedge', hoodLenFactor: 0,    clearance: -0.06 },
+    { id: 'enforcer',  name: 'Derby Armored Enforcer',kind: 'muscle',  length: 5.0, width: 2.08, height: 2.6, wheelRadius: 0.49, speedFactor: 1.22, accelFactor: 1.28, defaultColor: '#7c3aed', defaultRim: '#facc15', rimStyle: 'offroad', spoiler: true,  stripes: true,  stripeColor: '#10b981', hoodStyle: 'flat',  hoodLenFactor: 0.36, clearance: 0.04 },
+    { id: 'muscle',    name: 'Muscle Roar',           kind: 'muscle',  length: 4.9, width: 2.00, height: 2.5, wheelRadius: 0.48, speedFactor: 1.15, accelFactor: 1.20, defaultColor: '#2255cc', defaultRim: '#222222', rimStyle: 'sport',   spoiler: false, stripes: true,  stripeColor: '#ffffff', hoodStyle: 'flat',  hoodLenFactor: 0.40, clearance: 0.00 },
+    { id: 'hatch',     name: 'City Hatch',            kind: 'hatch',   length: 3.8, width: 1.80, height: 2.5, wheelRadius: 0.40, speedFactor: 0.85, accelFactor: 0.95, defaultColor: '#57b06a', defaultRim: '#cccccc', rimStyle: 'sport',   spoiler: false, stripes: false, stripeColor: '#000000', hoodStyle: 'flat',  hoodLenFactor: 0.14, clearance: 0.02 },
+    { id: 'suv',       name: 'Trail SUV',             kind: 'suv',     length: 4.7, width: 2.05, height: 3.2, wheelRadius: 0.50, speedFactor: 0.95, accelFactor: 0.90, defaultColor: '#5a5f66', defaultRim: '#111111', rimStyle: 'offroad', spoiler: false, stripes: false, stripeColor: '#ffffff', hoodStyle: 'flat',  hoodLenFactor: 0.20, clearance: 0.14 },
+    { id: 'truck',     name: 'Pickup Max',            kind: 'truck',   length: 5.3, width: 2.05, height: 3.0, wheelRadius: 0.50, speedFactor: 0.90, accelFactor: 0.90, defaultColor: '#8a3b1e', defaultRim: '#cccccc', rimStyle: 'offroad', spoiler: false, stripes: false, stripeColor: '#ffffff', hoodStyle: 'flat',  hoodLenFactor: 0.28, clearance: 0.16 },
+    { id: 'hyper',     name: 'Hypercar X GT3',        kind: 'hyper',   length: 4.4, width: 2.05, height: 1.95,wheelRadius: 0.42, speedFactor: 1.44, accelFactor: 1.40, defaultColor: '#f2c200', defaultRim: '#111111', rimStyle: 'chrome',  spoiler: true,  stripes: true,  stripeColor: '#111111', hoodStyle: 'wedge', hoodLenFactor: 0.34, clearance: -0.07 },
+    { id: 'classic',   name: 'Retro Classic',         kind: 'classic', length: 4.5, width: 1.90, height: 2.6, wheelRadius: 0.42, speedFactor: 0.90, accelFactor: 0.85, defaultColor: '#8a1f2b', defaultRim: '#ffffff', rimStyle: 'classic', spoiler: false, stripes: false, stripeColor: '#ffffff', hoodStyle: 'flat',  hoodLenFactor: 0.32, clearance: 0.02 },
+    { id: 'van',       name: 'Cargo Van',             kind: 'van',     length: 5.0, width: 2.10, height: 3.4, wheelRadius: 0.46, speedFactor: 0.80, accelFactor: 0.75, defaultColor: '#e0dfd6', defaultRim: '#333333', rimStyle: 'sport',   spoiler: false, stripes: false, stripeColor: '#2255cc', hoodStyle: 'none',  hoodLenFactor: 0.00, clearance: 0.10 },
+    { id: 'crawler',   name: 'Rock Crawler',          kind: 'offroad', length: 4.4, width: 2.15, height: 3.15,wheelRadius: 0.58, speedFactor: 0.85, accelFactor: 1.00, defaultColor: '#4c6b3a', defaultRim: '#222222', rimStyle: 'offroad', spoiler: false, stripes: false, stripeColor: '#ffffff', hoodStyle: 'flat',  hoodLenFactor: 0.24, clearance: 0.24 },
+    { id: 'lowrider',  name: 'Low Rider',             kind: 'sport',   length: 4.8, width: 2.00, height: 1.85,wheelRadius: 0.40, speedFactor: 1.00, accelFactor: 0.95, defaultColor: '#7a1fa2', defaultRim: '#ffe27a', rimStyle: 'chrome',  spoiler: false, stripes: true,  stripeColor: '#ffe27a', hoodStyle: 'wedge', hoodLenFactor: 0.30, clearance: -0.10 },
+    { id: 'mantis',    name: 'Verde Mantis Track',    kind: 'hyper',   length: 4.3, width: 1.90, height: 1.10,wheelRadius: 0.35, speedFactor: 1.42, accelFactor: 1.38, defaultColor: '#66cc33', defaultRim: '#222222', rimStyle: 'chrome',  spoiler: true,  stripes: false, stripeColor: '#ffffff', hoodStyle: 'wedge', hoodLenFactor: 0,    clearance: -0.05 }
   ];
 
   const garage = { selectedCarId: 'speedster', customs: {} };
   function getCustom(id) {
     if (!garage.customs[id]) {
-      const m = CAR_MODELS.find(x => x.id === id);
-      garage.customs[id] = { bodyColor: m.defaultColor, rimColor: m.defaultRim, rimStyle: m.rimStyle, spoiler: m.spoiler, stripes: m.stripes, stripeColor: m.stripeColor, tint: 0.3, underglow: false, underglowColor: '#33bfff' };
+      const m = CAR_MODELS.find(x => x.id === id) || CAR_MODELS[0];
+      garage.customs[id] = { bodyColor: m.defaultColor, rimColor: m.defaultRim, rimStyle: m.rimStyle, spoiler: m.spoiler, stripes: m.stripes, stripeColor: m.stripeColor, tint: 0.3, underglow: false, underglowColor: '#33bfff', tireCompound: 'soft' };
     }
     return garage.customs[id];
   }
@@ -3179,74 +3371,104 @@
 
   function buildFormula1Car(group, modelDef, custom, M) {
     const chassis = new THREE.Group();
+    const isZeroPod = modelDef.id === 'f1_w15';
+    const isProto = modelDef.id === 'f1_proto';
+    const isV10 = modelDef.id === 'f1_v10';
+
     // 1. Central carbon-fiber & painted monocoque tub + tapered needle nose cone
-    const tub = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.36, 2.45), M.paintMat);
+    const tub = new THREE.Mesh(new THREE.BoxGeometry(isProto ? 0.92 : 0.68, 0.36, 2.45), M.paintMat);
     tub.position.set(0, 0.34, -0.15);
     tub.castShadow = true;
     chassis.add(tub);
 
-    const nose = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.22, 1.45), M.paintMat);
+    const nose = new THREE.Mesh(new THREE.BoxGeometry(isProto ? 0.65 : 0.42, 0.22, 1.48), M.paintMat);
     nose.position.set(0, 0.25, 1.62);
     nose.rotation.x = 0.08;
     nose.castShadow = true;
     chassis.add(nose);
 
+    // Racing number / team nose stripe decal
+    const noseStripe = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.03, 1.35), M.stripeMat);
+    noseStripe.position.set(0, 0.36, 1.55);
+    noseStripe.rotation.x = 0.08;
+    chassis.add(noseStripe);
+
     // 2. Sculpted F1 Aerodynamic Sidepods + Floor Ground-Effect Plank
-    const floor = new THREE.Mesh(new THREE.BoxGeometry(1.65, 0.05, 3.1), M.trimMat);
+    const floor = new THREE.Mesh(new THREE.BoxGeometry(1.72, 0.05, 3.18), M.trimMat);
     floor.position.set(0, 0.14, -0.2);
     chassis.add(floor);
     [-1, 1].forEach(side => {
-      const pod = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.32, 1.65), M.paintMat);
-      pod.position.set(side * 0.52, 0.32, -0.25);
+      const podW = isZeroPod ? 0.28 : (isProto ? 0.56 : 0.44);
+      const pod = new THREE.Mesh(new THREE.BoxGeometry(podW, 0.32, 1.68), M.paintMat);
+      pod.position.set(side * (isZeroPod ? 0.42 : 0.52), 0.32, -0.25);
       pod.castShadow = true;
       chassis.add(pod);
+      // Team accent bargeboard stripe along sidepod
+      const podAccent = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.12, 1.55), M.stripeMat);
+      podAccent.position.set(side * (isZeroPod ? 0.57 : 0.74), 0.32, -0.25);
+      chassis.add(podAccent);
     });
 
     // 3. Multi-Element Front Wing + Endplates
-    const frontWing = new THREE.Mesh(new THREE.BoxGeometry(1.86, 0.05, 0.42), M.paintMat);
+    const frontWing = new THREE.Mesh(new THREE.BoxGeometry(1.88, 0.05, 0.42), M.paintMat);
     frontWing.position.set(0, 0.14, 2.24);
     chassis.add(frontWing);
-    const frontFlap = new THREE.Mesh(new THREE.BoxGeometry(1.82, 0.04, 0.22), M.stripeMat);
+    const frontFlap = new THREE.Mesh(new THREE.BoxGeometry(1.84, 0.04, 0.22), M.stripeMat);
     frontFlap.position.set(0, 0.19, 2.18);
     chassis.add(frontFlap);
-    [-0.93, 0.93].forEach(wx => {
-      const plate = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.22, 0.48), M.paintMat);
+    [-0.94, 0.94].forEach(wx => {
+      const plate = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.24, 0.50), M.paintMat);
       plate.position.set(wx, 0.22, 2.22);
       chassis.add(plate);
     });
 
-    // 4. Open Cockpit + Driver Helmet + Titanium Halo Safety Bar + Airbox Shark Fin
-    const cockpitRecess = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.12, 0.78), M.trimMat);
-    cockpitRecess.position.set(0, 0.50, 0.08);
-    chassis.add(cockpitRecess);
-    const helmet = new THREE.Mesh(new THREE.SphereGeometry(0.17, 14, 14), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.2, metalness: 0.6 }));
-    helmet.position.set(0, 0.64, 0.05);
-    chassis.add(helmet);
-    const haloLoop = new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.032, 8, 18, Math.PI), M.trimMat);
-    haloLoop.rotation.x = Math.PI / 2 - 0.15;
-    haloLoop.position.set(0, 0.68, 0.15);
-    chassis.add(haloLoop);
-    const haloPillar = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.22, 8), M.trimMat);
-    haloPillar.position.set(0, 0.59, 0.45);
-    chassis.add(haloPillar);
+    // 4. Open Cockpit + Driver Helmet + Titanium Halo Safety Bar (or LMP1 Canopy) + Airbox Shark Fin
+    if (isProto) {
+      const canopy = new THREE.Mesh(new THREE.SphereGeometry(0.42, 16, 12), M.glassMat);
+      canopy.scale.set(0.85, 0.58, 1.65);
+      canopy.position.set(0, 0.56, 0.05);
+      chassis.add(canopy);
+    } else {
+      const cockpitRecess = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.12, 0.78), M.trimMat);
+      cockpitRecess.position.set(0, 0.50, 0.08);
+      chassis.add(cockpitRecess);
+      const helmet = new THREE.Mesh(new THREE.SphereGeometry(0.17, 14, 14), M.stripeMat);
+      helmet.position.set(0, 0.64, 0.05);
+      chassis.add(helmet);
+      if (!isV10) {
+        const haloLoop = new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.032, 8, 18, Math.PI), M.trimMat);
+        haloLoop.rotation.x = Math.PI / 2 - 0.15;
+        haloLoop.position.set(0, 0.68, 0.15);
+        chassis.add(haloLoop);
+        const haloPillar = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.22, 8), M.trimMat);
+        haloPillar.position.set(0, 0.59, 0.45);
+        chassis.add(haloPillar);
+      }
+    }
 
     const airbox = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.36, 0.95), M.paintMat);
     airbox.position.set(0, 0.66, -0.62);
     chassis.add(airbox);
-    const sharkFin = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.34, 0.85), M.stripeMat);
+    // TV T-Cam above airbox
+    const tCam = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.04, 0.08), M.stripeMat);
+    tCam.position.set(0, 0.92, -0.35);
+    chassis.add(tCam);
+
+    const sharkFin = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.36, 0.92), M.stripeMat);
     sharkFin.position.set(0, 0.72, -1.25);
     chassis.add(sharkFin);
 
     // 5. High-Downforce DRS Rear Wing + FIA Rain Light
-    const rearWingMain = new THREE.Mesh(new THREE.BoxGeometry(1.56, 0.06, 0.38), M.paintMat);
-    rearWingMain.position.set(0, 0.88, -2.12);
+    const wingH = modelDef.id === 'f1_sf' ? 0.82 : 0.90;
+    const rearWingMain = new THREE.Mesh(new THREE.BoxGeometry(1.58, 0.06, 0.38), M.paintMat);
+    rearWingMain.position.set(0, wingH, -2.12);
     chassis.add(rearWingMain);
-    const rearWingDRS = new THREE.Mesh(new THREE.BoxGeometry(1.52, 0.05, 0.24), M.stripeMat);
-    rearWingDRS.position.set(0, 0.98, -2.18);
+    const rearWingDRS = new THREE.Mesh(new THREE.BoxGeometry(1.54, 0.05, 0.24), M.stripeMat);
+    rearWingDRS.position.set(0, wingH + 0.10, -2.18);
     chassis.add(rearWingDRS);
-    [-0.78, 0.78].forEach(wx => {
+    [-0.79, 0.79].forEach(wx => {
       const endplate = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.48, 0.52), M.paintMat);
-      endplate.position.set(wx, 0.82, -2.12);
+      endplate.position.set(wx, wingH - 0.06, -2.12);
       chassis.add(endplate);
     });
     const rainLight = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.18, 0.08), M.taillightMat);
@@ -3263,6 +3485,11 @@
     group.add(chassis);
     attachDoorAndFlames(group, chassis, 2.0, 1.08, 4.8, M.paintMat);
 
+    // Pirelli Tire Sidewall Compound Ring Color (Soft=Red, Medium=Yellow, Hard=White)
+    const compoundColors = { soft: 0xef4444, medium: 0xfacc15, hard: 0xf8fafc };
+    const ringHex = compoundColors[custom.tireCompound] || 0xef4444;
+    const tireRingMat = new THREE.MeshBasicMaterial({ color: ringHex, side: THREE.DoubleSide });
+
     const wheelR = modelDef.wheelRadius;
     const wheelPositions = [
       [-0.95, wheelR, 1.42], [0.95, wheelR, 1.42],
@@ -3275,9 +3502,16 @@
       tire.rotation.z = Math.PI / 2;
       tire.castShadow = true;
       grp.add(tire);
-      const rim = new THREE.Mesh(new THREE.CylinderGeometry(wheelR * 0.58, wheelR * 0.58, tireWidth + 0.02, 16), M.rimMat);
+      const rim = new THREE.Mesh(new THREE.CylinderGeometry(wheelR * 0.56, wheelR * 0.56, tireWidth + 0.02, 16), M.rimMat);
       rim.rotation.z = Math.PI / 2;
       grp.add(rim);
+      // Outer Pirelli compound ring
+      const sideSign = p[0] < 0 ? -1 : 1;
+      const pRing = new THREE.Mesh(new THREE.RingGeometry(wheelR * 0.64, wheelR * 0.78, 20), tireRingMat);
+      pRing.rotation.y = Math.PI / 2;
+      pRing.position.x = sideSign * (tireWidth * 0.5 + 0.008);
+      grp.add(pRing);
+
       grp.position.set(p[0], p[1], p[2]);
       group.add(grp);
       return grp;
@@ -3375,7 +3609,7 @@
     const chassis = new THREE.Group();
     group.add(chassis);
     const M = createCarMaterials(custom);
-    if (modelDef.id === 'f1') return buildFormula1Car(group, modelDef, custom, M);
+    if (modelDef.kind === 'f1' || modelDef.id === 'f1') return buildFormula1Car(group, modelDef, custom, M);
     if (modelDef.id === 'mantis') return buildMantisCar(group, modelDef, custom, M);
     const L = modelDef.length, W = modelDef.width, H = modelDef.height;
     const CL = modelDef.clearance || 0;
@@ -8944,11 +9178,11 @@
       return;
     }
 
-    // SPECIALIZED ARENA RADAR WHEN IN F1 CIRCUIT, FIRING RANGE, CONTAINER PVP, OR DERBY BOWL
+    // SPECIALIZED ARENA RADAR WHEN IN F1 CIRCUITS, FIRING RANGE, CONTAINER PVP, OR DERBY BOWL
     if (currentMpMap !== 'karachi_city') {
       if (currentMpMap === 'f1_circuit') {
         mmCtx.strokeStyle = '#334155';
-        mmCtx.lineWidth = 14;
+        mmCtx.lineWidth = 13;
         mmCtx.beginPath();
         mmCtx.ellipse(-pos.x * MM_SCALE, -pos.z * MM_SCALE, 145 * MM_SCALE, 92 * MM_SCALE, 0, 0, Math.PI * 2);
         mmCtx.stroke();
@@ -8956,6 +9190,19 @@
         mmCtx.lineWidth = 1.5;
         mmCtx.beginPath();
         mmCtx.ellipse(-pos.x * MM_SCALE, -pos.z * MM_SCALE, 145 * MM_SCALE, 92 * MM_SCALE, 0, 0, Math.PI * 2);
+        mmCtx.stroke();
+      } else if (currentMpMap === 'f1_marina' && typeof F1_MARINA_WP !== 'undefined') {
+        mmCtx.strokeStyle = '#334155';
+        mmCtx.lineWidth = 12;
+        mmCtx.beginPath();
+        F1_MARINA_WP.forEach((pt, idx) => {
+          const sx = (pt.x - pos.x) * MM_SCALE, sz = (pt.z - pos.z) * MM_SCALE;
+          if (idx === 0) mmCtx.moveTo(sx, sz); else mmCtx.lineTo(sx, sz);
+        });
+        mmCtx.closePath();
+        mmCtx.stroke();
+        mmCtx.strokeStyle = '#38bdf8';
+        mmCtx.lineWidth = 1.6;
         mmCtx.stroke();
       } else if (currentMpMap === 'firing_range') {
         mmCtx.strokeStyle = '#38bdf8';
@@ -8978,19 +9225,51 @@
         mmCtx.strokeRect((-90 - pos.x) * MM_SCALE, (-90 - pos.z) * MM_SCALE, 180 * MM_SCALE, 180 * MM_SCALE);
       }
 
+      // Draw Pit Box & Active Sector Gate on F1 maps
+      if ((currentMpMap === 'f1_circuit' || currentMpMap === 'f1_marina') && typeof getActiveF1PitBox === 'function') {
+        const pit = getActiveF1PitBox();
+        if (pit) {
+          const pProj = projectToMinimap(pit.x, pit.z, pos, 8);
+          mmCtx.fillStyle = '#facc15';
+          mmCtx.strokeStyle = '#000';
+          mmCtx.lineWidth = 1.4;
+          mmCtx.fillRect(pProj.x - 5, pProj.y - 5, 10, 10);
+          mmCtx.strokeRect(pProj.x - 5, pProj.y - 5, 10, 10);
+          mmCtx.fillStyle = '#fde047';
+          mmCtx.font = 'bold 8px sans-serif';
+          mmCtx.textAlign = 'center';
+          mmCtx.fillText('PIT', pProj.x, pProj.y - 7);
+        }
+        const gates = typeof getActiveF1Gates === 'function' ? getActiveF1Gates() : [];
+        const g = gates[f1GateIdx];
+        if (g) {
+          const gProj = projectToMinimap(g.x, g.z, pos, 8);
+          mmCtx.fillStyle = '#38bdf8';
+          mmCtx.beginPath();
+          mmCtx.arc(gProj.x, gProj.y, 4.8, 0, Math.PI * 2);
+          mmCtx.fill();
+        }
+      }
+
       remoteOperatives.forEach(op => {
         if (op.mode === 'interior') return;
         const opProj = projectToMinimap(op.x, op.z, pos, 8);
         mmCtx.save();
         mmCtx.translate(opProj.x, opProj.y);
         mmCtx.rotate(op.heading || 0);
-        mmCtx.fillStyle = '#10b981';
+        mmCtx.fillStyle = op.bodyColor || '#10b981';
         mmCtx.strokeStyle = '#ffffff';
         mmCtx.lineWidth = 1.4;
         mmCtx.beginPath();
         mmCtx.moveTo(0, -6.2); mmCtx.lineTo(4.4, 5.2); mmCtx.lineTo(0, 3.0); mmCtx.lineTo(-4.4, 5.2); mmCtx.closePath();
         mmCtx.fill(); mmCtx.stroke();
         mmCtx.restore();
+        if (opProj.visible) {
+          mmCtx.fillStyle = '#f8fafc';
+          mmCtx.font = 'bold 8px sans-serif';
+          mmCtx.textAlign = 'center';
+          mmCtx.fillText((op.name || 'OP').slice(0, 9), opProj.x, opProj.y - 8);
+        }
       });
 
       mmCtx.fillStyle = mode === 'walk' ? '#38bdf8' : '#ffffff';
@@ -9010,52 +9289,8 @@
     const cellPx = BLOCK * MM_SCALE;
     const swPx = CELL_INNER * MM_SCALE;
 
-    // 1. Draw Custom Arena Map Radar OR City Blocks
-    if (currentMpMap !== 'karachi_city') {
-      mmCtx.fillStyle = '#0f172a';
-      mmCtx.fillRect(-MM_HALF, -MM_HALF, MM_SIZE, MM_SIZE);
-      if (currentMpMap === 'f1_circuit') {
-        const rx = 165 * MM_SCALE, rz = 105 * MM_SCALE;
-        const ox = -pos.x * MM_SCALE, oz = -pos.z * MM_SCALE;
-        mmCtx.strokeStyle = '#334155';
-        mmCtx.lineWidth = 14 * MM_SCALE;
-        mmCtx.beginPath();
-        mmCtx.ellipse(ox, oz, rx, rz, 0, 0, Math.PI * 2);
-        mmCtx.stroke();
-        mmCtx.strokeStyle = '#ef4444';
-        mmCtx.lineWidth = 1.4;
-        mmCtx.beginPath();
-        mmCtx.ellipse(ox, oz, rx, rz, 0, 0, Math.PI * 2);
-        mmCtx.stroke();
-        if (f1Checkpoints.length) {
-          const cp = f1Checkpoints[f1NextGateIdx % f1Checkpoints.length];
-          const cpProj = projectToMinimap(cp.x, cp.z, pos, 8);
-          mmCtx.fillStyle = '#facc15';
-          mmCtx.beginPath();
-          mmCtx.arc(cpProj.x, cpProj.y, 5, 0, Math.PI * 2);
-          mmCtx.fill();
-        }
-      } else if (currentMpMap === 'firing_range') {
-        mmCtx.strokeStyle = '#f59e0b';
-        mmCtx.lineWidth = 1.5;
-        mmCtx.strokeRect((-45 - pos.x) * MM_SCALE, (-65 - pos.z) * MM_SCALE, 90 * MM_SCALE, 110 * MM_SCALE);
-        mpRangeTargets.forEach(t => {
-          if (!t.up) return;
-          const tx = (t.mesh.position.x - pos.x) * MM_SCALE;
-          const tz = (t.mesh.position.z - pos.z) * MM_SCALE;
-          if (Math.abs(tx) < MM_HALF - 4 && Math.abs(tz) < MM_HALF - 4) {
-            mmCtx.fillStyle = '#ef4444';
-            mmCtx.beginPath();
-            mmCtx.arc(tx, tz, 3.2, 0, Math.PI * 2);
-            mmCtx.fill();
-          }
-        });
-      } else {
-        mmCtx.strokeStyle = '#38bdf8';
-        mmCtx.lineWidth = 2;
-        mmCtx.strokeRect((-70 - pos.x) * MM_SCALE, (-70 - pos.z) * MM_SCALE, 140 * MM_SCALE, 140 * MM_SCALE);
-      }
-    } else {
+    // 1. Draw City Blocks
+    {
     for (let di = -MM_RADIUS_CELLS; di <= MM_RADIUS_CELLS; di++) {
       for (let dj = -MM_RADIUS_CELLS; dj <= MM_RADIUS_CELLS; dj++) {
         const i = Math.round(pi) + di, j = Math.round(pj) + dj;
@@ -9287,10 +9522,51 @@
     const brake = keys['KeyS'] || keys['ArrowDown'];
     const handbrake = keys['Space'];
     const nitroKey = keys['ShiftLeft'] || keys['ShiftRight'];
+    const isF1Map = currentMpMap === 'f1_circuit' || currentMpMap === 'f1_marina';
+
+    // Hold car on Starting Grid during 5-Red-Light FIA Countdown
+    if (isF1Map && typeof f1RaceStatus !== 'undefined' && f1RaceStatus === 'countdown') {
+      state.speed = 0;
+      if (car && car.userData.nitroFlames) {
+        car.userData.nitroFlames.visible = Boolean(gas);
+        if (gas) car.userData.nitroFlames.scale.set(1, 0.9 + Math.random() * 0.7, 1);
+      }
+      if (car && car.userData.chassis) {
+        car.userData.chassis.position.y = gas ? (Math.random() - 0.5) * 0.025 : 0;
+      }
+      car.position.set(state.x, 0, state.z);
+      car.rotation.y = state.heading;
+      speedEl.innerHTML = '0<span>km/h · REV</span>';
+      hintEl.textContent = '🚥 Hold W for Launch Control — Wait for GREEN LIGHTS OUT!';
+      return;
+    }
+
+    // Hold car on Hydraulic Jacks during Pit Stop Service
+    if (isF1Map && typeof f1PitStopTimer !== 'undefined' && f1PitStopTimer > 0) {
+      state.speed = 0;
+      car.position.set(state.x, 0.26, state.z);
+      car.rotation.y = state.heading;
+      wheels.forEach(w => { w.rotation.x += 18 * dt; });
+      speedEl.innerHTML = 'PIT<span>BOX</span>';
+      hintEl.textContent = '🔧 F1 Pit Crew changing Pirelli tires & adjusting front wing...';
+      return;
+    }
+
     const usingNitro = nitroKey && gas && playerStats.nitro > 1;
 
     let accelNow = state.accel;
     let maxSpeedNow = state.maxSpeed;
+
+    // Apply Pirelli Tire Compound & Tire Wear Physics on F1 Circuits
+    if (isF1Map && typeof f1TireCompound !== 'undefined') {
+      const compMult = f1TireCompound === 'soft' ? 1.12 : (f1TireCompound === 'medium' ? 1.06 : 1.0);
+      const wearPenalty = (typeof f1TireHealth === 'number' && f1TireHealth < 45)
+        ? Math.max(0.72, 0.72 + (f1TireHealth / 45) * 0.28)
+        : 1.0;
+      accelNow *= compMult * wearPenalty;
+      maxSpeedNow *= (1 + (compMult - 1) * 0.65) * wearPenalty;
+    }
+
     if (usingNitro) {
       accelNow *= 1.65;
       maxSpeedNow *= 1.32;
@@ -9522,12 +9798,14 @@
     sun.target.updateMatrixWorld();
 
     updateWorldStreaming(pos);
-    updatePeds(dt);
-    updateLoot(dt);
-    updateTraffic(dt);
-    updateSpikeStrips(dt);
-    updatePolice(dt);
-    updateMissionSystem(dt);
+    if (currentMpMap === 'karachi_city') {
+      updatePeds(dt);
+      updateLoot(dt);
+      updateTraffic(dt);
+      updateSpikeStrips(dt);
+      updatePolice(dt);
+      updateMissionSystem(dt);
+    }
     updateMultiplayer(dt);
     updateCamera(pos);
     drawMinimap(pos);
@@ -9539,13 +9817,15 @@
       wantedDecayTimer = 0;
     }
 
-    checkTriggers();
-    if (nearStoryStart && !activeMission && statsTracking.storyIndex < STORY_MISSIONS.length) {
-      hintEl.textContent = '★ Press E to start Story Mission: ' + STORY_MISSIONS[statsTracking.storyIndex].title;
-    } else if (nearStreetJob && !activeMission) {
-      hintEl.textContent = 'Press E to start Street Hustle: ' + nearStreetJob.title + ' (+$' + nearStreetJob.reward + ')';
-    } else if (nearBuilding) {
-      hintEl.textContent = '🏛 Press E to Enter ' + nearBuilding.name + ' (' + (nearBuilding.badge || nearBuilding.type.toUpperCase()) + ')';
+    if (currentMpMap === 'karachi_city') {
+      checkTriggers();
+      if (nearStoryStart && !activeMission && statsTracking.storyIndex < STORY_MISSIONS.length) {
+        hintEl.textContent = '★ Press E to start Story Mission: ' + STORY_MISSIONS[statsTracking.storyIndex].title;
+      } else if (nearStreetJob && !activeMission) {
+        hintEl.textContent = 'Press E to start Street Hustle: ' + nearStreetJob.title + ' (+$' + nearStreetJob.reward + ')';
+      } else if (nearBuilding) {
+        hintEl.textContent = '🏛 Press E to Enter ' + nearBuilding.name + ' (' + (nearBuilding.badge || nearBuilding.type.toUpperCase()) + ')';
+      }
     }
 
     exitBtnEl.textContent = mode === 'drive' ? '🚪 Exit Car' : '🚗 Enter Car';
@@ -9603,11 +9883,53 @@
 
   const MP_MAP_META = {
     karachi_city: { label: '🏙️ Karachi Open World', short: 'KARACHI CITY', color: '#38bdf8' },
-    f1_circuit:   { label: '🏎️ Karachi Grand Prix F1 Circuit', short: 'F1 CIRCUIT', color: '#ef4444' },
+    f1_circuit:   { label: '🏎️ Karachi F1 Stadium GP', short: 'F1 STADIUM GP', color: '#ef4444' },
+    f1_marina:    { label: '🌃 Clifton Night Marina GP', short: 'F1 MARINA GP', color: '#38bdf8' },
     firing_range: { label: '🎯 IB Tactical Firing Range', short: 'FIRING RANGE', color: '#facc15' },
     kemari_docks: { label: '⚓ Kemari Port Container PvP', short: 'CONTAINER PVP', color: '#f97316' },
     derby_dome:   { label: '💥 Clifton Destruction Derby Bowl', short: 'DERBY BOWL', color: '#a855f7' }
   };
+
+  // 8 Official Formula 1 Constructor Teams with Custom Liveries
+  const F1_TEAMS = [
+    { id: 'ferrari_corsa', name: 'Scuderia Corsa Rossa',  short: 'CORSA ROSSA',  badge: '🟥', bodyColor: '#dc2626', stripeColor: '#ffffff', rimColor: '#facc15', underglow: '#ef4444', desc: 'Maranello V6 Turbo · High Straight-Line Speed' },
+    { id: 'red_apex',      name: 'Oracle Red Apex Racing',short: 'RED APEX',     badge: '🟦', bodyColor: '#1e3a8a', stripeColor: '#ef4444', rimColor: '#facc15', underglow: '#38bdf8', desc: 'Ground-Effect Downforce Champion · Max Cornering' },
+    { id: 'mclaren_papaya',name: 'McLaren Papaya F1',     short: 'PAPAYA F1',    badge: '🟧', bodyColor: '#f97316', stripeColor: '#0f172a', rimColor: '#38bdf8', underglow: '#f97316', desc: 'Woking Carbon Aero · Low Drag & Fast Pit Crew' },
+    { id: 'silver_amg',    name: 'Silver Arrows AMG',     short: 'SILVER AMG',   badge: '🟩', bodyColor: '#111827', stripeColor: '#10b981', rimColor: '#e2e8f0', underglow: '#10b981', desc: 'Brackley Zero-Pod Hybrid · Smooth Tire Management' },
+    { id: 'aston_amr',     name: 'Aston Emerald AMR GP',  short: 'ASTON AMR',    badge: '🟩', bodyColor: '#065f46', stripeColor: '#a3e635', rimColor: '#f8fafc', underglow: '#10b981', desc: 'Silverstone British Racing Green · High Traction' },
+    { id: 'alpine_blue',   name: 'Alpine Tricolore F1',   short: 'ALPINE F1',    badge: '🟦', bodyColor: '#0284c7', stripeColor: '#ec4899', rimColor: '#f8fafc', underglow: '#38bdf8', desc: 'Enstone Renault E-Tech · ERS Boost Recovery' },
+    { id: 'karachi_ib',    name: 'Karachi IB Syndicate',  short: 'KARACHI IB',   badge: '🟨', bodyColor: '#eab308', stripeColor: '#090d16', rimColor: '#10b981', underglow: '#fde047', desc: 'Dhurandhar Special Ops Division · Stealth Spec' },
+    { id: 'lyari_phantom', name: 'Lyari Phantom V10 GP',  short: 'PHANTOM V10',  badge: '🟪', bodyColor: '#7c3aed', stripeColor: '#38bdf8', rimColor: '#f8fafc', underglow: '#a855f7', desc: 'Clifton Night Street Works · High-Rev Launch' }
+  ];
+
+  // Wide Selection of 8 Formula 1 & Grand Prix Cars
+  const F1_RACE_CARS = [
+    { id: 'f1',       name: 'Apex RB-26 F1',          spec: 'Ground-Effect Aero · 348 km/h', tag: 'F1 GROUND EFFECT' },
+    { id: 'f1_sf',    name: 'Corsa SF-90 Monza F1',   spec: 'Low-Drag Slipstream · 358 km/h',tag: 'F1 TOP SPEED' },
+    { id: 'f1_w15',   name: 'Silver Arrow W-Zero F1', spec: 'Zero-Pod Razor Turn · 344 km/h',tag: 'F1 CORNERING' },
+    { id: 'f1_mcl',   name: 'Papaya MCL-Stealth F1',  spec: 'Tire-Whisperer Spec · 350 km/h',tag: 'F1 ENDURANCE' },
+    { id: 'f1_v10',   name: '2004 V10 Screamer F1',   spec: '900HP NA V10 · Instant Accel',  tag: 'CLASSIC V10 F1' },
+    { id: 'f1_proto', name: 'Le Mans Hyper-LMP1',     spec: 'Closed Canopy Prototype · 338 km/h', tag: 'LMP1 HYPER' },
+    { id: 'hyper',    name: 'Hypercar X GT3',         spec: 'FIA GT3 Safety/Touring · 322 km/h',  tag: 'GT3 SUPERCAR' },
+    { id: 'mantis',   name: 'Verde Mantis Track',     spec: 'Mid-Engine Track Blade · 318 km/h',  tag: 'TRACK SPECIAL' }
+  ];
+
+  let f1SelectedTeamId = 'ferrari_corsa';
+  let f1SelectedTeamName = 'Scuderia Corsa Rossa';
+  let f1TireCompound = 'soft'; // 'soft' | 'medium' | 'hard'
+  let f1TireHealth = 100;
+  let f1PitStopTimer = 0;
+  const F1_PIT_DURATION = 2.4;
+  let f1PitCooldown = 0;
+  let f1PitCount = 0;
+  let f1SelfReady = false;
+  let f1RaceStatus = 'lobby'; // 'lobby' | 'countdown' | 'racing' | 'finished'
+  let f1TotalLaps = 3;
+  let f1CountdownStartMs = 0;
+  let f1LastBeepLight = -1;
+  let f1FinishOrder = [];
+  let f1PitCrewMeshes = [];
+  let f1GantryLightMeshes = [];
 
   // Dedicated 3D Arena Group & Interactive State
   const mpArenaGroup = new THREE.Group();
@@ -9617,15 +9939,50 @@
   let firingRangeBest = 0;
   let firingRangeHits = 0;
 
-  // F1 Circuit Telemetry State
+  // Track 1: Karachi F1 Stadium Circuit Geometry & Pit Box
   const F1_RX = 145;
   const F1_RZ = 92;
   const F1_GATES = [
-    { x: 0, z: -F1_RZ, label: 'Sector 1 (North Straight)' },
+    { x: 0, z: -F1_RZ, label: 'Sector 1 (North DRS Straight)' },
     { x: -F1_RX, z: 0, label: 'Sector 2 (West Hairpin)' },
-    { x: 0, z: F1_RZ, label: 'Sector 3 (South Pit Straight)' },
-    { x: F1_RX, z: 0, label: 'FINISH / START LINE (East Grandstand)' }
+    { x: 0, z: F1_RZ, label: 'Sector 3 (South Sweeper)' },
+    { x: F1_RX, z: 0, label: 'START / FINISH LINE (Main Grandstand)' }
   ];
+  const F1_STADIUM_PIT_BOX = { x: F1_RX - 18, z: -4, heading: Math.PI };
+
+  // Track 2: Clifton Night Marina GP (Multi-Corner Technical Street & Waterfront F1 Circuit)
+  const F1_MARINA_WP = [
+    { x: 0,    z: 96 },   // 0: Main Harbor Start/Finish Straight
+    { x: 96,   z: 96 },   // 1: Turn 1 Harbor Braking Zone
+    { x: 142,  z: 54 },   // 2: Turn 2 Waterfront Esses
+    { x: 136,  z: -24 },  // 3: Turn 3 Marina Promenade
+    { x: 82,   z: -88 },  // 4: Turn 4 North Pier Corner
+    { x: 18,   z: -56 },  // 5: Turn 5 Technical Infield Chicane Apex A
+    { x: -24,  z: -94 },  // 6: Turn 6 Chicane Exit B
+    { x: -112, z: -84 },  // 7: Turn 7 Arabian Sea Back Straight Entry
+    { x: -146, z: -18 },  // 8: Turn 8 West Lighthouse Hairpin
+    { x: -124, z: 58 },   // 9: Turn 9 Yacht Club Fast Sweeper
+    { x: -68,  z: 96 }    // 10: Turn 10 Pit Entry & Final Corner
+  ];
+  const F1_MARINA_GATES = [
+    { x: 96,   z: 96,  label: 'Sector 1 (Turn 1 Harbor Braking Zone)' },
+    { x: 136,  z: -24, label: 'Sector 2 (Marina Promenade)' },
+    { x: 18,   z: -56, label: 'Sector 3 (Clifton S-Chicane)' },
+    { x: -112, z: -84, label: 'Sector 4 (Arabian Sea Back Straight)' },
+    { x: -124, z: 58,  label: 'Sector 5 (Yacht Club Sweeper)' },
+    { x: 0,    z: 96,  label: 'START / FINISH LINE (Marina Grandstand)' }
+  ];
+  const F1_MARINA_PIT_BOX = { x: 0, z: 76, heading: Math.PI / 2 };
+
+  function getActiveF1Gates() {
+    return currentMpMap === 'f1_marina' ? F1_MARINA_GATES : F1_GATES;
+  }
+  function getActiveF1PitBox() {
+    if (currentMpMap === 'f1_marina') return F1_MARINA_PIT_BOX;
+    if (currentMpMap === 'f1_circuit') return F1_STADIUM_PIT_BOX;
+    return null;
+  }
+
   let f1GateIdx = 0;
   let f1LapCount = 1;
   let f1LapStartMs = 0;
@@ -9666,6 +10023,8 @@
     mpArenaHitboxes = [];
     firingRangeTargets = [];
     f1GateMeshes = [];
+    f1PitCrewMeshes = [];
+    f1GantryLightMeshes = [];
     derbyRamps = [];
   }
 
@@ -9686,10 +10045,62 @@
     return mesh;
   }
 
+  // Helper: Build 3D Pit Box, Pit Lane Garage Canopy & 4 Animated Pit Crew Mechanics
+  function build3DPitLaneStation(pitX, pitZ, pitHeading, teamHex) {
+    const pitGroup = new THREE.Group();
+    pitGroup.position.set(pitX, 0, pitZ);
+    pitGroup.rotation.y = pitHeading;
+
+    // Glowing Yellow/Emerald Pit Box Tarmac Pad
+    const pad = new THREE.Mesh(
+      new THREE.BoxGeometry(7.5, 0.10, 14.0),
+      new THREE.MeshBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.42 })
+    );
+    pad.position.y = 0.05;
+    pitGroup.add(pad);
+
+    // Inner Stop Marks
+    const stopBox = new THREE.Mesh(
+      new THREE.RingGeometry(2.8, 3.5, 28),
+      new THREE.MeshBasicMaterial({ color: 0x10b981, side: THREE.DoubleSide })
+    );
+    stopBox.rotation.x = -Math.PI / 2;
+    stopBox.position.y = 0.12;
+    pitGroup.add(stopBox);
+
+    // Overhead Pit Boom Rig & Team Telemetry Canopy
+    const rigMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.7, roughness: 0.3 });
+    const teamMat = new THREE.MeshStandardMaterial({ color: teamHex || 0xdc2626, emissive: teamHex || 0xdc2626, emissiveIntensity: 0.35 });
+    const pillar = new THREE.Mesh(new THREE.BoxGeometry(0.8, 5.2, 0.8), rigMat);
+    pillar.position.set(-4.4, 2.6, 0);
+    pitGroup.add(pillar);
+
+    const boom = new THREE.Mesh(new THREE.BoxGeometry(6.5, 0.45, 5.5), teamMat);
+    boom.position.set(-1.5, 5.0, 0);
+    pitGroup.add(boom);
+
+    // 4 Pit Crew Mechanics holding wheel guns around the car bay
+    const crewOffsets = [
+      { x: -2.2, z: 2.0, rot: Math.PI / 2 },
+      { x: 2.2,  z: 2.0, rot: -Math.PI / 2 },
+      { x: -2.2, z: -2.0, rot: Math.PI / 2 },
+      { x: 2.2,  z: -2.0, rot: -Math.PI / 2 }
+    ];
+    crewOffsets.forEach(co => {
+      const crew = buildPedMesh(teamHex || 0xdc2626, false);
+      crew.position.set(co.x, 0, co.z);
+      crew.rotation.y = co.rot;
+      pitGroup.add(crew);
+      f1PitCrewMeshes.push({ mesh: crew, baseX: co.x, baseZ: co.z });
+    });
+
+    mpArenaGroup.add(pitGroup);
+  }
+
   function buildF1CircuitArena() {
     // 1. Lush Stadium Infield Grass & Outer Tarmac Run-off
     const grass = new THREE.Mesh(
-      new THREE.PlaneGeometry(520, 420),
+      new THREE.PlaneGeometry(540, 440),
       new THREE.MeshStandardMaterial({ color: 0x14532d, roughness: 0.9 })
     );
     grass.rotation.x = -Math.PI / 2;
@@ -9699,7 +10110,7 @@
 
     // 2. Oval Grand Prix Track Segments + Red/White FIA Kerbs
     const segs = 72;
-    const trackWidth = 22;
+    const trackWidth = 24;
     const asphaltMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.55, metalness: 0.15 });
     const kerbRedMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.5 });
     const kerbWhiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.5 });
@@ -9713,7 +10124,7 @@
       const cz = Math.sin(am) * F1_RZ;
       const dx = Math.cos(a1) * F1_RX - Math.cos(a0) * F1_RX;
       const dz = Math.sin(a1) * F1_RZ - Math.sin(a0) * F1_RZ;
-      const segLen = Math.sqrt(dx * dx + dz * dz) + 1.4;
+      const segLen = Math.sqrt(dx * dx + dz * dz) + 1.6;
       const tang = Math.atan2(dx, dz);
 
       const roadSeg = new THREE.Mesh(new THREE.BoxGeometry(trackWidth, 0.08, segLen), asphaltMat);
@@ -9733,16 +10144,26 @@
       outerKerb.rotation.y = tang;
       mpArenaGroup.add(outerKerb);
 
-      // Tecpro Outer Safety Barriers every 2 segments
       if (i % 2 === 0) {
         const bar = new THREE.Mesh(new THREE.BoxGeometry(1.8, 1.4, segLen * 1.8), i % 4 === 0 ? kerbRedMat : barrierBlueMat);
-        bar.position.set(Math.cos(am) * (F1_RX + trackWidth * 0.5 + 6), 0.7, Math.sin(am) * (F1_RZ + trackWidth * 0.5 + 6));
+        bar.position.set(Math.cos(am) * (F1_RX + trackWidth * 0.5 + 6.5), 0.7, Math.sin(am) * (F1_RZ + trackWidth * 0.5 + 6.5));
         bar.rotation.y = tang;
         mpArenaGroup.add(bar);
       }
     }
 
-    // 3. Start / Finish Checkered Line & Overhead 5-Red-Light FIA Starting Gantry at (F1_RX, 0)
+    // 3. Dedicated 3D Pit Lane Parallel Tarmac & Pit Crew Box at (F1_RX - 18, -4)
+    const pitLaneAsphalt = new THREE.Mesh(
+      new THREE.BoxGeometry(12, 0.09, 68),
+      new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.5 })
+    );
+    pitLaneAsphalt.position.set(F1_RX - 18, 0.045, 0);
+    mpArenaGroup.add(pitLaneAsphalt);
+
+    const activeTeam = F1_TEAMS.find(t => t.id === f1SelectedTeamId) || F1_TEAMS[0];
+    build3DPitLaneStation(F1_STADIUM_PIT_BOX.x, F1_STADIUM_PIT_BOX.z, F1_STADIUM_PIT_BOX.heading, activeTeam.bodyColor);
+
+    // 4. Start / Finish Checkered Line & Overhead 5-Red-Light FIA Starting Gantry at (F1_RX, 0)
     const startLine = new THREE.Mesh(
       new THREE.BoxGeometry(trackWidth, 0.1, 3.2),
       new THREE.MeshBasicMaterial({ color: 0xffffff })
@@ -9756,33 +10177,178 @@
     addArenaWall(F1_RX, 8.6, 0, 27.5, 1.4, 1.4, gantryMat, false);
     for (let li = -2; li <= 2; li++) {
       const lightPod = new THREE.Mesh(
-        new THREE.SphereGeometry(0.48, 12, 12),
+        new THREE.SphereGeometry(0.52, 12, 12),
         new THREE.MeshBasicMaterial({ color: 0xef4444 })
       );
       lightPod.position.set(F1_RX + li * 2.2, 7.8, 0.8);
       mpArenaGroup.add(lightPod);
+      f1GantryLightMeshes.push(lightPod);
     }
 
-    // 4. Grandstands & Pit Garages
+    // 5. Grandstands & Pit Garages
     const standMat = new THREE.MeshStandardMaterial({ color: 0x1e3a8a, roughness: 0.6 });
     const roofMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.4 });
-    addArenaWall(F1_RX + 26, 4.0, 0, 10, 8, 76, standMat, true);
-    addArenaWall(F1_RX + 25, 9.2, 0, 14, 0.8, 78, roofMat, false);
-    addArenaWall(0, 3.5, F1_RZ - 26, 68, 7, 10, new THREE.MeshStandardMaterial({ color: 0x334155 }), true);
+    addArenaWall(F1_RX + 27, 4.0, 0, 10, 8, 78, standMat, true);
+    addArenaWall(F1_RX + 26, 9.2, 0, 14, 0.8, 80, roofMat, false);
+    addArenaWall(F1_RX - 28, 3.5, 0, 7, 7, 56, new THREE.MeshStandardMaterial({ color: 0x334155 }), true);
 
-    // 5. Sector Timing Gates (Glowing Rings)
+    // 6. Sector Timing Gates (Glowing Rings)
     F1_GATES.forEach((g, idx) => {
       const ring = new THREE.Mesh(
-        new THREE.RingGeometry(8.5, 10.2, 32),
+        new THREE.RingGeometry(9.0, 10.8, 32),
         new THREE.MeshBasicMaterial({
-          color: idx === 3 ? 0xfacc15 : 0x38bdf8,
+          color: idx === F1_GATES.length - 1 ? 0xfacc15 : 0x38bdf8,
           side: THREE.DoubleSide,
           transparent: true,
-          opacity: 0.75
+          opacity: 0.78
         })
       );
       ring.rotation.x = -Math.PI / 2;
       ring.position.set(g.x, 0.14, g.z);
+      mpArenaGroup.add(ring);
+      f1GateMeshes.push(ring);
+    });
+  }
+
+  // NEW F1 CIRCUIT: Clifton Night Marina GP (Multi-Corner Technical Street & Coastal F1 Track)
+  function buildF1MarinaCircuitArena() {
+    // 1. Deep Arabian Sea / Clifton Marina Water Lagoon + Dark Coastal Promenade Base
+    const seaPlane = new THREE.Mesh(
+      new THREE.PlaneGeometry(560, 460),
+      new THREE.MeshStandardMaterial({ color: 0x082f49, roughness: 0.22, metalness: 0.65 })
+    );
+    seaPlane.rotation.x = -Math.PI / 2;
+    seaPlane.position.y = 0.01;
+    mpArenaGroup.add(seaPlane);
+
+    // Central Marina Yacht Basin Island & Luxury Yachts
+    const yachtHullMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25, metalness: 0.3 });
+    const yachtDeckMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0284c7, emissiveIntensity: 0.5 });
+    [
+      { x: -35, z: 10, rot: 0.4 },
+      { x: 45,  z: 22, rot: -0.3 },
+      { x: -50, z: -32, rot: 1.1 }
+    ].forEach(y => {
+      const yacht = new THREE.Group();
+      const hull = new THREE.Mesh(new THREE.BoxGeometry(5.5, 2.2, 16), yachtHullMat);
+      hull.position.y = 1.1;
+      const cabin = new THREE.Mesh(new THREE.BoxGeometry(4.2, 1.8, 9), yachtDeckMat);
+      cabin.position.set(0, 2.6, -1);
+      yacht.add(hull, cabin);
+      yacht.position.set(y.x, 0, y.z);
+      yacht.rotation.y = y.rot;
+      mpArenaGroup.add(yacht);
+    });
+
+    // 2. Build Multi-Corner Technical Track Ribbon + Cyan/Yellow Marina Kerbs + Street Floodlights
+    const trackWidth = 24;
+    const asphaltMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.48, metalness: 0.2 });
+    const kerbCyanMat = new THREE.MeshStandardMaterial({ color: 0x06b6d4, emissive: 0x0891b2, emissiveIntensity: 0.35 });
+    const kerbYellowMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, emissive: 0xca8a04, emissiveIntensity: 0.25 });
+    const poleMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.8 });
+    const lampMat = new THREE.MeshBasicMaterial({ color: 0xfffbeb });
+
+    const n = F1_MARINA_WP.length;
+    for (let i = 0; i < n; i++) {
+      const p0 = F1_MARINA_WP[i];
+      const p1 = F1_MARINA_WP[(i + 1) % n];
+      const dx = p1.x - p0.x;
+      const dz = p1.z - p0.z;
+      const segLen = Math.sqrt(dx * dx + dz * dz);
+      const steps = Math.max(4, Math.ceil(segLen / 10));
+      const tang = Math.atan2(dx, dz);
+      const nx = Math.cos(tang);
+      const nz = -Math.sin(tang);
+
+      for (let s = 0; s < steps; s++) {
+        const t = (s + 0.5) / steps;
+        const cx = p0.x + dx * t;
+        const cz = p0.z + dz * t;
+        const subLen = (segLen / steps) + 3.6;
+
+        const road = new THREE.Mesh(new THREE.BoxGeometry(trackWidth, 0.12, subLen), asphaltMat);
+        road.position.set(cx, 0.06, cz);
+        road.rotation.y = tang;
+        road.receiveShadow = true;
+        mpArenaGroup.add(road);
+
+        const kMat = (i + s) % 2 === 0 ? kerbCyanMat : kerbYellowMat;
+        const kLeft = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.18, subLen), kMat);
+        kLeft.position.set(cx - nx * (trackWidth * 0.5), 0.09, cz - nz * (trackWidth * 0.5));
+        kLeft.rotation.y = tang;
+        mpArenaGroup.add(kLeft);
+
+        const kRight = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.18, subLen), kMat);
+        kRight.position.set(cx + nx * (trackWidth * 0.5), 0.09, cz + nz * (trackWidth * 0.5));
+        kRight.rotation.y = tang;
+        mpArenaGroup.add(kRight);
+      }
+
+      // Corner Joint Disc so multi-angle turns are 100% seamless & wide
+      const joint = new THREE.Mesh(new THREE.CylinderGeometry(trackWidth * 0.54, trackWidth * 0.54, 0.12, 24), asphaltMat);
+      joint.position.set(p0.x, 0.06, p0.z);
+      mpArenaGroup.add(joint);
+
+      // Night GP Floodlight Pylons at every corner apex
+      const poleX = p0.x + nx * (trackWidth * 0.68);
+      const poleZ = p0.z + nz * (trackWidth * 0.68);
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.35, 11, 8), poleMat);
+      pole.position.set(poleX, 5.5, poleZ);
+      const lamp = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.5, 1.2), lampMat);
+      lamp.position.set(poleX, 11.0, poleZ);
+      mpArenaGroup.add(pole, lamp);
+    }
+
+    // 3. Dedicated Marina Pit Lane Parallel Bypass & Glowing 3D Pit Stop Box at (0, 76)
+    const pitLaneRoad = new THREE.Mesh(
+      new THREE.BoxGeometry(82, 0.13, 12),
+      new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.45 })
+    );
+    pitLaneRoad.position.set(0, 0.065, 76);
+    mpArenaGroup.add(pitLaneRoad);
+
+    const activeTeam = F1_TEAMS.find(t => t.id === f1SelectedTeamId) || F1_TEAMS[0];
+    build3DPitLaneStation(F1_MARINA_PIT_BOX.x, F1_MARINA_PIT_BOX.z, F1_MARINA_PIT_BOX.heading, activeTeam.bodyColor);
+
+    // 4. Start / Finish Line & 5-Red-Light FIA Starting Gantry on the Harbor Main Straight (0, 96)
+    const startLine = new THREE.Mesh(
+      new THREE.BoxGeometry(3.2, 0.15, trackWidth),
+      new THREE.MeshBasicMaterial({ color: 0xffffff })
+    );
+    startLine.position.set(0, 0.08, 96);
+    mpArenaGroup.add(startLine);
+
+    const gantryMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.7, roughness: 0.3 });
+    addArenaWall(0, 4.5, 96 - 13, 1.2, 9, 1.2, gantryMat, false);
+    addArenaWall(0, 4.5, 96 + 13, 1.2, 9, 1.2, gantryMat, false);
+    addArenaWall(0, 8.6, 96, 1.4, 1.4, 27.5, gantryMat, false);
+    for (let li = -2; li <= 2; li++) {
+      const lightPod = new THREE.Mesh(
+        new THREE.SphereGeometry(0.52, 12, 12),
+        new THREE.MeshBasicMaterial({ color: 0xef4444 })
+      );
+      lightPod.position.set(-0.8, 7.8, 96 + li * 2.2);
+      mpArenaGroup.add(lightPod);
+      f1GantryLightMeshes.push(lightPod);
+    }
+
+    // Harbor Grandstand & Illuminated Marina Hotel Tower
+    addArenaWall(0, 4.2, 122, 86, 8.4, 10, new THREE.MeshStandardMaterial({ color: 0x1e3a8a, roughness: 0.5 }), true);
+    addArenaWall(0, 14, 58, 36, 28, 12, new THREE.MeshStandardMaterial({ color: 0x0f172a, emissive: 0x0284c7, emissiveIntensity: 0.25 }), true);
+
+    // 5. Sector Timing Gates (6 Glowing Marina Checkpoints)
+    F1_MARINA_GATES.forEach((g, idx) => {
+      const ring = new THREE.Mesh(
+        new THREE.RingGeometry(9.2, 11.2, 32),
+        new THREE.MeshBasicMaterial({
+          color: idx === F1_MARINA_GATES.length - 1 ? 0xfacc15 : 0x38bdf8,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.8
+        })
+      );
+      ring.rotation.x = -Math.PI / 2;
+      ring.position.set(g.x, 0.16, g.z);
       mpArenaGroup.add(ring);
       f1GateMeshes.push(ring);
     });
@@ -9980,6 +10546,235 @@
     });
   }
 
+  function isF1Map(mapId) {
+    return mapId === 'f1_circuit' || mapId === 'f1_marina';
+  }
+
+  function applyF1TeamAndCarLoadout(teamId, carId, tireCompound, broadcast) {
+    const team = F1_TEAMS.find(t => t.id === teamId) || F1_TEAMS[0];
+    const carOption = F1_RACE_CARS.find(c => c.id === carId) || F1_RACE_CARS[0];
+    f1SelectedTeamId = team.id;
+    f1SelectedTeamName = team.name;
+    if (tireCompound === 'soft' || tireCompound === 'medium' || tireCompound === 'hard') {
+      f1TireCompound = tireCompound;
+    }
+
+    // Unlock & apply F1 team livery + Pirelli tire compound to the chosen race car
+    garage.owned[carOption.id] = true;
+    const cust = getCustom(carOption.id);
+    cust.bodyColor = team.bodyColor;
+    cust.stripes = true;
+    cust.stripeColor = team.stripeColor;
+    cust.rimColor = team.rimColor;
+    cust.underglow = true;
+    cust.underglowColor = team.underglow;
+    cust.spoiler = true;
+    cust.tireCompound = f1TireCompound;
+
+    selectCar(carOption.id);
+    renderF1PaddockUI();
+    updateF1HudWidgets();
+
+    if (broadcast !== false && mpSocket && mpSocket.readyState === WebSocket.OPEN) {
+      mpSocket.send(JSON.stringify({
+        type: 'race:select_loadout',
+        teamId: f1SelectedTeamId,
+        teamName: f1SelectedTeamName,
+        carId: carOption.id,
+        bodyColor: team.bodyColor,
+        underglowColor: team.underglow,
+        tireCompound: f1TireCompound
+      }));
+    }
+  }
+
+  function positionOnF1StartingGrid(slotIndex) {
+    const idx = Math.max(0, Number(slotIndex) || 0);
+    const row = Math.floor(idx / 2);
+    const col = (idx % 2 === 0) ? -1 : 1;
+    mode = 'drive';
+    character.visible = false;
+    state.speed = 0;
+    playerStats.nitro = 100;
+    playerStats.health = 100;
+    f1TireHealth = 100;
+
+    if (currentMpMap === 'f1_marina') {
+      // Main Harbor Straight at (0, 96) facing East (+X => heading = Math.PI / 2)
+      state.x = -12 - row * 9.5;
+      state.z = 96 + col * 4.2;
+      state.heading = Math.PI / 2;
+    } else {
+      // Karachi F1 Stadium Main Straight at (F1_RX, 0) facing North (-Z => heading = Math.PI)
+      state.x = F1_RX + col * 4.2;
+      state.z = 12 + row * 9.5;
+      state.heading = Math.PI;
+    }
+    car.position.set(state.x, 0, state.z);
+    car.rotation.y = state.heading;
+    f1GateIdx = 0;
+    f1LapCount = 1;
+    f1LapStartMs = performance.now();
+  }
+
+  function triggerF1PitStop(nextCompound) {
+    if (!isF1Map(currentMpMap)) return;
+    if (f1PitStopTimer > 0 || f1PitCooldown > 0) return;
+
+    // Cycle or set fresh Pirelli tire compound
+    if (nextCompound === 'soft' || nextCompound === 'medium' || nextCompound === 'hard') {
+      f1TireCompound = nextCompound;
+    } else if (f1TireHealth < 88) {
+      // Keep current compound or rotate if user triggered manually at full health
+    } else {
+      const order = ['soft', 'medium', 'hard'];
+      f1TireCompound = order[(order.indexOf(f1TireCompound) + 1) % order.length];
+    }
+
+    const cust = getCustom(garage.selectedCarId);
+    cust.tireCompound = f1TireCompound;
+    selectCar(garage.selectedCarId);
+
+    f1PitStopTimer = F1_PIT_DURATION;
+    f1PitCooldown = 7.5;
+    f1TireHealth = 100;
+    f1PitCount++;
+    state.speed = 0;
+    playerStats.health = 100;
+    playerStats.armor = 100;
+    playerStats.nitro = 100;
+    updateStatsHud();
+    playSfx('cash');
+
+    const pitHud = document.getElementById('f1PitStopHud');
+    const pitSub = document.getElementById('f1PitStopSub');
+    if (pitHud) pitHud.classList.add('open');
+    if (pitSub) {
+      pitSub.textContent = `Fitting fresh ${f1TireCompound.toUpperCase()} Pirelli compound · 100% Grip + 100% ERS + Full Chassis Repair!`;
+    }
+
+    if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
+      mpSocket.send(JSON.stringify({
+        type: 'race:pit_stop',
+        tireCompound: f1TireCompound
+      }));
+    }
+    renderF1PaddockUI();
+    updateF1HudWidgets();
+  }
+
+  function updateF1HudWidgets() {
+    const tireHud = document.getElementById('mpF1TireHud');
+    const readyQuickBtn = document.getElementById('mpF1ReadyQuickBtn');
+    const pitQuickBtn = document.getElementById('mpF1PitQuickBtn');
+    const onF1 = isF1Map(currentMpMap);
+
+    if (tireHud) {
+      tireHud.style.display = onF1 ? 'inline-block' : 'none';
+      if (onF1) {
+        const compIcon = f1TireCompound === 'soft' ? '🔴 SOFT' : (f1TireCompound === 'medium' ? '🟡 MED' : '⚪ HARD');
+        const hp = Math.round(f1TireHealth);
+        tireHud.style.color = hp > 60 ? '#a7f3d0' : (hp > 30 ? '#fde047' : '#fca5a5');
+        tireHud.textContent = `${compIcon} ${hp}% · PITS: ${f1PitCount}`;
+      }
+    }
+    if (readyQuickBtn) {
+      readyQuickBtn.style.display = onF1 ? 'inline-block' : 'none';
+      if (f1RaceStatus === 'racing') {
+        readyQuickBtn.textContent = `🏁 RACING (LAP ${Math.min(f1LapCount, f1TotalLaps)}/${f1TotalLaps})`;
+        readyQuickBtn.style.background = '#0284c7';
+        readyQuickBtn.style.color = '#fff';
+      } else if (f1RaceStatus === 'countdown') {
+        readyQuickBtn.textContent = '🚥 5 RED LIGHTS...';
+        readyQuickBtn.style.background = '#ef4444';
+        readyQuickBtn.style.color = '#fff';
+      } else {
+        readyQuickBtn.textContent = f1SelfReady ? '✓ READY (WAITING)' : '✅ Ready for Race';
+        readyQuickBtn.style.background = f1SelfReady ? '#f59e0b' : '#10b981';
+        readyQuickBtn.style.color = '#052e16';
+      }
+    }
+    if (pitQuickBtn) {
+      pitQuickBtn.style.display = onF1 ? 'inline-block' : 'none';
+    }
+  }
+
+  function renderF1PaddockUI() {
+    const teamGrid = document.getElementById('f1TeamGrid');
+    const carGrid = document.getElementById('f1CarGrid');
+    if (teamGrid) {
+      teamGrid.innerHTML = '';
+      F1_TEAMS.forEach(t => {
+        const card = document.createElement('div');
+        card.className = 'f1OptionCard' + (t.id === f1SelectedTeamId ? ' active' : '');
+        card.innerHTML = `
+          <div class="f1OptionTitle">
+            <span class="f1Swatch" style="background:${t.bodyColor};border-color:${t.stripeColor};"></span>
+            <span>${t.short}</span>
+          </div>
+          <div class="f1OptionSub">${t.desc}</div>
+        `;
+        card.addEventListener('click', () => {
+          applyF1TeamAndCarLoadout(t.id, garage.selectedCarId, f1TireCompound, true);
+          showBuildingToast(`🏎️ Team Selected: ${t.name}!`, t.bodyColor);
+        });
+        teamGrid.appendChild(card);
+      });
+    }
+
+    if (carGrid) {
+      carGrid.innerHTML = '';
+      F1_RACE_CARS.forEach(c => {
+        const card = document.createElement('div');
+        card.className = 'f1OptionCard' + (c.id === garage.selectedCarId ? ' active' : '');
+        card.innerHTML = `
+          <div class="f1OptionTitle">🏎️ ${c.name}</div>
+          <div class="f1OptionSub"><b style="color:#fde047;">${c.tag}</b> · ${c.spec}</div>
+        `;
+        card.addEventListener('click', () => {
+          applyF1TeamAndCarLoadout(f1SelectedTeamId, c.id, f1TireCompound, true);
+          showBuildingToast(`🏎️ Race Car Selected: ${c.name}!`, '#10b981');
+        });
+        carGrid.appendChild(card);
+      });
+    }
+
+    document.querySelectorAll('.f1TireChip').forEach(btn => {
+      const comp = btn.getAttribute('data-tire');
+      btn.classList.toggle('active', comp === f1TireCompound);
+    });
+
+    // Update Ready Count Banner
+    let readyCount = f1SelfReady ? 1 : 0;
+    let totalDrivers = 1 + remoteOperatives.size;
+    remoteOperatives.forEach(op => {
+      if (op.ready) readyCount++;
+    });
+
+    const statusLbl = document.getElementById('f1LobbyStatusLabel');
+    const subLbl = document.getElementById('f1LobbySubLabel');
+    const toggleBtn = document.getElementById('f1ToggleReadyBtn');
+
+    if (statusLbl) {
+      if (f1RaceStatus === 'racing') {
+        statusLbl.textContent = `🏁 GRAND PRIX IN PROGRESS · LAP ${Math.min(f1LapCount, f1TotalLaps)} / ${f1TotalLaps}`;
+      } else if (f1RaceStatus === 'countdown') {
+        statusLbl.textContent = `🚥 5 RED LIGHTS COUNTDOWN ACTIVE — GET READY TO LAUNCH!`;
+      } else {
+        statusLbl.textContent = `🚥 STARTING GRID LOBBY · ${readyCount} / ${totalDrivers} DRIVERS READY`;
+      }
+    }
+    if (subLbl) {
+      const teamObj = F1_TEAMS.find(t => t.id === f1SelectedTeamId) || F1_TEAMS[0];
+      const carObj = CAR_MODELS.find(c => c.id === garage.selectedCarId) || CAR_MODELS[0];
+      subLbl.textContent = `Your Loadout: ${teamObj.name} · ${carObj.name} · ${f1TireCompound.toUpperCase()} Pirelli Tires`;
+    }
+    if (toggleBtn) {
+      toggleBtn.textContent = f1SelfReady ? '✓ YOU ARE READY (CLICK TO UNREADY)' : '✅ CLICK READY FOR RACE';
+      toggleBtn.style.background = f1SelfReady ? '#f59e0b' : '#10b981';
+    }
+  }
+
   function switchMultiplayerMap(mapId, silentToast) {
     const valid = MP_MAP_META[mapId] ? mapId : 'karachi_city';
     const prevMap = currentMpMap;
@@ -9998,6 +10793,8 @@
 
     const arenaHudEl = document.getElementById('mpArenaHud');
     const arenaTitleEl = document.getElementById('mpArenaTitle');
+    const gantryHud = document.getElementById('f1StartLightsHud');
+    if (gantryHud && !isF1Map(valid)) gantryHud.classList.remove('open');
 
     if (valid === 'karachi_city') {
       if (arenaHudEl) arenaHudEl.style.display = 'none';
@@ -10015,22 +10812,21 @@
       if (arenaHudEl) arenaHudEl.style.display = 'flex';
       if (arenaTitleEl) arenaTitleEl.textContent = MP_MAP_META[valid].label;
 
-      if (valid === 'f1_circuit') {
-        buildF1CircuitArena();
-        // Spawn on F1 Starting Grid in the Apex F1 GP car
-        selectCar('f1');
-        mode = 'drive';
-        character.visible = false;
-        state.x = F1_RX;
-        state.z = 12;
-        state.heading = Math.PI;
-        state.speed = 0;
-        playerStats.nitro = 100;
-        car.position.set(state.x, 0, state.z);
-        car.rotation.y = state.heading;
-        f1GateIdx = 0;
-        f1LapCount = 1;
-        f1LapStartMs = performance.now();
+      if (valid === 'f1_circuit' || valid === 'f1_marina') {
+        if (valid === 'f1_marina') {
+          buildF1MarinaCircuitArena();
+        } else {
+          buildF1CircuitArena();
+        }
+        // Ensure driver has an F1/GP car and team livery equipped
+        const curModel = CAR_MODELS.find(m => m.id === garage.selectedCarId);
+        const targetCarId = (curModel && (curModel.kind === 'f1' || F1_RACE_CARS.some(rc => rc.id === curModel.id)))
+          ? curModel.id
+          : 'f1';
+        applyF1TeamAndCarLoadout(f1SelectedTeamId, targetCarId, f1TireCompound, false);
+        f1PitCount = 0;
+        f1TireHealth = 100;
+        positionOnF1StartingGrid(0);
       } else if (valid === 'firing_range') {
         buildFiringRangeArena();
         // Unlock all weapons with 999 ammo & place Hamza on foot at the firing booth
@@ -10091,6 +10887,9 @@
       }
       updateStatsHud();
     }
+
+    updateF1HudWidgets();
+    renderF1PaddockUI();
 
     if (!silentToast) {
       showBuildingToast(`🗺️ Deployed to ${MP_MAP_META[valid].label}!`, '#10b981');
@@ -10232,15 +11031,17 @@
     }
     const rootGroup = new THREE.Group();
     const modelDef = CAR_MODELS.find(m => m.id === op.carId) || CAR_MODELS[0];
+    const teamDef = F1_TEAMS.find(t => t.id === op.teamId);
     const carCustom = {
-      bodyColor: op.bodyColor || '#eab308',
-      rimColor: '#e5e7eb',
+      bodyColor: op.bodyColor || (teamDef ? teamDef.bodyColor : '#eab308'),
+      rimColor: teamDef ? teamDef.rimColor : '#e5e7eb',
       rimStyle: 'sport',
       spoiler: true,
       stripes: true,
-      stripeColor: '#111827',
+      stripeColor: teamDef ? teamDef.stripeColor : '#111827',
       underglow: true,
-      underglowColor: op.underglowColor || '#10b981',
+      underglowColor: op.underglowColor || (teamDef ? teamDef.underglow : '#10b981'),
+      tireCompound: op.tireCompound || 'soft',
       tint: 0.45
     };
     const carMesh = buildCar(modelDef, carCustom);
@@ -10253,7 +11054,8 @@
       hat: false,
       hatColor: '#1e293b'
     });
-    const labelSprite = buildOperativeNameplateSprite(op.name, op.role, op.health, op.armor);
+    const roleTag = isF1Map(currentMpMap) && op.teamName ? `${op.teamName} · ${op.ready ? '✓ READY' : 'PADDOCK'}` : op.role;
+    const labelSprite = buildOperativeNameplateSprite(op.name, roleTag, op.health, op.armor);
     labelSprite.position.set(0, 2.9, 0);
 
     rootGroup.add(carMesh);
@@ -10268,6 +11070,7 @@
     op.builtCarId = op.carId;
     op.builtBodyColor = op.bodyColor;
     op.builtOutfitColor = op.outfitColor;
+    op.builtTireCompound = op.tireCompound;
   }
 
   function upsertRemoteOperative(data) {
@@ -10289,6 +11092,12 @@
         speed: Number(data.speed) || 0,
         steerAngle: Number(data.steerAngle) || 0,
         carId: data.carId || 'speedster',
+        teamId: data.teamId || 'ferrari_corsa',
+        teamName: data.teamName || 'Scuderia Corsa Rossa',
+        tireCompound: data.tireCompound || 'soft',
+        ready: Boolean(data.ready),
+        currentLap: data.currentLap || 1,
+        pitCount: data.pitCount || 0,
         bodyColor: data.bodyColor || '#eab308',
         underglowColor: data.underglowColor || '#10b981',
         outfitColor: data.outfitColor || '#1e242b',
@@ -10312,6 +11121,12 @@
       if (typeof data.speed === 'number') op.speed = data.speed;
       if (typeof data.steerAngle === 'number') op.steerAngle = data.steerAngle;
       if (data.carId) op.carId = data.carId;
+      if (data.teamId) op.teamId = data.teamId;
+      if (data.teamName) op.teamName = data.teamName;
+      if (data.tireCompound) op.tireCompound = data.tireCompound;
+      if (typeof data.ready === 'boolean') op.ready = data.ready;
+      if (typeof data.currentLap === 'number') op.currentLap = data.currentLap;
+      if (typeof data.pitCount === 'number') op.pitCount = data.pitCount;
       if (data.bodyColor) op.bodyColor = data.bodyColor;
       if (data.underglowColor) op.underglowColor = data.underglowColor;
       if (data.outfitColor) op.outfitColor = data.outfitColor;
@@ -10323,10 +11138,11 @@
       if (typeof data.bestLapMs === 'number') op.bestLapMs = data.bestLapMs;
       if (typeof data.rangeScore === 'number') op.rangeScore = data.rangeScore;
 
-      if (op.builtCarId !== op.carId || op.builtBodyColor !== op.bodyColor || op.builtOutfitColor !== op.outfitColor) {
+      const roleTag = isF1Map(currentMpMap) && op.teamName ? `${op.teamName} · ${op.ready ? '✓ READY' : 'PADDOCK'}` : op.role;
+      if (op.builtCarId !== op.carId || op.builtBodyColor !== op.bodyColor || op.builtOutfitColor !== op.outfitColor || op.builtTireCompound !== op.tireCompound) {
         rebuildRemoteOperativeMeshes(op);
       } else {
-        updateOperativeNameplate(op.labelSprite, op.name, op.role, op.health, op.armor);
+        updateOperativeNameplate(op.labelSprite, op.name, roleTag, op.health, op.armor);
       }
     }
   }
@@ -10365,7 +11181,9 @@
     if (mpOpen) {
       renderMpPlayersList();
       renderMpRoomsList();
+      renderF1PaddockUI();
     }
+    updateF1HudWidgets();
   }
 
   function appendMpChatMessage(msg) {
@@ -10400,23 +11218,30 @@
     listEl.innerHTML = '';
 
     const myCarName = (CAR_MODELS.find(m => m.id === garage.selectedCarId) || CAR_MODELS[0]).name;
-    const extraSelf = currentMpMap === 'f1_circuit' && f1BestLapMs > 0
-      ? ` · Best Lap: ${(f1BestLapMs / 1000).toFixed(2)}s`
+    const onF1 = isF1Map(currentMpMap);
+    const readyBadgeSelf = onF1
+      ? `<span style="margin-left:6px;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:900;background:${f1SelfReady ? '#10b981' : '#334155'};color:${f1SelfReady ? '#052e16' : '#cbd5e1'};">${f1SelfReady ? '✓ READY' : '⏳ PADDOCK'}</span>`
+      : '';
+    const extraSelf = onF1
+      ? ` · ${f1SelectedTeamName} · ${f1TireCompound.toUpperCase()} · Pits: ${f1PitCount}${f1BestLapMs > 0 ? ` · Best: ${(f1BestLapMs / 1000).toFixed(2)}s` : ''}`
       : (currentMpMap === 'firing_range' ? ` · Range: ${firingRangeBest} pts` : '');
     const selfRow = document.createElement('div');
     selfRow.className = 'shopItem';
     selfRow.style.borderColor = '#10b981';
-    selfRow.innerHTML = `<div><b style="color:#6ee7b7;">★ ${mpCallsign} (You)</b><div class="itemDesc">${mpRole} · ${mode === 'drive' ? myCarName : 'On Foot'}${extraSelf}</div></div>`;
+    selfRow.innerHTML = `<div><b style="color:#6ee7b7;">★ ${mpCallsign} (You)</b>${readyBadgeSelf}<div class="itemDesc">${mpRole} · ${mode === 'drive' ? myCarName : 'On Foot'}${extraSelf}</div></div>`;
     listEl.appendChild(selfRow);
 
     remoteOperatives.forEach(op => {
       const carDef = CAR_MODELS.find(m => m.id === op.carId) || CAR_MODELS[0];
-      const extraOp = op.bestLapMs > 0
-        ? ` · Best Lap: ${(op.bestLapMs / 1000).toFixed(2)}s`
+      const readyBadgeOp = onF1
+        ? `<span style="margin-left:6px;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:900;background:${op.ready ? '#10b981' : '#334155'};color:${op.ready ? '#052e16' : '#cbd5e1'};">${op.ready ? '✓ READY' : '⏳ PADDOCK'}</span>`
+        : '';
+      const extraOp = onF1
+        ? ` · ${op.teamName || 'F1 Team'} · ${(op.tireCompound || 'soft').toUpperCase()} · Pits: ${op.pitCount || 0}${op.bestLapMs > 0 ? ` · Best: ${(op.bestLapMs / 1000).toFixed(2)}s` : ''}`
         : (op.rangeScore > 0 ? ` · Range: ${op.rangeScore} pts` : '');
       const row = document.createElement('div');
       row.className = 'shopItem';
-      row.innerHTML = `<div><b>${op.name}</b><div class="itemDesc">${op.role} · ${op.mode === 'drive' ? carDef.name : 'On Foot'} · Kills: ${op.kills || 0}${extraOp}</div></div>`;
+      row.innerHTML = `<div><b>${op.name}</b>${readyBadgeOp}<div class="itemDesc">${op.role} · ${op.mode === 'drive' ? carDef.name : 'On Foot'}${extraOp}</div></div>`;
       const warpBtn = document.createElement('button');
       warpBtn.className = 'buyBtn';
       warpBtn.textContent = '⚡ Teleport';
@@ -10499,6 +11324,9 @@
       speed: Number((mode === 'drive' ? state.speed : walkState.speed).toFixed(2)),
       steerAngle: Number((state.steerAngle || 0).toFixed(3)),
       carId: garage.selectedCarId,
+      teamId: f1SelectedTeamId,
+      teamName: f1SelectedTeamName,
+      tireCompound: f1TireCompound,
       bodyColor: c.bodyColor,
       underglowColor: c.underglowColor,
       outfitColor: characterCustom.shirt,
@@ -10506,6 +11334,24 @@
       health: Math.round(playerStats.health),
       armor: Math.round(playerStats.armor)
     }, extra || {});
+  }
+
+  function syncLobbyPlayersState(playersArr, raceStatusVal, totalLapsVal, finishOrderVal) {
+    if (raceStatusVal) f1RaceStatus = raceStatusVal;
+    if (totalLapsVal) f1TotalLaps = totalLapsVal;
+    if (Array.isArray(finishOrderVal)) f1FinishOrder = finishOrderVal;
+    if (Array.isArray(playersArr)) {
+      playersArr.forEach(p => {
+        if (p.id === mpSelfId) {
+          f1SelfReady = Boolean(p.ready);
+        } else {
+          upsertRemoteOperative(p);
+        }
+      });
+    }
+    renderF1PaddockUI();
+    updateF1HudWidgets();
+    if (mpOpen) renderMpPlayersList();
   }
 
   function connectMultiplayerSocket() {
@@ -10532,6 +11378,9 @@
           mpSelfId = msg.selfId;
           mpRoomId = msg.room || mpRoomId;
           if (mpRoomInputEl) mpRoomInputEl.value = mpRoomId;
+          f1RaceStatus = msg.raceStatus || 'lobby';
+          f1TotalLaps = msg.raceTotalLaps || 3;
+          f1FinishOrder = Array.isArray(msg.finishOrder) ? msg.finishOrder : [];
           if (msg.mapId && msg.mapId !== currentMpMap) {
             switchMultiplayerMap(msg.mapId, false);
           } else {
@@ -10539,7 +11388,10 @@
           }
           clearAllRemoteOperatives();
           if (Array.isArray(msg.players)) {
-            msg.players.forEach(p => upsertRemoteOperative(p));
+            msg.players.forEach(p => {
+              if (p.id === mpSelfId) f1SelfReady = Boolean(p.ready);
+              else upsertRemoteOperative(p);
+            });
           }
           if (Array.isArray(msg.roomsList)) {
             mpPublicRooms = msg.roomsList;
@@ -10550,11 +11402,94 @@
           updateSupplyDropUI();
           updateMpLiveBadge();
         } else if (msg.type === 'room:map_changed') {
+          f1RaceStatus = msg.raceStatus || 'lobby';
+          f1SelfReady = false;
           if (msg.mapId) switchMultiplayerMap(msg.mapId, false);
+          if (Array.isArray(msg.players)) syncLobbyPlayersState(msg.players, msg.raceStatus, msg.raceTotalLaps, []);
           mpSupplyDrop = msg.supplyDrop || null;
           updateSupplyDropUI();
           if (msg.chatMessage) appendMpChatMessage(msg.chatMessage);
           updateMpLiveBadge();
+        } else if (msg.type === 'race:lobby_state') {
+          syncLobbyPlayersState(msg.players, msg.raceStatus, msg.raceTotalLaps, msg.finishOrder);
+          if (msg.chatMessage) appendMpChatMessage(msg.chatMessage);
+        } else if (msg.type === 'race:countdown_start') {
+          f1RaceStatus = 'countdown';
+          f1TotalLaps = msg.totalLaps || 3;
+          f1CountdownStartMs = performance.now();
+          f1LastBeepLight = -1;
+          if (msg.chatMessage) appendMpChatMessage(msg.chatMessage);
+          if (mpOpen) closeMp();
+
+          // Line up local player on their assigned starting grid slot
+          let mySlot = 0;
+          if (Array.isArray(msg.players)) {
+            const foundIdx = msg.players.findIndex(p => p.id === mpSelfId);
+            if (foundIdx >= 0) mySlot = foundIdx;
+            syncLobbyPlayersState(msg.players, 'countdown', f1TotalLaps, []);
+          }
+          positionOnF1StartingGrid(mySlot);
+
+          const gantryHud = document.getElementById('f1StartLightsHud');
+          const gantryTitle = document.getElementById('f1GantryTrackTitle');
+          if (gantryHud) gantryHud.classList.add('open');
+          if (gantryTitle) gantryTitle.textContent = `${MP_MAP_META[currentMpMap].label} · ${f1TotalLaps}-LAP GRAND PRIX`;
+          updateF1HudWidgets();
+        } else if (msg.type === 'race:lights_out') {
+          f1RaceStatus = 'racing';
+          f1TotalLaps = msg.totalLaps || 3;
+          f1LapCount = 1;
+          f1GateIdx = 0;
+          f1LapStartMs = performance.now();
+          playerStats.nitro = 100;
+          if (msg.chatMessage) appendMpChatMessage(msg.chatMessage);
+          playSfx('fanfare');
+
+          for (let i = 0; i < 5; i++) {
+            const pod = document.getElementById('f1Light' + i);
+            if (pod) { pod.classList.remove('red'); pod.classList.add('green'); }
+          }
+          f1GantryLightMeshes.forEach(m => { m.material.color.setHex(0x10b981); });
+          const stTxt = document.getElementById('f1GantryStatusText');
+          if (stTxt) {
+            stTxt.style.color = '#10b981';
+            stTxt.textContent = '🟢 LIGHTS OUT AND AWAY WE GO! FULL DRS!';
+          }
+          setTimeout(() => {
+            const gantryHud = document.getElementById('f1StartLightsHud');
+            if (gantryHud && f1RaceStatus === 'racing') gantryHud.classList.remove('open');
+          }, 1800);
+          updateF1HudWidgets();
+          renderF1PaddockUI();
+        } else if (msg.type === 'race:pit_broadcast') {
+          if (msg.chatMessage) appendMpChatMessage(msg.chatMessage);
+          const op = remoteOperatives.get(msg.playerId);
+          if (op) {
+            op.tireCompound = msg.tireCompound || op.tireCompound;
+            op.pitCount = msg.pitCount || (op.pitCount + 1);
+            rebuildRemoteOperativeMeshes(op);
+          }
+          if (mpOpen) renderMpPlayersList();
+        } else if (msg.type === 'race:lap_broadcast') {
+          if (msg.chatMessage) appendMpChatMessage(msg.chatMessage);
+          if (Array.isArray(msg.finishOrder)) f1FinishOrder = msg.finishOrder;
+          if (msg.raceStatus) f1RaceStatus = msg.raceStatus;
+          const op = remoteOperatives.get(msg.playerId);
+          if (op) {
+            if (msg.bestLapMs) op.bestLapMs = msg.bestLapMs;
+            if (msg.currentLap) op.currentLap = msg.currentLap;
+          }
+          if (msg.finished && msg.playerId === mpSelfId) {
+            f1SelfReady = false;
+            const bonus = msg.position === 1 ? 10000 : (msg.position === 2 ? 6000 : 3500);
+            playerStats.cash += bonus;
+            updateStatsHud();
+            playSfx('fanfare');
+            showMissionBanner(`🏆 P${msg.position} GRAND PRIX FINISH!`, `+$${bonus} FIA PRIZE PURSE · ${f1SelectedTeamName}`);
+          }
+          updateF1HudWidgets();
+          renderF1PaddockUI();
+          if (mpOpen) renderMpPlayersList();
         } else if (msg.type === 'rooms:list') {
           if (Array.isArray(msg.roomsList)) {
             mpPublicRooms = msg.roomsList;
@@ -10690,32 +11625,111 @@
       mpSocket.send(JSON.stringify(getLocalMpPayload('player:update')));
     }
 
-    // 2. Map-Specific Live Gameplay Logic (F1 Circuit Lap Timer, Firing Range Targets, Derby Nitro Pads)
+    // 2. Map-Specific Live Gameplay Logic (F1 Circuits, Pit Stops, 5-Light Start, Firing Range, Derby Bowl)
     const arenaStatsEl = document.getElementById('mpArenaStats');
     const px = mode === 'drive' ? state.x : walkState.x;
     const pz = mode === 'drive' ? state.z : walkState.z;
 
-    if (currentMpMap === 'f1_circuit') {
-      playerStats.nitro = Math.min(100, playerStats.nitro + dt * 18); // Continuous DRS/ERS recharge on F1 circuit
-      const activeGate = F1_GATES[f1GateIdx];
-      if (activeGate) {
+    if (isF1Map(currentMpMap)) {
+      playerStats.nitro = Math.min(100, playerStats.nitro + dt * 20); // Continuous DRS/ERS recharge on F1 circuits
+      f1PitCooldown = Math.max(0, f1PitCooldown - dt);
+
+      // 2A. 5-Red-Light FIA Starting Gantry Countdown Animation
+      if (f1RaceStatus === 'countdown') {
+        const elapsedSec = (performance.now() - f1CountdownStartMs) / 1000;
+        const litCount = Math.min(5, Math.floor(elapsedSec / 0.82) + 1);
+        if (litCount > f1LastBeepLight && litCount <= 5) {
+          f1LastBeepLight = litCount;
+          playSfx('door');
+        }
+        for (let i = 0; i < 5; i++) {
+          const pod = document.getElementById('f1Light' + i);
+          if (pod) {
+            pod.classList.remove('green');
+            pod.classList.toggle('red', i < litCount);
+          }
+          if (f1GantryLightMeshes[i]) {
+            f1GantryLightMeshes[i].material.color.setHex(i < litCount ? 0xef4444 : 0x1e293b);
+          }
+        }
+        const stTxt = document.getElementById('f1GantryStatusText');
+        if (stTxt) {
+          stTxt.style.color = '#fde047';
+          stTxt.textContent = `🔴 ${litCount} / 5 RED LIGHTS — HOLD THROTTLE ON STARTING GRID...`;
+        }
+      }
+
+      // 2B. Active 2.4s Pit Crew Service Animation & Progress Bar
+      if (f1PitStopTimer > 0) {
+        f1PitStopTimer = Math.max(0, f1PitStopTimer - dt);
+        const pct = Math.min(100, Math.round(((F1_PIT_DURATION - f1PitStopTimer) / F1_PIT_DURATION) * 100));
+        const barEl = document.getElementById('f1PitStopBar');
+        if (barEl) barEl.style.width = pct + '%';
+
+        // Animate 3D Pit Crew mechanics leaning in with pneumatic wheel-gun sparks
+        const wiggle = Math.sin(performance.now() * 0.035) * 0.25;
+        f1PitCrewMeshes.forEach((c, idx) => {
+          c.mesh.position.x = c.baseX * 0.72 + wiggle * (idx % 2 === 0 ? 1 : -1);
+        });
+        if (Math.random() < 0.45) {
+          spawnParticle(state.x + (Math.random() - 0.5) * 2.4, 0.45, state.z + (Math.random() - 0.5) * 3.2, (Math.random() - 0.5) * 4, 2.2, (Math.random() - 0.5) * 4, 0xfacc15, 0.16, 0.28);
+        }
+
+        if (f1PitStopTimer <= 0) {
+          const pitHud = document.getElementById('f1PitStopHud');
+          if (pitHud) pitHud.classList.remove('open');
+          f1PitCrewMeshes.forEach(c => { c.mesh.position.x = c.baseX; });
+          playSfx('fanfare');
+          showBuildingToast(`🟢 BOX BOX COMPLETE! Fresh ${f1TireCompound.toUpperCase()} Tires + 100% ERS — GO GO GO!`, '#10b981');
+          updateF1HudWidgets();
+        }
+      } else {
+        // 2C. Tire Degradation while driving + Pit Lane Box proximity detection
+        if (mode === 'drive' && Math.abs(state.speed) > 5) {
+          const wearRate = f1TireCompound === 'soft' ? 1.35 : (f1TireCompound === 'medium' ? 0.88 : 0.55);
+          f1TireHealth = Math.max(12, f1TireHealth - dt * wearRate * (Math.abs(state.speed) / 30));
+        }
+
+        const pitBox = getActiveF1PitBox();
+        if (pitBox && f1PitCooldown <= 0) {
+          const dxP = px - pitBox.x, dzP = pz - pitBox.z;
+          const distPit = Math.sqrt(dxP * dxP + dzP * dzP);
+          if (distPit < 8.2 && Math.abs(state.speed) < 26) {
+            triggerF1PitStop();
+          } else if (distPit < 18) {
+            hintEl.textContent = '🔧 PIT LANE: Drive into Yellow Pit Box (or press B) for 2.4s Tire & Wing Service!';
+          }
+        }
+      }
+
+      // 2D. Sector Gates & Multi-Lap Grand Prix Progression
+      const gates = getActiveF1Gates();
+      const activeGate = gates[f1GateIdx];
+      if (activeGate && f1RaceStatus !== 'countdown') {
         const dx = px - activeGate.x, dz = pz - activeGate.z;
-        if (Math.sqrt(dx * dx + dz * dz) < 19.5) {
+        if (Math.sqrt(dx * dx + dz * dz) < 20.5) {
           playSfx('door');
           f1GateIdx++;
-          if (f1GateIdx >= F1_GATES.length) {
+          if (f1GateIdx >= gates.length) {
             f1GateIdx = 0;
-            const lapTimeMs = Math.max(5000, Math.round(performance.now() - f1LapStartMs));
+            const lapTimeMs = Math.max(4500, Math.round(performance.now() - f1LapStartMs));
             f1LapStartMs = performance.now();
             if (f1BestLapMs === 0 || lapTimeMs < f1BestLapMs) f1BestLapMs = lapTimeMs;
+            const completedLap = f1LapCount;
+            f1LapCount++;
             playerStats.cash += 2500;
             updateStatsHud();
             playSfx('fanfare');
-            showMissionBanner(`🏁 LAP ${f1LapCount} COMPLETE!`, `${(lapTimeMs / 1000).toFixed(2)}s · +$2,500 F1 GP Bonus`);
+            showMissionBanner(`🏁 LAP ${completedLap}/${f1TotalLaps} COMPLETE!`, `${(lapTimeMs / 1000).toFixed(2)}s · +$2,500 F1 GP Bonus`);
             if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
-              mpSocket.send(JSON.stringify({ type: 'map:score', kind: 'f1_lap', lap: f1LapCount, value: lapTimeMs }));
+              mpSocket.send(JSON.stringify({
+                type: 'race:lap',
+                lap: completedLap,
+                lapTimeMs,
+                totalLaps: f1TotalLaps
+              }));
+              mpSocket.send(JSON.stringify({ type: 'map:score', kind: 'f1_lap', lap: completedLap, value: lapTimeMs }));
             }
-            f1LapCount++;
           } else {
             showBuildingToast(`⏱ ${activeGate.label} Cleared!`, '#38bdf8');
           }
@@ -10727,8 +11741,9 @@
       if (arenaStatsEl) {
         const curSec = ((performance.now() - f1LapStartMs) / 1000).toFixed(1);
         const bestStr = f1BestLapMs > 0 ? (f1BestLapMs / 1000).toFixed(2) + 's' : '--';
-        arenaStatsEl.textContent = `LAP ${f1LapCount} · GATE ${f1GateIdx + 1}/4 · TIME: ${curSec}s · BEST: ${bestStr}`;
+        arenaStatsEl.textContent = `LAP ${Math.min(f1LapCount, f1TotalLaps)}/${f1TotalLaps} · GATE ${f1GateIdx + 1}/${gates.length} · ${curSec}s · BEST: ${bestStr}`;
       }
+      updateF1HudWidgets();
     } else if (currentMpMap === 'firing_range') {
       const nowT = performance.now() * 0.001;
       firingRangeTargets.forEach(t => {
@@ -10835,6 +11850,7 @@
     if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
       mpSocket.send(JSON.stringify({ type: 'rooms:request' }));
     }
+    renderF1PaddockUI();
     renderMpPlayersList();
     renderMpRoomsList();
     renderMpChatLog();
@@ -10845,17 +11861,97 @@
     document.getElementById('mpOverlay').classList.remove('open');
   }
 
+  function toggleF1ReadyState() {
+    if (!isF1Map(currentMpMap)) {
+      // Automatically switch room to Karachi F1 Stadium GP if player clicks F1 Ready while on another map
+      if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
+        mpSocket.send(JSON.stringify({ type: 'room:change_map', mapId: 'f1_circuit' }));
+      } else {
+        switchMultiplayerMap('f1_circuit', false);
+      }
+    }
+    f1SelfReady = !f1SelfReady;
+    renderF1PaddockUI();
+    updateF1HudWidgets();
+    if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
+      mpSocket.send(JSON.stringify({
+        type: 'race:toggle_ready',
+        ready: f1SelfReady,
+        totalLaps: f1TotalLaps
+      }));
+    } else if (f1SelfReady) {
+      // Offline fallback: start 5-light countdown locally
+      f1RaceStatus = 'countdown';
+      f1CountdownStartMs = performance.now();
+      positionOnF1StartingGrid(0);
+      const gantryHud = document.getElementById('f1StartLightsHud');
+      if (gantryHud) gantryHud.classList.add('open');
+      setTimeout(() => {
+        f1RaceStatus = 'racing';
+        if (gantryHud) gantryHud.classList.remove('open');
+      }, 4500);
+    }
+  }
+
+  function forceStartF1Race() {
+    if (!isF1Map(currentMpMap)) {
+      if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
+        mpSocket.send(JSON.stringify({ type: 'room:change_map', mapId: 'f1_circuit' }));
+      } else {
+        switchMultiplayerMap('f1_circuit', false);
+      }
+    }
+    f1SelfReady = true;
+    if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
+      mpSocket.send(JSON.stringify({
+        type: 'race:force_start',
+        totalLaps: f1TotalLaps
+      }));
+    }
+  }
+
   document.getElementById('mpBtn').addEventListener('click', () => { if (!pauseOpen) mpOpen ? closeMp() : openMp(); });
   document.getElementById('mpLiveBadge').addEventListener('click', () => { if (!pauseOpen) mpOpen ? closeMp() : openMp(); });
   document.getElementById('mobMpBtn').addEventListener('click', () => { closeMobileDrawer(); mpOpen ? closeMp() : openMp(); });
   document.getElementById('mobDrwMp').addEventListener('click', () => { closeMobileDrawer(); mpOpen ? closeMp() : openMp(); });
   document.getElementById('closeMpBtn').addEventListener('click', closeMp);
 
-  // Arena HUD top bar buttons
+  // Arena HUD top bar buttons + F1 Quick Ready & Pit Stop buttons
   document.getElementById('mpArenaActionBtn').addEventListener('click', () => {
     switchMultiplayerMap(currentMpMap, false);
   });
   document.getElementById('mpArenaHubBtn').addEventListener('click', openMp);
+  const f1ToggleReadyBtnEl = document.getElementById('f1ToggleReadyBtn');
+  if (f1ToggleReadyBtnEl) f1ToggleReadyBtnEl.addEventListener('click', toggleF1ReadyState);
+  const f1ForceStartBtnEl = document.getElementById('f1ForceStartBtn');
+  if (f1ForceStartBtnEl) f1ForceStartBtnEl.addEventListener('click', forceStartF1Race);
+  const mpF1ReadyQuickBtnEl = document.getElementById('mpF1ReadyQuickBtn');
+  if (mpF1ReadyQuickBtnEl) mpF1ReadyQuickBtnEl.addEventListener('click', toggleF1ReadyState);
+  const mpF1PitQuickBtnEl = document.getElementById('mpF1PitQuickBtn');
+  if (mpF1PitQuickBtnEl) {
+    mpF1PitQuickBtnEl.addEventListener('click', () => {
+      const pitBox = getActiveF1PitBox();
+      if (pitBox) {
+        state.x = pitBox.x;
+        state.z = pitBox.z;
+        state.heading = pitBox.heading;
+        state.speed = 0;
+        car.position.set(state.x, 0, state.z);
+        car.rotation.y = state.heading;
+      }
+      f1PitCooldown = 0;
+      triggerF1PitStop();
+    });
+  }
+
+  // Pirelli Tire Compound selector chips in Paddock
+  document.querySelectorAll('.f1TireChip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const comp = btn.getAttribute('data-tire') || 'soft';
+      applyF1TeamAndCarLoadout(f1SelectedTeamId, garage.selectedCarId, comp, true);
+      showBuildingToast(`🛞 Pirelli ${comp.toUpperCase()} Tire Compound Fitted!`, '#fde047');
+    });
+  });
 
   // Map Cards click: switches the active room's map for everyone in the room
   document.querySelectorAll('.mpMapCard').forEach(card => {
@@ -10952,9 +12048,22 @@
   window.addEventListener('keydown', ev => {
     if (ev.code === 'KeyU' && !pauseOpen && !cutsceneActive) {
       mpOpen ? closeMp() : openMp();
+    } else if (ev.code === 'KeyB' && !pauseOpen && !cutsceneActive && !mpOpen && isF1Map(currentMpMap)) {
+      const pitBox = getActiveF1PitBox();
+      if (pitBox) {
+        state.x = pitBox.x;
+        state.z = pitBox.z;
+        state.heading = pitBox.heading;
+        state.speed = 0;
+        car.position.set(state.x, 0, state.z);
+        car.rotation.y = state.heading;
+      }
+      f1PitCooldown = 0;
+      triggerF1PitStop();
     }
   });
 
+  renderF1PaddockUI();
   connectMultiplayerSocket();
 
   // ===================================================================

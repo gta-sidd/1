@@ -8,7 +8,7 @@ import { createServer as createViteServer } from 'vite';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export type MapId = 'karachi_city' | 'f1_circuit' | 'firing_range' | 'kemari_docks' | 'derby_dome';
+export type MapId = 'karachi_city' | 'f1_circuit' | 'f1_marina' | 'firing_range' | 'kemari_docks' | 'derby_dome';
 
 interface PlayerState {
   id: string;
@@ -23,8 +23,18 @@ interface PlayerState {
   speed: number;
   steerAngle: number;
   carId: string;
+  teamId: string;
+  teamName: string;
   bodyColor: string;
+  stripeColor: string;
+  rimColor: string;
   underglowColor: string;
+  tireCompound: 'soft' | 'medium' | 'hard';
+  ready: boolean;
+  gridIndex: number;
+  raceLap: number;
+  raceGate: number;
+  pitCount: number;
   outfitColor: string;
   weapon: string;
   health: number;
@@ -54,6 +64,17 @@ interface SupplyDrop {
   reward: number;
 }
 
+interface RaceFinishEntry {
+  id: string;
+  name: string;
+  teamName: string;
+  carId: string;
+  position: number;
+  totalTimeMs: number;
+  bestLapMs: number;
+  pitCount: number;
+}
+
 interface RoomState {
   id: string;
   code: string;
@@ -63,14 +84,20 @@ interface RoomState {
   players: Map<string, PlayerState>;
   chat: ChatMessage[];
   supplyDrop: SupplyDrop;
+  raceStatus: 'lobby' | 'countdown' | 'racing' | 'finished';
+  raceStartTime: number;
+  raceTotalLaps: number;
+  finishOrder: RaceFinishEntry[];
+  countdownTimer?: ReturnType<typeof setTimeout>;
   createdAt: number;
 }
 
-const VALID_MAPS: MapId[] = ['karachi_city', 'f1_circuit', 'firing_range', 'kemari_docks', 'derby_dome'];
+const VALID_MAPS: MapId[] = ['karachi_city', 'f1_circuit', 'f1_marina', 'firing_range', 'kemari_docks', 'derby_dome'];
 
 const MAP_LABELS: Record<MapId, string> = {
   karachi_city: '🏙️ Karachi Open World (Lyari & Clifton)',
-  f1_circuit: '🏎️ Karachi Grand Prix F1 Circuit',
+  f1_circuit: '🏎️ Karachi Grand Prix F1 Stadium Circuit',
+  f1_marina: '🌃 Clifton Night Marina GP (Street F1 Circuit)',
   firing_range: '🎯 IB Tactical Firing Range & Killhouse',
   kemari_docks: '⚓ Kemari Port Container PvP Arena',
   derby_dome: '💥 Clifton Destruction Derby Bowl',
@@ -124,6 +151,7 @@ function generateShortRoomCode(mapId: MapId): string {
   const prefixes: Record<MapId, string> = {
     karachi_city: 'KRC',
     f1_circuit: 'F1X',
+    f1_marina: 'MGP',
     firing_range: 'RNG',
     kemari_docks: 'PVP',
     derby_dome: 'DRB',
@@ -143,6 +171,12 @@ function generateShortRoomCode(mapId: MapId): string {
 function sanitizeMapId(raw: unknown): MapId {
   const s = String(raw || 'karachi_city') as MapId;
   return VALID_MAPS.includes(s) ? s : 'karachi_city';
+}
+
+function sanitizeTireCompound(raw: unknown): 'soft' | 'medium' | 'hard' {
+  const s = String(raw || 'soft').toLowerCase();
+  if (s === 'medium' || s === 'hard') return s;
+  return 'soft';
 }
 
 function getOrCreateRoom(rawCode: string, mapId?: MapId, hostId?: string, hostName?: string): RoomState {
@@ -168,11 +202,93 @@ function getOrCreateRoom(rawCode: string, mapId?: MapId, hostId?: string, hostNa
         },
       ],
       supplyDrop: createSupplyDrop(initialMap),
+      raceStatus: 'lobby',
+      raceStartTime: 0,
+      raceTotalLaps: 3,
+      finishOrder: [],
       createdAt: Date.now(),
     };
     rooms.set(code, room);
   }
   return room;
+}
+
+function triggerRaceCountdown(room: RoomState, initiatorName?: string) {
+  if (room.countdownTimer) {
+    clearTimeout(room.countdownTimer);
+  }
+  room.raceStatus = 'countdown';
+  room.finishOrder = [];
+  room.raceStartTime = Date.now() + 5000;
+
+  let slot = 0;
+  for (const [, p] of room.players) {
+    p.gridIndex = slot++;
+    p.raceLap = 1;
+    p.raceGate = 0;
+    p.pitCount = 0;
+  }
+
+  const cdMsg: ChatMessage = {
+    id: 'cd-' + Date.now(),
+    senderId: 'system',
+    senderName: 'FIA RACE DIRECTOR',
+    text: `🚥 ALL DRIVERS READY${initiatorName ? ` (${initiatorName})` : ''}! Cars on the Starting Grid — 5 Red Lights sequence initiated!`,
+    timestamp: Date.now(),
+    system: true,
+  };
+  room.chat.push(cdMsg);
+  if (room.chat.length > 40) room.chat.shift();
+
+  broadcastToRoom(room.code, {
+    type: 'race:countdown_start',
+    mapId: room.mapId,
+    countdownMs: 5000,
+    totalLaps: room.raceTotalLaps,
+    players: Array.from(room.players.values()),
+    chatMessage: cdMsg,
+  });
+
+  room.countdownTimer = setTimeout(() => {
+    room.raceStatus = 'racing';
+    room.raceStartTime = Date.now();
+    const goMsg: ChatMessage = {
+      id: 'go-' + Date.now(),
+      senderId: 'system',
+      senderName: 'FIA RACE DIRECTOR',
+      text: `🟢 LIGHTS OUT AND AWAY WE GO! ${room.raceTotalLaps}-Lap Grand Prix is LIVE on ${MAP_LABELS[room.mapId]}!`,
+      timestamp: Date.now(),
+      system: true,
+    };
+    room.chat.push(goMsg);
+    if (room.chat.length > 40) room.chat.shift();
+
+    broadcastToRoom(room.code, {
+      type: 'race:lights_out',
+      raceStartTime: room.raceStartTime,
+      totalLaps: room.raceTotalLaps,
+      chatMessage: goMsg,
+    });
+  }, 5000);
+}
+
+function checkAllPlayersReadyAndStart(room: RoomState) {
+  if (room.players.size === 0) return;
+  if (room.raceStatus === 'countdown') return;
+  let allReady = true;
+  for (const [, p] of room.players) {
+    if (!p.ready) {
+      allReady = false;
+      break;
+    }
+  }
+  if (allReady) {
+    // Ensure room is on an F1 circuit if someone readied up in F1 paddock
+    if (room.mapId !== 'f1_circuit' && room.mapId !== 'f1_marina') {
+      room.mapId = 'f1_circuit';
+    }
+    triggerRaceCountdown(room);
+  }
 }
 
 function getPublicRoomsList() {
@@ -266,6 +382,7 @@ async function startServer() {
         room.hostName = callsign;
       }
 
+      const isF1Map = room.mapId === 'f1_circuit' || room.mapId === 'f1_marina';
       const newPlayer: PlayerState = {
         id: playerId,
         name: callsign,
@@ -278,9 +395,19 @@ async function startServer() {
         heading: Number(msg.heading) || 0,
         speed: Number(msg.speed) || 0,
         steerAngle: Number(msg.steerAngle) || 0,
-        carId: String(msg.carId || (room.mapId === 'f1_circuit' ? 'f1' : 'speedster')),
-        bodyColor: String(msg.bodyColor || '#eab308'),
-        underglowColor: String(msg.underglowColor || '#38bdf8'),
+        carId: String(msg.carId || (isF1Map ? 'f1' : 'speedster')).slice(0, 24),
+        teamId: String(msg.teamId || 'ferrari_corsa').slice(0, 24),
+        teamName: String(msg.teamName || 'Scuderia Corsa Rossa').slice(0, 36),
+        bodyColor: String(msg.bodyColor || '#dc2626').slice(0, 16),
+        stripeColor: String(msg.stripeColor || '#ffffff').slice(0, 16),
+        rimColor: String(msg.rimColor || '#facc15').slice(0, 16),
+        underglowColor: String(msg.underglowColor || '#38bdf8').slice(0, 16),
+        tireCompound: sanitizeTireCompound(msg.tireCompound),
+        ready: Boolean(msg.ready),
+        gridIndex: room.players.size,
+        raceLap: 1,
+        raceGate: 0,
+        pitCount: 0,
         outfitColor: String(msg.outfitColor || '#1e242b'),
         weapon: String(msg.weapon || 'pistol'),
         health: Math.max(1, Math.min(100, Number(msg.health) || 100)),
@@ -302,6 +429,9 @@ async function startServer() {
         mapId: room.mapId,
         hostId: room.hostId,
         hostName: room.hostName,
+        raceStatus: room.raceStatus,
+        raceTotalLaps: room.raceTotalLaps,
+        finishOrder: room.finishOrder,
         players: Array.from(room.players.values()),
         chat: room.chat.slice(-25),
         supplyDrop: room.supplyDrop,
@@ -338,19 +468,25 @@ async function startServer() {
         if (msg.type === 'room:create') {
           const chosenMap = sanitizeMapId(msg.mapId);
           const customCode = msg.customCode ? normalizeRoomCode(msg.customCode) : generateShortRoomCode(chosenMap);
-          // If room already exists, still update its map if creator requested it
           joinPlayerToRoom(customCode, msg, chosenMap);
         } else if (msg.type === 'player:join' || msg.type === 'room:switch') {
           const targetCode = normalizeRoomCode(msg.room || 'KARACHI-1');
           const requestedMap = msg.mapId ? sanitizeMapId(msg.mapId) : undefined;
           const existing = rooms.get(targetCode);
-          // Only override map if room is brand new
           joinPlayerToRoom(targetCode, msg, existing ? undefined : requestedMap);
         } else if (msg.type === 'room:change_map') {
           const room = rooms.get(currentRoomCode);
           if (!room) return;
           const nextMap = sanitizeMapId(msg.mapId);
           room.mapId = nextMap;
+          room.raceStatus = 'lobby';
+          room.finishOrder = [];
+          for (const [, rp] of room.players) {
+            rp.ready = false;
+            rp.raceLap = 1;
+            rp.raceGate = 0;
+            rp.pitCount = 0;
+          }
           room.supplyDrop = createSupplyDrop(nextMap);
           const p = room.players.get(playerId);
           const changerName = p ? p.name : 'Host';
@@ -359,7 +495,7 @@ async function startServer() {
             id: 'map-' + Date.now(),
             senderId: 'system',
             senderName: 'MAP CONTROL',
-            text: `🗺️ ${changerName} switched Room [${room.code}] map to ${MAP_LABELS[nextMap]}! Deploying all operatives...`,
+            text: `🗺️ ${changerName} switched Room [${room.code}] map to ${MAP_LABELS[nextMap]}!`,
             timestamp: Date.now(),
             system: true,
           };
@@ -369,8 +505,145 @@ async function startServer() {
           broadcastToRoom(room.code, {
             type: 'room:map_changed',
             mapId: nextMap,
+            raceStatus: room.raceStatus,
+            players: Array.from(room.players.values()),
             supplyDrop: room.supplyDrop,
             chatMessage: mapMsg,
+          });
+        } else if (msg.type === 'race:select_loadout') {
+          const room = rooms.get(currentRoomCode);
+          if (!room) return;
+          const p = room.players.get(playerId);
+          if (!p) return;
+
+          if (typeof msg.name === 'string' && msg.name.trim()) p.name = msg.name.trim().slice(0, 20);
+          if (typeof msg.teamId === 'string') p.teamId = msg.teamId.slice(0, 24);
+          if (typeof msg.teamName === 'string') p.teamName = msg.teamName.slice(0, 36);
+          if (typeof msg.carId === 'string') p.carId = msg.carId.slice(0, 24);
+          if (typeof msg.bodyColor === 'string') p.bodyColor = msg.bodyColor.slice(0, 16);
+          if (typeof msg.stripeColor === 'string') p.stripeColor = msg.stripeColor.slice(0, 16);
+          if (typeof msg.rimColor === 'string') p.rimColor = msg.rimColor.slice(0, 16);
+          if (msg.tireCompound) p.tireCompound = sanitizeTireCompound(msg.tireCompound);
+          if (typeof msg.totalLaps === 'number') {
+            room.raceTotalLaps = Math.max(1, Math.min(10, Math.round(msg.totalLaps)));
+          }
+
+          broadcastToRoom(room.code, {
+            type: 'race:lobby_state',
+            mapId: room.mapId,
+            raceStatus: room.raceStatus,
+            raceTotalLaps: room.raceTotalLaps,
+            players: Array.from(room.players.values()),
+          });
+        } else if (msg.type === 'race:toggle_ready') {
+          const room = rooms.get(currentRoomCode);
+          if (!room) return;
+          const p = room.players.get(playerId);
+          if (!p) return;
+
+          if (typeof msg.name === 'string' && msg.name.trim()) p.name = msg.name.trim().slice(0, 20);
+          if (typeof msg.teamId === 'string') p.teamId = msg.teamId.slice(0, 24);
+          if (typeof msg.teamName === 'string') p.teamName = msg.teamName.slice(0, 36);
+          if (typeof msg.carId === 'string') p.carId = msg.carId.slice(0, 24);
+          if (typeof msg.bodyColor === 'string') p.bodyColor = msg.bodyColor.slice(0, 16);
+          if (typeof msg.stripeColor === 'string') p.stripeColor = msg.stripeColor.slice(0, 16);
+          if (typeof msg.rimColor === 'string') p.rimColor = msg.rimColor.slice(0, 16);
+          if (msg.tireCompound) p.tireCompound = sanitizeTireCompound(msg.tireCompound);
+          if (msg.mapId) {
+            const reqMap = sanitizeMapId(msg.mapId);
+            if (reqMap === 'f1_circuit' || reqMap === 'f1_marina') {
+              room.mapId = reqMap;
+            }
+          }
+
+          p.ready = msg.ready !== undefined ? Boolean(msg.ready) : !p.ready;
+
+          let readyCount = 0;
+          for (const [, rp] of room.players) {
+            if (rp.ready) readyCount++;
+          }
+
+          const rdyMsg: ChatMessage = {
+            id: 'rdy-' + Date.now() + '-' + Math.random(),
+            senderId: 'system',
+            senderName: 'F1 PADDOCK',
+            text: p.ready
+              ? `✅ ${p.name} [${p.teamName}] is READY on ${p.tireCompound.toUpperCase()} tires (${readyCount}/${room.players.size} Ready)!`
+              : `⏸ ${p.name} is adjusting garage setup (${readyCount}/${room.players.size} Ready).`,
+            timestamp: Date.now(),
+            system: true,
+          };
+          room.chat.push(rdyMsg);
+          if (room.chat.length > 40) room.chat.shift();
+
+          broadcastToRoom(room.code, {
+            type: 'race:lobby_state',
+            mapId: room.mapId,
+            raceStatus: room.raceStatus,
+            raceTotalLaps: room.raceTotalLaps,
+            players: Array.from(room.players.values()),
+            chatMessage: rdyMsg,
+          });
+
+          checkAllPlayersReadyAndStart(room);
+        } else if (msg.type === 'race:force_start') {
+          const room = rooms.get(currentRoomCode);
+          if (!room) return;
+          const p = room.players.get(playerId);
+          if (msg.mapId) {
+            const reqMap = sanitizeMapId(msg.mapId);
+            if (reqMap === 'f1_circuit' || reqMap === 'f1_marina') room.mapId = reqMap;
+          }
+          for (const [, rp] of room.players) rp.ready = true;
+          triggerRaceCountdown(room, p ? p.name : 'Race Host');
+        } else if (msg.type === 'race:reset') {
+          const room = rooms.get(currentRoomCode);
+          if (!room) return;
+          if (room.countdownTimer) clearTimeout(room.countdownTimer);
+          room.raceStatus = 'lobby';
+          room.finishOrder = [];
+          for (const [, rp] of room.players) {
+            rp.ready = false;
+            rp.raceLap = 1;
+            rp.raceGate = 0;
+            rp.pitCount = 0;
+          }
+          broadcastToRoom(room.code, {
+            type: 'race:lobby_state',
+            mapId: room.mapId,
+            raceStatus: room.raceStatus,
+            raceTotalLaps: room.raceTotalLaps,
+            players: Array.from(room.players.values()),
+          });
+        } else if (msg.type === 'race:pit_stop') {
+          const room = rooms.get(currentRoomCode);
+          if (!room) return;
+          const p = room.players.get(playerId);
+          if (!p) return;
+
+          p.pitCount = (p.pitCount || 0) + 1;
+          if (msg.tireCompound) p.tireCompound = sanitizeTireCompound(msg.tireCompound);
+          const stopDur = Number(msg.durationSec) || 2.4;
+
+          const pitMsg: ChatMessage = {
+            id: 'pit-' + Date.now() + '-' + Math.random(),
+            senderId: 'system',
+            senderName: 'F1 PIT WALL',
+            text: `🔧 BOX BOX! ${p.name} (${p.teamName}) completed a ${stopDur.toFixed(1)}s Pit Stop → Fitted fresh ${p.tireCompound.toUpperCase()} compound tires (Stop #${p.pitCount})!`,
+            timestamp: Date.now(),
+            system: true,
+          };
+          room.chat.push(pitMsg);
+          if (room.chat.length > 40) room.chat.shift();
+
+          broadcastToRoom(room.code, {
+            type: 'race:pit_broadcast',
+            playerId: p.id,
+            playerName: p.name,
+            teamName: p.teamName,
+            tireCompound: p.tireCompound,
+            pitCount: p.pitCount,
+            chatMessage: pitMsg,
           });
         } else if (msg.type === 'rooms:request') {
           sendToPlayer(playerId, {
@@ -384,29 +657,77 @@ async function startServer() {
           if (!p) return;
 
           if (msg.kind === 'f1_lap') {
-            const lapMs = Math.max(5000, Math.round(Number(msg.value) || 0));
+            const lapMs = Math.max(4000, Math.round(Number(msg.value) || 0));
+            const lapNum = Math.max(1, Math.round(Number(msg.lap) || 1));
             const isPB = p.bestLapMs === 0 || lapMs < p.bestLapMs;
             if (isPB) p.bestLapMs = lapMs;
+            p.raceLap = lapNum + 1;
             const lapSec = (lapMs / 1000).toFixed(2);
-            const scoreMsg: ChatMessage = {
-              id: 'lap-' + Date.now() + '-' + Math.random(),
-              senderId: 'system',
-              senderName: 'F1 TELEMETRY',
-              text: `🏁 ${p.name} completed Lap ${msg.lap || 1} in ${lapSec}s${isPB ? ' (★ NEW PERSONAL BEST!)' : ''}!`,
-              timestamp: Date.now(),
-              system: true,
-            };
-            room.chat.push(scoreMsg);
-            if (room.chat.length > 40) room.chat.shift();
-            broadcastToRoom(room.code, {
-              type: 'map:score_broadcast',
-              playerId: p.id,
-              playerName: p.name,
-              kind: 'f1_lap',
-              value: lapMs,
-              bestLapMs: p.bestLapMs,
-              chatMessage: scoreMsg,
-            });
+
+            const finishedRace = lapNum >= (room.raceTotalLaps || 3);
+            if (finishedRace && !room.finishOrder.some((f) => f.id === p.id)) {
+              const pos = room.finishOrder.length + 1;
+              const totalTimeMs = room.raceStartTime > 0 ? Math.max(lapMs, Date.now() - room.raceStartTime) : lapMs * lapNum;
+              const entry: RaceFinishEntry = {
+                id: p.id,
+                name: p.name,
+                teamName: p.teamName,
+                carId: p.carId,
+                position: pos,
+                totalTimeMs,
+                bestLapMs: p.bestLapMs,
+                pitCount: p.pitCount || 0,
+              };
+              room.finishOrder.push(entry);
+              p.ready = false;
+
+              const medals = ['🏆 P1 WINNER', '🥈 P2 PODIUM', '🥉 P3 PODIUM'];
+              const badge = medals[pos - 1] || `🏁 P${pos} FINISHER`;
+              const finMsg: ChatMessage = {
+                id: 'fin-' + Date.now() + '-' + Math.random(),
+                senderId: 'system',
+                senderName: 'FIA CHECKERED FLAG',
+                text: `${badge}! ${p.name} [${p.teamName}] finished the ${room.raceTotalLaps}-Lap Grand Prix! Best Lap: ${(p.bestLapMs / 1000).toFixed(2)}s · Pit Stops: ${p.pitCount || 0}`,
+                timestamp: Date.now(),
+                system: true,
+              };
+              room.chat.push(finMsg);
+              if (room.chat.length > 40) room.chat.shift();
+
+              if (room.finishOrder.length >= room.players.size) {
+                room.raceStatus = 'finished';
+              }
+
+              broadcastToRoom(room.code, {
+                type: 'race:driver_finished',
+                entry,
+                finishOrder: room.finishOrder,
+                raceStatus: room.raceStatus,
+                players: Array.from(room.players.values()),
+                chatMessage: finMsg,
+              });
+            } else {
+              const scoreMsg: ChatMessage = {
+                id: 'lap-' + Date.now() + '-' + Math.random(),
+                senderId: 'system',
+                senderName: 'F1 TELEMETRY',
+                text: `🏁 ${p.name} [${p.teamName}] completed Lap ${lapNum}/${room.raceTotalLaps || 3} in ${lapSec}s${isPB ? ' (★ PURPLE SECTOR PB!)' : ''}!`,
+                timestamp: Date.now(),
+                system: true,
+              };
+              room.chat.push(scoreMsg);
+              if (room.chat.length > 40) room.chat.shift();
+              broadcastToRoom(room.code, {
+                type: 'map:score_broadcast',
+                playerId: p.id,
+                playerName: p.name,
+                kind: 'f1_lap',
+                lap: lapNum,
+                value: lapMs,
+                bestLapMs: p.bestLapMs,
+                chatMessage: scoreMsg,
+              });
+            }
           } else if (msg.kind === 'firing_range') {
             const pts = Math.max(0, Math.round(Number(msg.value) || 0));
             if (pts > p.rangeScore) p.rangeScore = pts;
@@ -444,8 +765,16 @@ async function startServer() {
           if (typeof msg.steerAngle === 'number' && !Number.isNaN(msg.steerAngle)) p.steerAngle = msg.steerAngle;
           if (msg.mode === 'drive' || msg.mode === 'walk' || msg.mode === 'interior') p.mode = msg.mode;
           if (typeof msg.carId === 'string') p.carId = msg.carId.slice(0, 24);
+          if (typeof msg.teamId === 'string') p.teamId = msg.teamId.slice(0, 24);
+          if (typeof msg.teamName === 'string') p.teamName = msg.teamName.slice(0, 36);
           if (typeof msg.bodyColor === 'string') p.bodyColor = msg.bodyColor.slice(0, 16);
+          if (typeof msg.stripeColor === 'string') p.stripeColor = msg.stripeColor.slice(0, 16);
+          if (typeof msg.rimColor === 'string') p.rimColor = msg.rimColor.slice(0, 16);
           if (typeof msg.underglowColor === 'string') p.underglowColor = msg.underglowColor.slice(0, 16);
+          if (msg.tireCompound) p.tireCompound = sanitizeTireCompound(msg.tireCompound);
+          if (typeof msg.raceLap === 'number') p.raceLap = msg.raceLap;
+          if (typeof msg.raceGate === 'number') p.raceGate = msg.raceGate;
+          if (typeof msg.pitCount === 'number') p.pitCount = msg.pitCount;
           if (typeof msg.outfitColor === 'string') p.outfitColor = msg.outfitColor.slice(0, 16);
           if (typeof msg.weapon === 'string') p.weapon = msg.weapon.slice(0, 20);
           if (typeof msg.health === 'number') p.health = Math.max(0, Math.min(100, msg.health));
@@ -469,8 +798,17 @@ async function startServer() {
               speed: p.speed,
               steerAngle: p.steerAngle,
               carId: p.carId,
+              teamId: p.teamId,
+              teamName: p.teamName,
               bodyColor: p.bodyColor,
+              stripeColor: p.stripeColor,
+              rimColor: p.rimColor,
               underglowColor: p.underglowColor,
+              tireCompound: p.tireCompound,
+              ready: p.ready,
+              raceLap: p.raceLap,
+              raceGate: p.raceGate,
+              pitCount: p.pitCount,
               outfitColor: p.outfitColor,
               weapon: p.weapon,
               health: p.health,
