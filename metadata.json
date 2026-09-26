@@ -1,6 +1,6 @@
 {
-  "name": "Vice & Verde: Open World GTA Story",
-  "description": "A 3D open-world action driving game featuring an 8-mission crime storyline, choreographed 3D cutscenes, carjacking animations, drift physics, nitro, and street jobs.",
+  "name": "DHURANDHAR · Deep Cover in Karachi",
+  "description": "Play as undercover Indian Intelligence operative Hamza Ali Mazari (Jaskirat Singh Rangi) in Karachi. Sent by IB Chief Ajay Sanyal to infiltrate Rehman Dakait's Lyari gang, evade SP Chaudhary Aslam, and dismantle Major Iqbal's terror network.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
