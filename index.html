@@ -562,42 +562,289 @@
   }
   .missionTabBtn.active { background: #ffd54a; color: #111318; border-color: #ffd54a; }
 
-  /* ---------- mobile controls ---------- */
-  #mobileControls { display: none; }
+  /* ---------- Dedicated Clean Mobile Mode ---------- */
+  #mobileTopBar, #mobileDrawer, #mobileControls { display: none; }
+
+  body.show-mobile #controls,
+  body.show-mobile #chapterBadge,
+  body.show-mobile #title,
+  body.show-mobile #statsHud,
+  body.show-mobile #toolbar {
+    display: none !important;
+  }
+
+  body.show-mobile #mobileTopBar {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    right: 104px;
+    z-index: 35;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(10, 14, 24, 0.72);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 10px;
+    padding: 5px 8px;
+    color: #f8fafc;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    user-select: none;
+  }
+  .mobVitals {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 48px;
+    flex-shrink: 0;
+  }
+  .mobBarBg {
+    width: 100%;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.16);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  #mobHealthFill { height: 100%; width: 100%; background: #10b981; transition: width 0.2s; }
+  #mobArmorFill  { height: 100%; width: 0%;   background: #38bdf8; transition: width 0.2s; }
+  .mobStatText {
+    font-weight: 800;
+    color: #fbbf24;
+    white-space: nowrap;
+    font-size: 11px;
+  }
+  #mobWantedStars {
+    color: #f59e0b;
+    font-size: 10.5px;
+    letter-spacing: 0.5px;
+  }
+  .mobTopSpacer { flex: 1; }
+  .mobTopBtn {
+    background: rgba(30, 41, 59, 0.85);
+    color: #f8fafc;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 7px;
+    padding: 5px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .mobTopBtn.accent {
+    background: rgba(245, 158, 11, 0.22);
+    border-color: #f59e0b;
+    color: #fde047;
+  }
+
+  /* Collapsible Mobile Quick-Tools Drawer */
+  body.show-mobile #mobileDrawer.open {
+    position: fixed;
+    top: 50px;
+    left: 8px;
+    right: 8px;
+    z-index: 75;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    background: rgba(10, 14, 24, 0.94);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(251, 191, 36, 0.4);
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75);
+  }
+  .mobDrawerBtn {
+    background: rgba(30, 41, 59, 0.85);
+    color: #f8fafc;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 8px;
+    padding: 9px 6px;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+  }
+  .mobDrawerBtn:active { background: rgba(245, 158, 11, 0.35); border-color: #fbbf24; }
+
+  /* Compact Circular Corner Radar in Mobile Mode */
+  body.show-mobile #minimap {
+    top: 8px;
+    right: 8px;
+    width: 86px;
+    height: 86px;
+    border-radius: 50%;
+    border: 2px solid rgba(251, 191, 36, 0.55);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+    cursor: pointer;
+  }
+
+  /* Ultra-Minimal Speed Pill & Tappable Action Prompt in Mobile Mode */
+  body.show-mobile #hud {
+    top: 48px;
+    left: 8px;
+    bottom: auto;
+    min-width: 0;
+    padding: 4px 9px;
+    border-radius: 8px;
+    background: rgba(10, 14, 24, 0.62);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-left: 2px solid #f59e0b;
+    box-shadow: none;
+  }
+  body.show-mobile #speed { font-size: 20px; }
+  body.show-mobile #speed span { font-size: 9px; margin-left: 3px; }
+  body.show-mobile #nitroBarOuter { height: 4px; margin-top: 3px; width: 64px; }
+  body.show-mobile #carLabel,
+  body.show-mobile #radioLabel { display: none; }
+  body.show-mobile #actionHint {
+    position: fixed;
+    bottom: 138px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10, 14, 24, 0.82);
+    border: 1px solid rgba(251, 191, 36, 0.45);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 11.5px;
+    color: #fde047;
+    white-space: nowrap;
+    max-width: 88vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: auto;
+    cursor: pointer;
+    min-height: 0;
+    margin: 0;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+  }
+  body.show-mobile #actionHint:empty { display: none; }
+
+  /* Compact Mission Tracker & Interior HUD on Mobile */
+  body.show-mobile #missionHud {
+    top: 48px;
+    left: 96px;
+    right: 100px;
+    transform: none;
+    min-width: 0;
+    max-width: none;
+    padding: 6px 10px;
+    border-radius: 9px;
+  }
+  body.show-mobile #missionTitle { font-size: 11.5px; }
+  body.show-mobile #missionObjective { font-size: 11px; margin-top: 2px; }
+  body.show-mobile #missionDistance { font-size: 10px; margin-top: 2px; }
+  body.show-mobile #missionProgress { display: none; }
+  body.show-mobile .missionActionBtn,
+  body.show-mobile #missionAbandonBtn { padding: 3px 7px; font-size: 10px; }
+
+  body.show-mobile #interiorHud {
+    bottom: 136px;
+    padding: 8px 10px;
+    min-width: 0;
+    width: 92vw;
+  }
+  body.show-mobile #intBuildingTitle { font-size: 13.5px; }
+  body.show-mobile #intBuildingSub { display: none; }
+  body.show-mobile .intStationsGrid { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+  body.show-mobile .intStationCard { padding: 6px 7px; }
+  body.show-mobile .intStationName { font-size: 10.5px; }
+  body.show-mobile .intStationDesc { display: none; }
+
+  body.show-mobile #phonePopup {
+    top: 52px;
+    bottom: auto;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(300px, 90vw);
+    padding: 10px 12px;
+  }
+
+  /* Translucent Dual-Thumb Touch Controls */
   body.show-mobile #mobileControls { display: block; }
-  body.show-mobile #controls { display: none; }
+
+  #joyZone {
+    position: fixed;
+    left: 14px;
+    bottom: 14px;
+    width: 112px;
+    height: 112px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(30, 41, 59, 0.38) 0%, rgba(10, 14, 24, 0.52) 100%);
+    border: 1.5px solid rgba(255, 255, 255, 0.24);
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #joyKnob {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(248, 250, 252, 0.45);
+    border: 2px solid rgba(251, 191, 36, 0.75);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+    pointer-events: none;
+    transition: transform 0.04s linear;
+  }
+  .joyHintLabel {
+    position: absolute;
+    font-size: 9px;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.45);
+    pointer-events: none;
+  }
+  .joyHintLabel.up    { top: 5px; left: 50%; transform: translateX(-50%); }
+  .joyHintLabel.down  { bottom: 5px; left: 50%; transform: translateX(-50%); }
+  .joyHintLabel.left  { left: 6px; top: 50%; transform: translateY(-50%); }
+  .joyHintLabel.right { right: 6px; top: 50%; transform: translateY(-50%); }
 
   .mc-btn {
     position: fixed;
-    background: rgba(20,20,24,0.55);
-    border: 2px solid rgba(255,255,255,0.35);
+    background: rgba(15, 23, 42, 0.48);
+    border: 1.5px solid rgba(255, 255, 255, 0.28);
     color: #fff;
-    font-size: 22px;
-    font-weight: 700;
+    font-weight: 800;
     user-select: none;
     -webkit-user-select: none;
     touch-action: none;
     z-index: 30;
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  .mc-round { width: 62px; height: 62px; border-radius: 50%; display:flex; align-items:center; justify-content:center; }
-  .mc-small {
-    position: fixed;
-    padding: 8px 10px;
-    border-radius: 8px;
-    font-size: 11px;
-    z-index: 30;
+  .mc-btn:active {
+    transform: scale(0.94);
+    border-color: #fbbf24;
   }
-  #btnLeft   { left: 20px;  bottom: 40px; }
-  #btnRight  { left: 92px;  bottom: 40px; }
-  #btnGas    { right: 20px; bottom: 108px; background: rgba(70,150,70,0.55); }
-  #btnBrake  { right: 20px; bottom: 36px; background: rgba(150,60,60,0.55); }
-  #btnHandbrake { right: 100px; bottom: 40px; }
-  #btnFire   { right: 100px; bottom: 108px; background: rgba(200,60,60,0.55); }
-  #btnNitro  { right: 170px; bottom: 108px; background: rgba(6,182,212,0.55); }
-  #btnCam    { left: 20px; bottom: 116px; }
-  #btnReset  { left: 92px; bottom: 116px; }
-  #btnEnter  { left: 92px; bottom: 190px; background: rgba(255,213,74,0.35); }
-  #btnExitMobile { left: 20px; bottom: 190px; }
+  .mc-pedal {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    font-size: 18px;
+  }
+  .mc-sat {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    font-size: 10px;
+    letter-spacing: 0.3px;
+  }
+  /* Hidden legacy left/right buttons kept in DOM for safety */
+  #btnLeft, #btnRight, #btnCam, #btnReset { display: none !important; }
+
+  #btnGas       { right: 14px; bottom: 74px; background: rgba(16, 185, 129, 0.42); border-color: rgba(52, 211, 153, 0.55); }
+  #btnBrake     { right: 14px; bottom: 14px; background: rgba(239, 68, 68, 0.38);  border-color: rgba(248, 113, 113, 0.5); }
+  #btnHandbrake { right: 76px; bottom: 14px; background: rgba(30, 41, 59, 0.52); }
+  #btnFire      { right: 76px; bottom: 66px; background: rgba(220, 38, 38, 0.48); border-color: rgba(252, 165, 165, 0.55); }
+  #btnNitro     { right: 128px; bottom: 14px; background: rgba(6, 182, 212, 0.45); border-color: rgba(103, 232, 249, 0.55); }
+  #btnEnter     { right: 128px; bottom: 66px; background: rgba(245, 158, 11, 0.48); border-color: rgba(253, 224, 71, 0.65); color: #fef08a; }
+  #btnExitMobile { right: 14px; bottom: 134px; width: 42px; height: 34px; border-radius: 9px; font-size: 13px; }
 </style>
 </head>
 <body>
@@ -607,6 +854,33 @@
 <div id="vignette"></div>
 <div id="lightningFlashOverlay"></div>
 <div id="rainOverlay"></div>
+
+<!-- Compact Single-Line Top Bar for Mobile Mode -->
+<div id="mobileTopBar">
+  <div class="mobVitals">
+    <div class="mobBarBg"><div id="mobHealthFill"></div></div>
+    <div class="mobBarBg"><div id="mobArmorFill"></div></div>
+  </div>
+  <span class="mobStatText">$<span id="mobCashVal">500</span></span>
+  <span id="mobWantedStars"></span>
+  <div class="mobTopSpacer"></div>
+  <button class="mobTopBtn" id="mobWeaponBtn">🔫 Fists</button>
+  <button class="mobTopBtn accent" id="mobOpsBtn">🎬 Ops</button>
+  <button class="mobTopBtn" id="mobMenuBtn">☰ Menu</button>
+</div>
+
+<!-- Collapsible Quick Drawer for Mobile Mode -->
+<div id="mobileDrawer">
+  <button class="mobDrawerBtn" id="mobDrwBldg">🏛 Enter Bldg</button>
+  <button class="mobDrawerBtn" id="mobDrwGarage">🔧 Garage</button>
+  <button class="mobDrawerBtn" id="mobDrwShop">🧥 Disguise</button>
+  <button class="mobDrawerBtn" id="mobDrwCam">🎥 Camera</button>
+  <button class="mobDrawerBtn" id="mobDrwWeather">⛈ Weather</button>
+  <button class="mobDrawerBtn" id="mobDrwRadio">📻 Radio</button>
+  <button class="mobDrawerBtn" id="mobDrwReset">↺ Reset Car</button>
+  <button class="mobDrawerBtn" id="mobDrwPause">⏸ Pause</button>
+  <button class="mobDrawerBtn" id="mobDrwDesktop">🖥 Desktop UI</button>
+</div>
 
 <div id="missionBanner">
   <div id="missionBannerTitle">OPERATION COMPLETE!</div>
@@ -752,6 +1026,7 @@
   <div class="titleBtnRow">
     <button id="startBtn">▶ Begin Operation Dhurandhar</button>
     <button id="freeRoamBtn">🚗 Karachi Free Roam</button>
+    <button id="titleMobileBtn" style="background:rgba(16,185,129,0.22); color:#6ee7b7; border:1px solid #10b981; border-radius:8px; padding:14px 20px; font-size:14px; font-weight:700; cursor:pointer;">📱 Clean Mobile Mode: AUTO</button>
   </div>
 </div>
 
@@ -856,17 +1131,24 @@
 </div>
 
 <div id="mobileControls">
-  <button class="mc-btn mc-round" id="btnLeft">◀</button>
-  <button class="mc-btn mc-round" id="btnRight">▶</button>
-  <button class="mc-btn mc-round" id="btnGas">▲</button>
-  <button class="mc-btn mc-round" id="btnBrake">▼</button>
-  <button class="mc-btn mc-small" id="btnHandbrake">DRIFT</button>
-  <button class="mc-btn mc-small" id="btnFire">FIRE</button>
-  <button class="mc-btn mc-small" id="btnNitro">NITRO</button>
-  <button class="mc-btn mc-small" id="btnCam">CAM</button>
-  <button class="mc-btn mc-small" id="btnReset">RESET</button>
-  <button class="mc-btn mc-small" id="btnEnter">ACT</button>
-  <button class="mc-btn mc-small" id="btnExitMobile">🚪</button>
+  <div id="joyZone">
+    <span class="joyHintLabel up">▲</span>
+    <span class="joyHintLabel down">▼</span>
+    <span class="joyHintLabel left">◀</span>
+    <span class="joyHintLabel right">▶</span>
+    <div id="joyKnob"></div>
+  </div>
+  <button class="mc-btn" id="btnLeft">◀</button>
+  <button class="mc-btn" id="btnRight">▶</button>
+  <button class="mc-btn mc-pedal" id="btnGas">▲</button>
+  <button class="mc-btn mc-pedal" id="btnBrake">▼</button>
+  <button class="mc-btn mc-sat" id="btnHandbrake">DRIFT</button>
+  <button class="mc-btn mc-sat" id="btnFire">FIRE</button>
+  <button class="mc-btn mc-sat" id="btnNitro">NITRO</button>
+  <button class="mc-btn" id="btnCam">CAM</button>
+  <button class="mc-btn" id="btnReset">RESET</button>
+  <button class="mc-btn mc-sat" id="btnEnter">ACT</button>
+  <button class="mc-btn" id="btnExitMobile">🚗</button>
 </div>
 
 <div id="root"></div>
@@ -3483,14 +3765,29 @@
   ];
 
   function updateStatsHud() {
-    document.getElementById('healthBarInner').style.width = Math.max(0, playerStats.health) + '%';
-    document.getElementById('armorBarInner').style.width = Math.max(0, playerStats.armor) + '%';
+    const hpPct = Math.max(0, playerStats.health) + '%';
+    const arPct = Math.max(0, playerStats.armor) + '%';
+    document.getElementById('healthBarInner').style.width = hpPct;
+    document.getElementById('armorBarInner').style.width = arPct;
     document.getElementById('respectBarInner').style.width = Math.min(100, Math.max(0, playerStats.respect)) + '%';
     document.getElementById('nitroBarInner').style.width = Math.max(0, playerStats.nitro) + '%';
     document.getElementById('cashVal').textContent = playerStats.cash;
     document.getElementById('wantedStars').textContent = '★'.repeat(playerStats.wantedLevel) + '☆'.repeat(5 - playerStats.wantedLevel);
     const wd = WEAPON_DEFS.find(w => w.id === playerStats.weapon);
-    document.getElementById('weaponName').textContent = wd.name + (wd.ammoCapacity ? ' (' + playerStats.ammo[wd.id] + ')' : '');
+    const weapText = wd.name + (wd.ammoCapacity ? ' (' + playerStats.ammo[wd.id] + ')' : '');
+    document.getElementById('weaponName').textContent = weapText;
+
+    // Sync Clean Mobile Mode Top Bar
+    const mobHp = document.getElementById('mobHealthFill');
+    const mobAr = document.getElementById('mobArmorFill');
+    const mobCash = document.getElementById('mobCashVal');
+    const mobHeat = document.getElementById('mobWantedStars');
+    const mobWeap = document.getElementById('mobWeaponBtn');
+    if (mobHp) mobHp.style.width = hpPct;
+    if (mobAr) mobAr.style.width = arPct;
+    if (mobCash) mobCash.textContent = playerStats.cash;
+    if (mobHeat) mobHeat.textContent = playerStats.wantedLevel > 0 ? '★'.repeat(playerStats.wantedLevel) : '';
+    if (mobWeap) mobWeap.textContent = '🔫 ' + wd.name.split(' ').pop() + (wd.ammoCapacity ? '·' + playerStats.ammo[wd.id] : '');
   }
 
   function takeDamage(amount) {
@@ -7004,9 +7301,12 @@
   let camPos = new THREE.Vector3(0, 6, -10);
   let camLook = new THREE.Vector3();
 
-  // Mobile Touch Controls
+  // ===================================================================
+  // Dedicated Clean Mobile Mode + Virtual Joystick + Quick Drawer
+  // ===================================================================
   function bindHold(el, code) {
-    const on = ev => { ev.preventDefault(); keys[code] = true; };
+    if (!el) return;
+    const on = ev => { ev.preventDefault(); ev.stopPropagation(); keys[code] = true; };
     const off = ev => { ev.preventDefault(); keys[code] = false; };
     el.addEventListener('touchstart', on, { passive: false });
     el.addEventListener('touchend', off);
@@ -7025,10 +7325,140 @@
   document.getElementById('btnReset').addEventListener('click', resetCar);
   document.getElementById('btnEnter').addEventListener('click', interact);
   document.getElementById('btnFire').addEventListener('click', tryShoot);
-  document.getElementById('mobileToggle').addEventListener('click', () => { document.body.classList.toggle('show-mobile'); });
 
-  if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-    document.body.classList.add('show-mobile');
+  // Virtual Analog Touch Joystick (#joyZone) for smooth 1-thumb steering & walking
+  const joyZoneEl = document.getElementById('joyZone');
+  const joyKnobEl = document.getElementById('joyKnob');
+  let joyActive = false;
+
+  function updateJoystickFromPoint(clientX, clientY) {
+    if (!joyZoneEl || !joyKnobEl) return;
+    const rect = joyZoneEl.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    let dx = clientX - cx;
+    let dy = clientY - cy;
+    const maxR = 36;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > maxR) {
+      dx = (dx / dist) * maxR;
+      dy = (dy / dist) * maxR;
+    }
+    joyKnobEl.style.transform = `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px)`;
+
+    // Horizontal axis steers left/right
+    keys['ArrowLeft']  = dx < -10;
+    keys['ArrowRight'] = dx > 10;
+    // Vertical axis walks forward/backward (or accelerates when driving with one thumb!)
+    if (mode !== 'drive') {
+      keys['ArrowUp']   = dy < -12;
+      keys['ArrowDown'] = dy > 12;
+    }
+  }
+
+  function releaseJoystick() {
+    joyActive = false;
+    if (joyKnobEl) joyKnobEl.style.transform = 'translate(0px, 0px)';
+    keys['ArrowLeft'] = false;
+    keys['ArrowRight'] = false;
+    if (mode !== 'drive') {
+      keys['ArrowUp'] = false;
+      keys['ArrowDown'] = false;
+    }
+  }
+
+  if (joyZoneEl) {
+    joyZoneEl.addEventListener('touchstart', ev => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      joyActive = true;
+      const t = ev.touches[0];
+      if (t) updateJoystickFromPoint(t.clientX, t.clientY);
+    }, { passive: false });
+    joyZoneEl.addEventListener('touchmove', ev => {
+      if (!joyActive) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      const t = ev.touches[0];
+      if (t) updateJoystickFromPoint(t.clientX, t.clientY);
+    }, { passive: false });
+    joyZoneEl.addEventListener('touchend', releaseJoystick);
+    joyZoneEl.addEventListener('touchcancel', releaseJoystick);
+    joyZoneEl.addEventListener('mousedown', ev => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      joyActive = true;
+      updateJoystickFromPoint(ev.clientX, ev.clientY);
+    });
+    window.addEventListener('mousemove', ev => {
+      if (joyActive) updateJoystickFromPoint(ev.clientX, ev.clientY);
+    });
+    window.addEventListener('mouseup', () => {
+      if (joyActive) releaseJoystick();
+    });
+  }
+
+  // Cycle owned weapons on mobile with 1 tap
+  function cycleOwnedWeapon() {
+    const order = ['fists', 'knife', 'bat', 'pistol', 'shotgun', 'rifle'];
+    const avail = order.filter(id => id === 'fists' || playerStats.owned[id]);
+    const curIdx = avail.indexOf(playerStats.weapon);
+    playerStats.weapon = avail[(curIdx + 1) % avail.length];
+    updateHeldWeaponMesh();
+    updateStatsHud();
+  }
+
+  const mobDrawerEl = document.getElementById('mobileDrawer');
+  function closeMobileDrawer() {
+    if (mobDrawerEl) mobDrawerEl.classList.remove('open');
+  }
+
+  function setMobileMode(enabled) {
+    document.body.classList.toggle('show-mobile', enabled);
+    closeMobileDrawer();
+    const titleMobBtn = document.getElementById('titleMobileBtn');
+    if (titleMobBtn) {
+      titleMobBtn.textContent = enabled ? '📱 Clean Mobile Mode: ON' : '🖥 Clean Mobile Mode: OFF (Desktop)';
+    }
+  }
+
+  document.getElementById('mobileToggle').addEventListener('click', () => {
+    setMobileMode(!document.body.classList.contains('show-mobile'));
+  });
+  const titleMobBtnEl = document.getElementById('titleMobileBtn');
+  if (titleMobBtnEl) {
+    titleMobBtnEl.addEventListener('click', () => {
+      setMobileMode(!document.body.classList.contains('show-mobile'));
+    });
+  }
+
+  // Mobile Top Bar & Collapsible Quick Drawer Buttons
+  document.getElementById('mobWeaponBtn').addEventListener('click', cycleOwnedWeapon);
+  document.getElementById('mobOpsBtn').addEventListener('click', () => { closeMobileDrawer(); missionsOpen ? closeMissions() : openMissions(); });
+  document.getElementById('mobMenuBtn').addEventListener('click', () => {
+    if (mobDrawerEl) mobDrawerEl.classList.toggle('open');
+  });
+
+  document.getElementById('mobDrwBldg').addEventListener('click', () => { closeMobileDrawer(); document.getElementById('enterBldgBtn').click(); });
+  document.getElementById('mobDrwGarage').addEventListener('click', () => { closeMobileDrawer(); garageOpen ? closeGarage() : openGarage(); });
+  document.getElementById('mobDrwShop').addEventListener('click', () => { closeMobileDrawer(); shopOpen ? closeShop() : openShop(); });
+  document.getElementById('mobDrwCam').addEventListener('click', () => { closeMobileDrawer(); camMode = (camMode + 1) % 3; });
+  document.getElementById('mobDrwWeather').addEventListener('click', () => { closeMobileDrawer(); cycleWeatherState(); });
+  document.getElementById('mobDrwRadio').addEventListener('click', () => { closeMobileDrawer(); cycleRadioStation(); });
+  document.getElementById('mobDrwReset').addEventListener('click', () => { closeMobileDrawer(); resetCar(); });
+  document.getElementById('mobDrwPause').addEventListener('click', () => { closeMobileDrawer(); openPause(); });
+  document.getElementById('mobDrwDesktop').addEventListener('click', () => { setMobileMode(false); });
+
+  // Tapping the floating action prompt or minimap radar on mobile
+  document.getElementById('actionHint').addEventListener('click', interact);
+  document.getElementById('minimap').addEventListener('click', () => {
+    if (document.body.classList.contains('show-mobile')) {
+      missionsOpen ? closeMissions() : openMissions();
+    }
+  });
+
+  if ('ontouchstart' in window || navigator.maxTouchPoints > 0 || window.innerWidth <= 920) {
+    setMobileMode(true);
   }
 
   // ===================================================================
