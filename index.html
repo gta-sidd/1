@@ -1172,6 +1172,90 @@
     background: rgba(250, 204, 21, 0.2);
     color: #fff;
   }
+  #mpFloatingTagsContainer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 21;
+    overflow: hidden;
+  }
+  .mpFloatingTag {
+    position: absolute;
+    transform: translate(-50%, -100%);
+    background: rgba(9, 14, 26, 0.92);
+    border: 2px solid #10b981;
+    border-radius: 8px;
+    padding: 4px 9px;
+    color: #ffffff;
+    font-size: 11.5px;
+    font-weight: 900;
+    white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.75);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    pointer-events: auto;
+    cursor: pointer;
+    user-select: none;
+  }
+  .mpFloatingTag:hover {
+    transform: translate(-50%, -100%) scale(1.06);
+    border-color: #fde047 !important;
+  }
+  .mpFloatingTagSub {
+    font-size: 9.5px;
+    font-weight: 800;
+    color: #38bdf8;
+    letter-spacing: 0.3px;
+  }
+  #mpLiveRosterHud {
+    position: fixed;
+    top: 94px;
+    right: 16px;
+    background: rgba(9, 14, 26, 0.88);
+    border: 1.5px solid rgba(16, 185, 129, 0.55);
+    border-radius: 10px;
+    padding: 8px 11px;
+    z-index: 22;
+    min-width: 215px;
+    max-width: 280px;
+    color: #f8fafc;
+    font-size: 11px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  body.show-mobile #mpLiveRosterHud {
+    top: auto;
+    bottom: 145px;
+    left: 10px;
+    right: auto;
+    min-width: 185px;
+    max-width: 230px;
+    padding: 6px 8px;
+    font-size: 10px;
+  }
+  #mpOtherRoomBanner {
+    position: fixed;
+    top: 86px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(90deg, #f59e0b, #10b981);
+    color: #052e16;
+    font-size: 12px;
+    font-weight: 900;
+    padding: 7px 16px;
+    border-radius: 999px;
+    z-index: 38;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    box-shadow: 0 6px 24px rgba(245, 158, 11, 0.55);
+    border: 2px solid #ffffff;
+  }
 </style>
 </head>
 <body>
@@ -1181,6 +1265,23 @@
 <div id="vignette"></div>
 <div id="lightningFlashOverlay"></div>
 <div id="rainOverlay"></div>
+
+<!-- 2D Projected Floating Player Name & Car Tags in 3D Viewport -->
+<div id="mpFloatingTagsContainer"></div>
+
+<!-- Live On-Screen Multiplayer Drivers / Operatives Roster -->
+<div id="mpLiveRosterHud">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;border-bottom:1px solid rgba(148,163,184,0.22);padding-bottom:4px;">
+    <span style="font-weight:900;color:#6ee7b7;letter-spacing:0.6px;font-size:10.5px;" id="mpRosterHeader">🏎️ ROOM DRIVERS (1)</span>
+    <button id="mpRosterEditBtn" class="mpQuickBtn" style="padding:2px 6px;font-size:9.5px;">✏️ Name / Car</button>
+  </div>
+  <div id="mpRosterRows" style="display:flex;flex-direction:column;gap:4px;"></div>
+</div>
+
+<!-- 1-Click Alert Banner if another player is active in a different room on the server -->
+<div id="mpOtherRoomBanner" title="Click to join the other player's active room!">
+  <span id="mpOtherRoomText">🌐 Other player online in another room — Click to Join!</span>
+</div>
 
 <!-- Live Multiplayer Status Pill -->
 <div id="mpLiveBadge" title="Click to open Karachi Multiplayer Hub [U]">
@@ -1439,13 +1540,17 @@
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
           <div>
             <div style="font-size:12px;font-weight:900;color:#fde047;letter-spacing:0.8px;">🏁 F1 GRAND PRIX PADDOCK · CHOOSE TEAM, CAR, TIRES &amp; READY UP</div>
-            <div style="font-size:10.5px;color:#94a3b8;">Select your Constructor Team, Open-Wheel F1 Chassis, and Tire Strategy. When all drivers click Ready, the 5-Red-Light Race Start begins!</div>
+            <div style="font-size:10.5px;color:#94a3b8;">Enter your Driver Name, choose your Team &amp; Open-Wheel F1 Car, and click Ready!</div>
           </div>
-          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-            <span style="font-size:10.5px;font-weight:800;color:#cbd5e1;">Pirelli Tire Compound:</span>
-            <button class="f1TireChip active" data-tire="soft" style="color:#fca5a5;">🔴 SOFT (Max Grip)</button>
-            <button class="f1TireChip" data-tire="medium" style="color:#fde047;">🟡 MEDIUM (Balanced)</button>
-            <button class="f1TireChip" data-tire="hard" style="color:#f8fafc;">⚪ HARD (Durable)</button>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <label style="font-size:10.5px;font-weight:800;color:#6ee7b7;display:flex;align-items:center;gap:5px;">
+              👤 Driver Name:
+              <input id="f1DriverNameInput" class="mpInput" style="width:135px;padding:4px 8px;font-weight:800;border-color:#10b981;" type="text" maxlength="18" placeholder="Your Driver Name">
+            </label>
+            <span style="font-size:10.5px;font-weight:800;color:#cbd5e1;">Pirelli Tires:</span>
+            <button class="f1TireChip active" data-tire="soft" style="color:#fca5a5;">🔴 SOFT</button>
+            <button class="f1TireChip" data-tire="medium" style="color:#fde047;">🟡 MEDIUM</button>
+            <button class="f1TireChip" data-tire="hard" style="color:#f8fafc;">⚪ HARD</button>
           </div>
         </div>
 
@@ -3288,7 +3393,7 @@
     { id: 'mantis',    name: 'Verde Mantis Track',    kind: 'hyper',   length: 4.3, width: 1.90, height: 1.10,wheelRadius: 0.35, speedFactor: 1.42, accelFactor: 1.38, defaultColor: '#66cc33', defaultRim: '#222222', rimStyle: 'chrome',  spoiler: true,  stripes: false, stripeColor: '#ffffff', hoodStyle: 'wedge', hoodLenFactor: 0,    clearance: -0.05 }
   ];
 
-  const garage = { selectedCarId: 'speedster', customs: {} };
+  const garage = { selectedCarId: 'speedster', customs: {}, owned: {} };
   function getCustom(id) {
     if (!garage.customs[id]) {
       const m = CAR_MODELS.find(x => x.id === id) || CAR_MODELS[0];
@@ -9867,16 +9972,23 @@
   // ===================================================================
   let mpSocket = null;
   let mpConnected = false;
-  let mpSelfId = null;
+  const mpClientId = 'op-' + Math.random().toString(36).slice(2, 9) + '-' + Date.now().toString(36).slice(-3);
+  let mpSelfId = mpClientId;
+  let mpMyGridSlot = 0;
   let mpOpen = false;
   const urlParams = new URLSearchParams(window.location.search);
   let mpRoomId = (urlParams.get('room') || 'KARACHI-1').trim().toUpperCase();
   let mpSelectedMapForCreate = urlParams.get('map') || 'karachi_city';
-  let mpCallsign = 'Hamza-' + Math.floor(100 + Math.random() * 899);
+  let savedCallsign = '';
+  try { savedCallsign = localStorage.getItem('dhurandhar_callsign') || ''; } catch (_e) {}
+  let mpCallsign = savedCallsign || ('Driver-' + Math.floor(100 + Math.random() * 899));
   let mpRole = 'IB Deep-Cover (Hamza)';
   let mpSyncTimer = 0;
+  let mpHttpSyncTimer = 0;
+  let mpHttpSyncInFlight = false;
   let mpRamCooldown = 0;
   const remoteOperatives = new Map();
+  const floatingTagEls = new Map();
   let mpChatHistory = [];
   let mpSupplyDrop = null;
   let mpPublicRooms = [];
@@ -10560,6 +10672,7 @@
     }
 
     // Unlock & apply F1 team livery + Pirelli tire compound to the chosen race car
+    if (!garage.owned) garage.owned = {};
     garage.owned[carOption.id] = true;
     const cust = getCustom(carOption.id);
     cust.bodyColor = team.bodyColor;
@@ -10574,24 +10687,32 @@
     selectCar(carOption.id);
     renderF1PaddockUI();
     updateF1HudWidgets();
+    renderLiveRosterHud();
 
-    if (broadcast !== false && mpSocket && mpSocket.readyState === WebSocket.OPEN) {
-      mpSocket.send(JSON.stringify({
-        type: 'race:select_loadout',
-        teamId: f1SelectedTeamId,
-        teamName: f1SelectedTeamName,
-        carId: carOption.id,
-        bodyColor: team.bodyColor,
-        underglowColor: team.underglow,
-        tireCompound: f1TireCompound
-      }));
+    if (broadcast !== false) {
+      if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
+        mpSocket.send(JSON.stringify({
+          type: 'race:select_loadout',
+          name: mpCallsign,
+          teamId: f1SelectedTeamId,
+          teamName: f1SelectedTeamName,
+          carId: carOption.id,
+          bodyColor: team.bodyColor,
+          stripeColor: team.stripeColor,
+          rimColor: team.rimColor,
+          underglowColor: team.underglow,
+          tireCompound: f1TireCompound
+        }));
+      }
+      sendImmediateMpUpdate();
     }
   }
 
   function positionOnF1StartingGrid(slotIndex) {
-    const idx = Math.max(0, Number(slotIndex) || 0);
+    const idx = Math.max(0, Number(slotIndex !== undefined ? slotIndex : mpMyGridSlot) || 0);
     const row = Math.floor(idx / 2);
     const col = (idx % 2 === 0) ? -1 : 1;
+    const stagger = (idx % 2 === 1) ? -3.5 : 0;
     mode = 'drive';
     character.visible = false;
     state.speed = 0;
@@ -10601,13 +10722,13 @@
 
     if (currentMpMap === 'f1_marina') {
       // Main Harbor Straight at (0, 96) facing East (+X => heading = Math.PI / 2)
-      state.x = -12 - row * 9.5;
+      state.x = -12 - row * 9.5 - stagger;
       state.z = 96 + col * 4.2;
       state.heading = Math.PI / 2;
     } else {
       // Karachi F1 Stadium Main Straight at (F1_RX, 0) facing North (-Z => heading = Math.PI)
       state.x = F1_RX + col * 4.2;
-      state.z = 12 + row * 9.5;
+      state.z = 12 + row * 9.5 + stagger;
       state.heading = Math.PI;
     }
     car.position.set(state.x, 0, state.z);
@@ -10615,6 +10736,7 @@
     f1GateIdx = 0;
     f1LapCount = 1;
     f1LapStartMs = performance.now();
+    sendImmediateMpUpdate();
   }
 
   function triggerF1PitStop(nextCompound) {
@@ -10659,6 +10781,7 @@
         tireCompound: f1TireCompound
       }));
     }
+    sendImmediateMpUpdate();
     renderF1PaddockUI();
     updateF1HudWidgets();
   }
@@ -10702,6 +10825,10 @@
   function renderF1PaddockUI() {
     const teamGrid = document.getElementById('f1TeamGrid');
     const carGrid = document.getElementById('f1CarGrid');
+    const f1NameEl = document.getElementById('f1DriverNameInput');
+    if (f1NameEl && document.activeElement !== f1NameEl) {
+      f1NameEl.value = mpCallsign;
+    }
     if (teamGrid) {
       teamGrid.innerHTML = '';
       F1_TEAMS.forEach(t => {
@@ -10767,7 +10894,7 @@
     if (subLbl) {
       const teamObj = F1_TEAMS.find(t => t.id === f1SelectedTeamId) || F1_TEAMS[0];
       const carObj = CAR_MODELS.find(c => c.id === garage.selectedCarId) || CAR_MODELS[0];
-      subLbl.textContent = `Your Loadout: ${teamObj.name} · ${carObj.name} · ${f1TireCompound.toUpperCase()} Pirelli Tires`;
+      subLbl.textContent = `Driver: ${mpCallsign} · ${teamObj.name} · ${carObj.name} · ${f1TireCompound.toUpperCase()} Pirelli Tires`;
     }
     if (toggleBtn) {
       toggleBtn.textContent = f1SelfReady ? '✓ YOU ARE READY (CLICK TO UNREADY)' : '✅ CLICK READY FOR RACE';
@@ -10799,12 +10926,14 @@
     if (valid === 'karachi_city') {
       if (arenaHudEl) arenaHudEl.style.display = 'none';
       if (prevMap !== 'karachi_city') {
-        state.x = SPAWN.x;
-        state.z = SPAWN.z;
+        const col = (mpMyGridSlot % 2 === 0) ? -1 : 1;
+        const row = Math.floor(mpMyGridSlot / 2);
+        state.x = SPAWN.x + col * (mpMyGridSlot > 0 ? 3.5 : 0);
+        state.z = SPAWN.z + row * 6;
         state.speed = 0;
         car.position.set(state.x, 0, state.z);
-        walkState.x = SPAWN.x + 2;
-        walkState.z = SPAWN.z;
+        walkState.x = state.x + 2;
+        walkState.z = state.z;
         restoreCityCellsFromArena();
       }
     } else {
@@ -10826,10 +10955,9 @@
         applyF1TeamAndCarLoadout(f1SelectedTeamId, targetCarId, f1TireCompound, false);
         f1PitCount = 0;
         f1TireHealth = 100;
-        positionOnF1StartingGrid(0);
+        positionOnF1StartingGrid(mpMyGridSlot);
       } else if (valid === 'firing_range') {
         buildFiringRangeArena();
-        // Unlock all weapons with 999 ammo & place Hamza on foot at the firing booth
         ['knife', 'bat', 'pistol', 'shotgun', 'rifle'].forEach(w => {
           playerStats.owned[w] = true;
           if (playerStats.ammo[w] !== undefined) playerStats.ammo[w] = 999;
@@ -10838,7 +10966,8 @@
         updateHeldWeaponMesh();
         mode = 'walk';
         character.visible = true;
-        walkState.x = 0;
+        const col = (mpMyGridSlot % 2 === 0) ? -1 : 1;
+        walkState.x = mpMyGridSlot === 0 ? 0 : col * 3.8;
         walkState.z = 15.5;
         walkState.heading = Math.PI;
         walkState.speed = 0;
@@ -10861,9 +10990,9 @@
         updateHeldWeaponMesh();
         mode = 'walk';
         character.visible = true;
-        const ang = Math.random() * Math.PI * 2;
-        walkState.x = Math.cos(ang) * 38;
-        walkState.z = Math.sin(ang) * 38;
+        const ang = (mpMyGridSlot * Math.PI) / 3;
+        walkState.x = Math.cos(ang) * 28;
+        walkState.z = Math.sin(ang) * 28;
         walkState.heading = ang + Math.PI;
         character.position.set(walkState.x, 0, walkState.z);
         state.x = walkState.x + 4;
@@ -10874,9 +11003,9 @@
         selectCar('enforcer');
         mode = 'drive';
         character.visible = false;
-        const ang = Math.random() * Math.PI * 2;
-        state.x = Math.cos(ang) * 45;
-        state.z = Math.sin(ang) * 45;
+        const ang = (mpMyGridSlot * Math.PI) / 3;
+        state.x = Math.cos(ang) * 38;
+        state.z = Math.sin(ang) * 38;
         state.heading = ang + Math.PI;
         state.speed = 0;
         playerStats.nitro = 100;
@@ -10890,6 +11019,7 @@
 
     updateF1HudWidgets();
     renderF1PaddockUI();
+    sendImmediateMpUpdate();
 
     if (!silentToast) {
       showBuildingToast(`🗺️ Deployed to ${MP_MAP_META[valid].label}!`, '#10b981');
@@ -10972,54 +11102,64 @@
   scene.add(mpSupplyGroup);
 
   const mpNameInputEl = document.getElementById('mpNameInput');
+  const f1DriverNameInputEl = document.getElementById('f1DriverNameInput');
   const mpRoleSelectEl = document.getElementById('mpRoleSelect');
   const mpRoomInputEl = document.getElementById('mpRoomInput');
   if (mpNameInputEl) mpNameInputEl.value = mpCallsign;
+  if (f1DriverNameInputEl) f1DriverNameInputEl.value = mpCallsign;
   if (mpRoomInputEl) mpRoomInputEl.value = mpRoomId;
 
-  function buildOperativeNameplateSprite(name, role, health, armor) {
+  function buildOperativeNameplateSprite(name, role, health, armor, carLabel, accentColor) {
     const canvas = document.createElement('canvas');
-    canvas.width = 256;
-    canvas.height = 84;
+    canvas.width = 384;
+    canvas.height = 112;
     const ctx = canvas.getContext('2d');
     const tex = new THREE.CanvasTexture(canvas);
     const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
     const sprite = new THREE.Sprite(mat);
-    sprite.scale.set(3.8, 1.25, 1);
+    sprite.scale.set(5.4, 1.58, 1);
     sprite.renderOrder = 999;
     sprite.userData = { canvas, ctx, tex };
-    updateOperativeNameplate(sprite, name, role, health, armor);
+    updateOperativeNameplate(sprite, name, role, health, armor, carLabel, accentColor);
     return sprite;
   }
 
-  function updateOperativeNameplate(sprite, name, role, health, armor) {
+  function updateOperativeNameplate(sprite, name, role, health, armor, carLabel, accentColor) {
     if (!sprite || !sprite.userData || !sprite.userData.ctx) return;
     const { canvas, ctx, tex } = sprite.userData;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = 'rgba(9, 14, 26, 0.85)';
-    ctx.strokeStyle = '#10b981';
-    ctx.lineWidth = 3;
-    ctx.fillRect(8, 6, 240, 70);
-    ctx.strokeRect(8, 6, 240, 70);
+    const borderCol = accentColor || '#10b981';
+    ctx.fillStyle = 'rgba(5, 9, 18, 0.92)';
+    ctx.strokeStyle = borderCol;
+    ctx.lineWidth = 4;
+    ctx.fillRect(8, 6, 368, 96);
+    ctx.strokeRect(8, 6, 368, 96);
 
+    // Top team color accent bar
+    ctx.fillStyle = borderCol;
+    ctx.fillRect(10, 8, 364, 7);
+
+    // Player Name (Large & High Contrast)
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 20px sans-serif';
+    ctx.font = '900 26px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(String(name || 'Operative').slice(0, 18), 128, 30);
+    ctx.fillText('🏎️ ' + String(name || 'Driver').slice(0, 18), 192, 42);
 
-    ctx.fillStyle = '#38bdf8';
-    ctx.font = 'bold 12px sans-serif';
-    ctx.fillText(String(role || 'IB Operative').slice(0, 26), 128, 47);
+    // Car Model + Team Subtitle
+    ctx.fillStyle = '#fde047';
+    ctx.font = 'bold 15px sans-serif';
+    const subText = carLabel ? `${carLabel} · ${String(role || '').slice(0, 22)}` : String(role || 'Operative').slice(0, 32);
+    ctx.fillText(subText, 192, 65);
 
     const hpPct = Math.max(0, Math.min(100, Number(health) || 100)) / 100;
     const arPct = Math.max(0, Math.min(100, Number(armor) || 0)) / 100;
     ctx.fillStyle = '#1e293b';
-    ctx.fillRect(24, 55, 208, 9);
+    ctx.fillRect(32, 76, 320, 10);
     ctx.fillStyle = '#22c55e';
-    ctx.fillRect(24, 55, Math.round(208 * hpPct), 9);
+    ctx.fillRect(32, 76, Math.round(320 * hpPct), 10);
     if (arPct > 0) {
       ctx.fillStyle = '#38bdf8';
-      ctx.fillRect(24, 66, Math.round(208 * arPct), 4);
+      ctx.fillRect(32, 89, Math.round(320 * arPct), 5);
     }
     tex.needsUpdate = true;
   }
@@ -11032,54 +11172,88 @@
     const rootGroup = new THREE.Group();
     const modelDef = CAR_MODELS.find(m => m.id === op.carId) || CAR_MODELS[0];
     const teamDef = F1_TEAMS.find(t => t.id === op.teamId);
+    const bodyHex = op.bodyColor || (teamDef ? teamDef.bodyColor : '#dc2626');
+    const stripeHex = op.stripeColor || (teamDef ? teamDef.stripeColor : '#ffffff');
+    const rimHex = op.rimColor || (teamDef ? teamDef.rimColor : '#facc15');
+    const glowHex = op.underglowColor || (teamDef ? teamDef.underglow : '#38bdf8');
+
     const carCustom = {
-      bodyColor: op.bodyColor || (teamDef ? teamDef.bodyColor : '#eab308'),
-      rimColor: teamDef ? teamDef.rimColor : '#e5e7eb',
+      bodyColor: bodyHex,
+      rimColor: rimHex,
       rimStyle: 'sport',
       spoiler: true,
       stripes: true,
-      stripeColor: teamDef ? teamDef.stripeColor : '#111827',
+      stripeColor: stripeHex,
       underglow: true,
-      underglowColor: op.underglowColor || (teamDef ? teamDef.underglow : '#10b981'),
+      underglowColor: glowHex,
       tireCompound: op.tireCompound || 'soft',
-      tint: 0.45
+      tint: 0.35
     };
     const carMesh = buildCar(modelDef, carCustom);
     const charMesh = buildCharacter({
-      skin: '#c68b59',
-      shirt: op.outfitColor || '#1e242b',
-      pants: '#151921',
-      shoes: '#0f1318',
-      hair: '#0a0c10',
-      hat: false,
+      skinColor: '#c68b59',
+      shirtColor: op.outfitColor || bodyHex || '#1e242b',
+      pantsColor: '#151921',
+      shoeColor: '#0f1318',
+      hairColor: '#0a0c10',
+      hasHat: false,
       hatColor: '#1e293b'
     });
-    const roleTag = isF1Map(currentMpMap) && op.teamName ? `${op.teamName} · ${op.ready ? '✓ READY' : 'PADDOCK'}` : op.role;
-    const labelSprite = buildOperativeNameplateSprite(op.name, roleTag, op.health, op.armor);
-    labelSprite.position.set(0, 2.9, 0);
+
+    // High-visibility 3D Ground Team Ring + Overhead Pointer Diamond so remote players are unmistakable
+    const ringCol = new THREE.Color(bodyHex);
+    const groundRing = new THREE.Mesh(
+      new THREE.RingGeometry(1.75, 2.25, 32),
+      new THREE.MeshBasicMaterial({ color: ringCol, side: THREE.DoubleSide, transparent: true, opacity: 0.72 })
+    );
+    groundRing.rotation.x = -Math.PI / 2;
+    groundRing.position.y = 0.08;
+    rootGroup.add(groundRing);
+
+    const pointerCone = new THREE.Mesh(
+      new THREE.ConeGeometry(0.42, 0.85, 6),
+      new THREE.MeshBasicMaterial({ color: ringCol })
+    );
+    pointerCone.rotation.x = Math.PI;
+    pointerCone.position.set(0, 2.25, 0);
+    rootGroup.add(pointerCone);
+
+    const roleTag = isF1Map(currentMpMap) && op.teamName
+      ? `${op.teamName} · ${(op.tireCompound || 'soft').toUpperCase()}`
+      : op.role;
+    const labelSprite = buildOperativeNameplateSprite(op.name, roleTag, op.health, op.armor, modelDef.name, bodyHex);
+    labelSprite.position.set(0, 3.35, 0);
+
+    carMesh.visible = op.mode !== 'walk';
+    charMesh.visible = op.mode === 'walk';
 
     rootGroup.add(carMesh);
     rootGroup.add(charMesh);
     rootGroup.add(labelSprite);
+    rootGroup.position.set(op.x || 0, 0, op.z || 0);
+    rootGroup.rotation.y = op.heading || 0;
     scene.add(rootGroup);
 
     op.rootGroup = rootGroup;
     op.carMesh = carMesh;
     op.charMesh = charMesh;
     op.labelSprite = labelSprite;
+    op.pointerCone = pointerCone;
     op.builtCarId = op.carId;
-    op.builtBodyColor = op.bodyColor;
+    op.builtBodyColor = bodyHex;
+    op.builtStripeColor = stripeHex;
+    op.builtRimColor = rimHex;
     op.builtOutfitColor = op.outfitColor;
     op.builtTireCompound = op.tireCompound;
   }
 
   function upsertRemoteOperative(data) {
-    if (!data || !data.id || data.id === mpSelfId) return;
+    if (!data || !data.id || data.id === mpSelfId || data.id === mpClientId) return;
     let op = remoteOperatives.get(data.id);
     if (!op) {
       op = {
         id: data.id,
-        name: data.name || 'Operative',
+        name: data.name || 'Driver',
         role: data.role || 'IB Operative',
         mode: data.mode || 'drive',
         x: Number(data.x) || 0,
@@ -11091,14 +11265,17 @@
         targetHeading: Number(data.heading) || 0,
         speed: Number(data.speed) || 0,
         steerAngle: Number(data.steerAngle) || 0,
-        carId: data.carId || 'speedster',
+        carId: data.carId || (isF1Map(currentMpMap) ? 'f1' : 'speedster'),
         teamId: data.teamId || 'ferrari_corsa',
         teamName: data.teamName || 'Scuderia Corsa Rossa',
         tireCompound: data.tireCompound || 'soft',
         ready: Boolean(data.ready),
-        currentLap: data.currentLap || 1,
+        gridIndex: data.gridIndex || 0,
+        currentLap: data.currentLap || data.raceLap || 1,
         pitCount: data.pitCount || 0,
-        bodyColor: data.bodyColor || '#eab308',
+        bodyColor: data.bodyColor || '#dc2626',
+        stripeColor: data.stripeColor || '#ffffff',
+        rimColor: data.rimColor || '#facc15',
         underglowColor: data.underglowColor || '#10b981',
         outfitColor: data.outfitColor || '#1e242b',
         weapon: data.weapon || 'pistol',
@@ -11111,13 +11288,22 @@
       };
       rebuildRemoteOperativeMeshes(op);
       remoteOperatives.set(data.id, op);
+      renderLiveRosterHud();
     } else {
       op.name = data.name || op.name;
       op.role = data.role || op.role;
       op.mode = data.mode || op.mode;
-      if (typeof data.x === 'number') op.targetX = data.x;
-      if (typeof data.z === 'number') op.targetZ = data.z;
-      if (typeof data.heading === 'number') op.targetHeading = data.heading;
+      if (typeof data.x === 'number' && !Number.isNaN(data.x)) {
+        const jumpDist = Math.hypot(data.x - op.x, (typeof data.z === 'number' ? data.z : op.z) - op.z);
+        op.targetX = data.x;
+        if (jumpDist > 28) op.x = data.x;
+      }
+      if (typeof data.z === 'number' && !Number.isNaN(data.z)) {
+        const jumpDistZ = Math.abs(data.z - op.z);
+        op.targetZ = data.z;
+        if (jumpDistZ > 28) op.z = data.z;
+      }
+      if (typeof data.heading === 'number' && !Number.isNaN(data.heading)) op.targetHeading = data.heading;
       if (typeof data.speed === 'number') op.speed = data.speed;
       if (typeof data.steerAngle === 'number') op.steerAngle = data.steerAngle;
       if (data.carId) op.carId = data.carId;
@@ -11125,9 +11311,13 @@
       if (data.teamName) op.teamName = data.teamName;
       if (data.tireCompound) op.tireCompound = data.tireCompound;
       if (typeof data.ready === 'boolean') op.ready = data.ready;
+      if (typeof data.gridIndex === 'number') op.gridIndex = data.gridIndex;
       if (typeof data.currentLap === 'number') op.currentLap = data.currentLap;
+      else if (typeof data.raceLap === 'number') op.currentLap = data.raceLap;
       if (typeof data.pitCount === 'number') op.pitCount = data.pitCount;
       if (data.bodyColor) op.bodyColor = data.bodyColor;
+      if (data.stripeColor) op.stripeColor = data.stripeColor;
+      if (data.rimColor) op.rimColor = data.rimColor;
       if (data.underglowColor) op.underglowColor = data.underglowColor;
       if (data.outfitColor) op.outfitColor = data.outfitColor;
       if (data.weapon) op.weapon = data.weapon;
@@ -11138,29 +11328,188 @@
       if (typeof data.bestLapMs === 'number') op.bestLapMs = data.bestLapMs;
       if (typeof data.rangeScore === 'number') op.rangeScore = data.rangeScore;
 
-      const roleTag = isF1Map(currentMpMap) && op.teamName ? `${op.teamName} · ${op.ready ? '✓ READY' : 'PADDOCK'}` : op.role;
-      if (op.builtCarId !== op.carId || op.builtBodyColor !== op.bodyColor || op.builtOutfitColor !== op.outfitColor || op.builtTireCompound !== op.tireCompound) {
+      const modelDef = CAR_MODELS.find(m => m.id === op.carId) || CAR_MODELS[0];
+      const roleTag = isF1Map(currentMpMap) && op.teamName
+        ? `${op.teamName} · ${(op.tireCompound || 'soft').toUpperCase()}`
+        : op.role;
+      if (
+        op.builtCarId !== op.carId ||
+        op.builtBodyColor !== op.bodyColor ||
+        op.builtStripeColor !== op.stripeColor ||
+        op.builtRimColor !== op.rimColor ||
+        op.builtOutfitColor !== op.outfitColor ||
+        op.builtTireCompound !== op.tireCompound
+      ) {
         rebuildRemoteOperativeMeshes(op);
       } else {
-        updateOperativeNameplate(op.labelSprite, op.name, roleTag, op.health, op.armor);
+        updateOperativeNameplate(op.labelSprite, op.name, roleTag, op.health, op.armor, modelDef.name, op.bodyColor);
       }
     }
   }
 
   function removeRemoteOperative(id) {
     const op = remoteOperatives.get(id);
-    if (!op) return;
-    if (op.rootGroup) {
+    if (op && op.rootGroup) {
       scene.remove(op.rootGroup);
       disposeObject3D(op.rootGroup);
     }
     remoteOperatives.delete(id);
+    const tagEl = floatingTagEls.get(id);
+    if (tagEl && tagEl.parentNode) {
+      tagEl.parentNode.removeChild(tagEl);
+    }
+    floatingTagEls.delete(id);
+    renderLiveRosterHud();
   }
 
   function clearAllRemoteOperatives() {
-    for (const [id] of remoteOperatives) {
+    for (const [id] of Array.from(remoteOperatives.keys())) {
       removeRemoteOperative(id);
     }
+  }
+
+  function renderLiveRosterHud() {
+    const headerEl = document.getElementById('mpRosterHeader');
+    const rowsEl = document.getElementById('mpRosterRows');
+    const otherBannerEl = document.getElementById('mpOtherRoomBanner');
+    const otherTextEl = document.getElementById('mpOtherRoomText');
+    const totalOps = 1 + remoteOperatives.size;
+    const onF1 = isF1Map(currentMpMap);
+
+    if (headerEl) {
+      headerEl.textContent = `${onF1 ? '🏎️ F1 GRID' : '🌐 ROOM'} [${mpRoomId.toUpperCase()}] (${totalOps})`;
+    }
+    if (rowsEl) {
+      rowsEl.innerHTML = '';
+      const myCar = (CAR_MODELS.find(m => m.id === garage.selectedCarId) || CAR_MODELS[0]).name;
+      const myCust = getCustom(garage.selectedCarId);
+      const selfDiv = document.createElement('div');
+      selfDiv.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:6px;padding:3px 6px;border-radius:5px;background:rgba(16,185,129,0.14);border-left:3px solid ' + (myCust.bodyColor || '#10b981') + ';';
+      selfDiv.innerHTML = `
+        <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+          <b style="color:#6ee7b7;">★ ${mpCallsign} (You)</b>
+          <div style="font-size:9.5px;color:#cbd5e1;">${myCar}${onF1 ? ' · ' + f1TireCompound.toUpperCase() : ''}</div>
+        </div>
+        ${onF1 ? `<span style="font-size:9px;font-weight:900;padding:2px 5px;border-radius:4px;background:${f1SelfReady ? '#10b981' : '#334155'};color:${f1SelfReady ? '#052e16' : '#e2e8f0'};">${f1SelfReady ? 'READY' : 'LOBBY'}</span>` : ''}
+      `;
+      rowsEl.appendChild(selfDiv);
+
+      const px = mode === 'drive' ? state.x : walkState.x;
+      const pz = mode === 'drive' ? state.z : walkState.z;
+
+      remoteOperatives.forEach(op => {
+        const opCar = (CAR_MODELS.find(m => m.id === op.carId) || CAR_MODELS[0]).name;
+        const distM = Math.round(Math.hypot(op.x - px, op.z - pz));
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:6px;padding:3px 6px;border-radius:5px;background:rgba(30,41,59,0.75);border-left:3px solid ' + (op.bodyColor || '#38bdf8') + ';';
+        row.innerHTML = `
+          <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+            <b style="color:#ffffff;">🏎️ ${op.name}</b> <span style="color:#fde047;font-size:9.5px;">(${distM}m)</span>
+            <div style="font-size:9.5px;color:#93c5fd;">${opCar}${onF1 && op.teamName ? ' · ' + op.teamName.split(' ')[0] : ''}</div>
+          </div>
+        `;
+        const warpBtn = document.createElement('button');
+        warpBtn.className = 'mpQuickBtn';
+        warpBtn.style.cssText = 'padding:2px 6px;font-size:9.5px;background:#10b981;color:#052e16;border:none;font-weight:900;flex-shrink:0;';
+        warpBtn.textContent = '⚡ Warp';
+        warpBtn.title = 'Teleport right next to ' + op.name;
+        warpBtn.addEventListener('click', () => {
+          warpToCoordinates(op.x + 3.8, op.z, `⚡ Teleported beside ${op.name} (${opCar})!`);
+        });
+        row.appendChild(warpBtn);
+        rowsEl.appendChild(row);
+      });
+    }
+
+    // Check if player is alone in current room while another room on the server has active players
+    if (otherBannerEl && otherTextEl) {
+      const otherActiveRoom = (mpPublicRooms || []).find(
+        r => r.code.toUpperCase() !== mpRoomId.toUpperCase() && r.playerCount > 0
+      );
+      if (remoteOperatives.size === 0 && otherActiveRoom) {
+        otherBannerEl.style.display = 'flex';
+        const who = (otherActiveRoom.playerNames && otherActiveRoom.playerNames.length > 0)
+          ? otherActiveRoom.playerNames.join(', ')
+          : otherActiveRoom.hostName;
+        otherTextEl.textContent = `🌐 Player Online in Room [${otherActiveRoom.code}]: ${who} — Click Here to Join Their Race!`;
+        otherBannerEl.onclick = () => {
+          mpRoomId = otherActiveRoom.code.toUpperCase();
+          if (mpRoomInputEl) mpRoomInputEl.value = mpRoomId;
+          if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
+            mpSocket.send(JSON.stringify(getLocalMpPayload('room:switch')));
+          }
+          syncMultiplayerViaHttp();
+          showBuildingToast(`🌐 Joined ${who} in Room [${mpRoomId}]!`, '#10b981');
+        };
+      } else {
+        otherBannerEl.style.display = 'none';
+      }
+    }
+  }
+
+  // Project 3D remote operative positions to 2D screen-space floating tags + off-screen directional indicators
+  const _projVec = new THREE.Vector3();
+  function updateScreenSpaceDriverTags() {
+    const container = document.getElementById('mpFloatingTagsContainer');
+    if (!container) return;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const px = mode === 'drive' ? state.x : walkState.x;
+    const pz = mode === 'drive' ? state.z : walkState.z;
+
+    remoteOperatives.forEach((op, id) => {
+      let el = floatingTagEls.get(id);
+      if (!el) {
+        el = document.createElement('div');
+        el.className = 'mpFloatingTag';
+        el.addEventListener('click', () => {
+          warpToCoordinates(op.x + 3.8, op.z, `⚡ Teleported beside ${op.name}!`);
+        });
+        container.appendChild(el);
+        floatingTagEls.set(id, el);
+      }
+
+      if (op.mode === 'interior' || !op.rootGroup || !op.rootGroup.visible) {
+        el.style.display = 'none';
+        return;
+      }
+
+      const distM = Math.round(Math.hypot(op.x - px, op.z - pz));
+      const carDef = CAR_MODELS.find(m => m.id === op.carId) || CAR_MODELS[0];
+      const teamLabel = isF1Map(currentMpMap) && op.teamName ? `${op.teamName} · ` : '';
+
+      _projVec.set(op.x, op.mode === 'drive' ? 2.4 : 2.2, op.z);
+      _projVec.project(camera);
+
+      const isBehind = _projVec.z > 1.0;
+      let sx = (_projVec.x * 0.5 + 0.5) * vw;
+      let sy = (-_projVec.y * 0.5 + 0.5) * vh;
+
+      if (isBehind) {
+        sx = vw - sx;
+        sy = vh - 42;
+      }
+
+      const marginX = 95;
+      const marginY = 75;
+      const clampedX = Math.max(marginX, Math.min(vw - marginX, sx));
+      const clampedY = Math.max(marginY, Math.min(vh - marginY, sy));
+      const isOffscreen = isBehind || sx < marginX || sx > vw - marginX || sy < marginY || sy > vh - marginY;
+
+      el.style.display = 'flex';
+      el.style.left = `${clampedX.toFixed(1)}px`;
+      el.style.top = `${clampedY.toFixed(1)}px`;
+      el.style.borderColor = op.bodyColor || '#10b981';
+
+      const dirArrow = isOffscreen
+        ? (sx < marginX ? '◀ ' : (sx > vw - marginX ? '▶ ' : (isBehind ? '▼ ' : '▲ ')))
+        : '🏎️ ';
+
+      el.innerHTML = `
+        <div>${dirArrow}${op.name} <span style="color:#fde047;">(${distM}m)</span></div>
+        <div class="mpFloatingTagSub">${teamLabel}${carDef.name}${isOffscreen ? ' · Click to Warp' : ''}</div>
+      `;
+    });
   }
 
   function updateMpLiveBadge() {
@@ -11174,8 +11523,8 @@
     if (codeDispEl) codeDispEl.textContent = mpRoomId.toUpperCase();
     if (txtEl) {
       txtEl.textContent = mpConnected
-        ? `CODE [${mpRoomId.toUpperCase()}] · ${mapMeta.short} · ${totalOps} OP${totalOps > 1 ? 'S' : ''}`
-        : 'KARACHI COMMS · RECONNECTING...';
+        ? `CODE [${mpRoomId.toUpperCase()}] · ${mapMeta.short} · ${totalOps} DRIVER${totalOps > 1 ? 'S' : ''}`
+        : `ROOM [${mpRoomId.toUpperCase()}] · SYNCING...`;
     }
     if (countEl) countEl.textContent = String(totalOps);
     if (mpOpen) {
@@ -11183,6 +11532,7 @@
       renderMpRoomsList();
       renderF1PaddockUI();
     }
+    renderLiveRosterHud();
     updateF1HudWidgets();
   }
 
@@ -11312,6 +11662,8 @@
     const c = getCustom(garage.selectedCarId);
     return Object.assign({
       type,
+      clientId: mpClientId,
+      selfId: mpClientId,
       room: mpRoomId,
       mapId: currentMpMap,
       name: mpCallsign,
@@ -11327,7 +11679,13 @@
       teamId: f1SelectedTeamId,
       teamName: f1SelectedTeamName,
       tireCompound: f1TireCompound,
+      ready: f1SelfReady,
+      pitCount: f1PitCount,
+      bestLapMs: f1BestLapMs,
+      currentLap: f1LapCount,
       bodyColor: c.bodyColor,
+      stripeColor: c.stripeColor || '#ffffff',
+      rimColor: c.rimColor || '#facc15',
       underglowColor: c.underglowColor,
       outfitColor: characterCustom.shirt,
       weapon: playerStats.weapon,
@@ -11336,21 +11694,81 @@
     }, extra || {});
   }
 
+  function sendImmediateMpUpdate() {
+    if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
+      mpSocket.send(JSON.stringify(getLocalMpPayload('player:update')));
+    } else {
+      syncMultiplayerViaHttp();
+    }
+  }
+
+  let mpRosterHudTimer = 0;
+
+  async function syncMultiplayerViaHttp() {
+    if (mpHttpSyncInFlight) return;
+    mpHttpSyncInFlight = true;
+    try {
+      const res = await fetch('/api/mp/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(getLocalMpPayload('http:sync'))
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!data) return;
+      mpConnected = true;
+      if (Array.isArray(data.roomsList)) {
+        mpPublicRooms = data.roomsList;
+      }
+      if (data.mapId && data.mapId !== currentMpMap) {
+        switchMultiplayerMap(data.mapId, false);
+      }
+      if (Array.isArray(data.players)) {
+        const seenIds = new Set();
+        data.players.forEach(p => {
+          if (!p || !p.id) return;
+          if (p.id === mpSelfId || p.id === mpClientId) {
+            if (typeof p.gridIndex === 'number') mpMyGridSlot = p.gridIndex;
+          } else {
+            seenIds.add(p.id);
+            upsertRemoteOperative(p);
+          }
+        });
+        // Remove any stale remote operatives who left the room
+        remoteOperatives.forEach((_op, id) => {
+          if (!seenIds.has(id)) removeRemoteOperative(id);
+        });
+      }
+      updateMpLiveBadge();
+    } catch (_err) {
+      // Ignore transient network errors
+    } finally {
+      mpHttpSyncInFlight = false;
+    }
+  }
+
   function syncLobbyPlayersState(playersArr, raceStatusVal, totalLapsVal, finishOrderVal) {
     if (raceStatusVal) f1RaceStatus = raceStatusVal;
     if (totalLapsVal) f1TotalLaps = totalLapsVal;
     if (Array.isArray(finishOrderVal)) f1FinishOrder = finishOrderVal;
     if (Array.isArray(playersArr)) {
+      const seenIds = new Set();
       playersArr.forEach(p => {
-        if (p.id === mpSelfId) {
+        if (p.id === mpSelfId || p.id === mpClientId) {
           f1SelfReady = Boolean(p.ready);
+          if (typeof p.gridIndex === 'number') mpMyGridSlot = p.gridIndex;
         } else {
+          seenIds.add(p.id);
           upsertRemoteOperative(p);
         }
+      });
+      remoteOperatives.forEach((_op, id) => {
+        if (!seenIds.has(id)) removeRemoteOperative(id);
       });
     }
     renderF1PaddockUI();
     updateF1HudWidgets();
+    renderLiveRosterHud();
     if (mpOpen) renderMpPlayersList();
   }
 
@@ -11375,12 +11793,20 @@
         if (!msg || !msg.type) return;
 
         if (msg.type === 'room:init') {
-          mpSelfId = msg.selfId;
+          mpSelfId = msg.selfId || mpClientId;
           mpRoomId = msg.room || mpRoomId;
           if (mpRoomInputEl) mpRoomInputEl.value = mpRoomId;
           f1RaceStatus = msg.raceStatus || 'lobby';
           f1TotalLaps = msg.raceTotalLaps || 3;
           f1FinishOrder = Array.isArray(msg.finishOrder) ? msg.finishOrder : [];
+
+          if (Array.isArray(msg.players)) {
+            const me = msg.players.find(p => p.id === mpSelfId || p.id === mpClientId);
+            if (me && typeof me.gridIndex === 'number') {
+              mpMyGridSlot = me.gridIndex;
+            }
+          }
+
           if (msg.mapId && msg.mapId !== currentMpMap) {
             switchMultiplayerMap(msg.mapId, false);
           } else {
@@ -11389,8 +11815,12 @@
           clearAllRemoteOperatives();
           if (Array.isArray(msg.players)) {
             msg.players.forEach(p => {
-              if (p.id === mpSelfId) f1SelfReady = Boolean(p.ready);
-              else upsertRemoteOperative(p);
+              if (p.id === mpSelfId || p.id === mpClientId) {
+                f1SelfReady = Boolean(p.ready);
+                if (typeof p.gridIndex === 'number') mpMyGridSlot = p.gridIndex;
+              } else {
+                upsertRemoteOperative(p);
+              }
             });
           }
           if (Array.isArray(msg.roomsList)) {
@@ -11401,15 +11831,21 @@
           mpSupplyDrop = msg.supplyDrop || null;
           updateSupplyDropUI();
           updateMpLiveBadge();
+          sendImmediateMpUpdate();
         } else if (msg.type === 'room:map_changed') {
           f1RaceStatus = msg.raceStatus || 'lobby';
           f1SelfReady = false;
+          if (Array.isArray(msg.players)) {
+            const me = msg.players.find(p => p.id === mpSelfId || p.id === mpClientId);
+            if (me && typeof me.gridIndex === 'number') mpMyGridSlot = me.gridIndex;
+          }
           if (msg.mapId) switchMultiplayerMap(msg.mapId, false);
           if (Array.isArray(msg.players)) syncLobbyPlayersState(msg.players, msg.raceStatus, msg.raceTotalLaps, []);
           mpSupplyDrop = msg.supplyDrop || null;
           updateSupplyDropUI();
           if (msg.chatMessage) appendMpChatMessage(msg.chatMessage);
           updateMpLiveBadge();
+          sendImmediateMpUpdate();
         } else if (msg.type === 'race:lobby_state') {
           syncLobbyPlayersState(msg.players, msg.raceStatus, msg.raceTotalLaps, msg.finishOrder);
           if (msg.chatMessage) appendMpChatMessage(msg.chatMessage);
@@ -11422,12 +11858,13 @@
           if (mpOpen) closeMp();
 
           // Line up local player on their assigned starting grid slot
-          let mySlot = 0;
+          let mySlot = mpMyGridSlot;
           if (Array.isArray(msg.players)) {
-            const foundIdx = msg.players.findIndex(p => p.id === mpSelfId);
+            const foundIdx = msg.players.findIndex(p => p.id === mpSelfId || p.id === mpClientId);
             if (foundIdx >= 0) mySlot = foundIdx;
             syncLobbyPlayersState(msg.players, 'countdown', f1TotalLaps, []);
           }
+          mpMyGridSlot = mySlot;
           positionOnF1StartingGrid(mySlot);
 
           const gantryHud = document.getElementById('f1StartLightsHud');
@@ -11479,7 +11916,7 @@
             if (msg.bestLapMs) op.bestLapMs = msg.bestLapMs;
             if (msg.currentLap) op.currentLap = msg.currentLap;
           }
-          if (msg.finished && msg.playerId === mpSelfId) {
+          if (msg.finished && (msg.playerId === mpSelfId || msg.playerId === mpClientId)) {
             f1SelfReady = false;
             const bonus = msg.position === 1 ? 10000 : (msg.position === 2 ? 6000 : 3500);
             playerStats.cash += bonus;
@@ -11494,6 +11931,7 @@
           if (Array.isArray(msg.roomsList)) {
             mpPublicRooms = msg.roomsList;
             renderMpRoomsList();
+            renderLiveRosterHud();
           }
         } else if (msg.type === 'map:score_broadcast') {
           if (msg.chatMessage) appendMpChatMessage(msg.chatMessage);
@@ -11505,20 +11943,23 @@
           if (mpOpen) renderMpPlayersList();
         } else if (msg.type === 'player:joined') {
           upsertRemoteOperative(msg.player);
+          if (Array.isArray(msg.roomsList)) mpPublicRooms = msg.roomsList;
           if (msg.chatMessage) appendMpChatMessage(msg.chatMessage);
           updateMpLiveBadge();
+          sendImmediateMpUpdate();
         } else if (msg.type === 'player:moved') {
           upsertRemoteOperative(msg);
           if (mpOpen) renderMpPlayersList();
         } else if (msg.type === 'player:left') {
           removeRemoteOperative(msg.id);
+          if (Array.isArray(msg.roomsList)) mpPublicRooms = msg.roomsList;
           if (msg.chatMessage) appendMpChatMessage(msg.chatMessage);
           updateMpLiveBadge();
         } else if (msg.type === 'player:shot') {
           spawnBulletTracer(msg.ox, msg.oy || 1.2, msg.oz, msg.tx, msg.ty || 1.1, msg.tz, 0x38bdf8);
           playSfx('shoot');
         } else if (msg.type === 'player:damaged') {
-          if (msg.targetId === mpSelfId) {
+          if (msg.targetId === mpSelfId || msg.targetId === mpClientId) {
             playerStats.health = msg.health;
             playerStats.armor = msg.armor;
             const vig = document.getElementById('vignette');
@@ -11530,18 +11971,19 @@
             if (op) {
               op.health = msg.health;
               op.armor = msg.armor;
-              updateOperativeNameplate(op.labelSprite, op.name, op.role, op.health, op.armor);
+              const modelDef = CAR_MODELS.find(m => m.id === op.carId) || CAR_MODELS[0];
+              updateOperativeNameplate(op.labelSprite, op.name, op.role, op.health, op.armor, modelDef.name, op.bodyColor);
             }
           }
         } else if (msg.type === 'combat:kill') {
           if (msg.chatMessage) appendMpChatMessage(msg.chatMessage);
-          if (msg.attackerId === mpSelfId) {
+          if (msg.attackerId === mpSelfId || msg.attackerId === mpClientId) {
             playerStats.cash += msg.reward || 1500;
             statsTracking.cashEarned += msg.reward || 1500;
             statsTracking.kills++;
             updateStatsHud();
             showMissionBanner('OPERATIVE NEUTRALIZED!', `+$${msg.reward || 1500} BOUNTY · ${msg.victimName}`);
-          } else if (msg.victimId === mpSelfId) {
+          } else if (msg.victimId === mpSelfId || msg.victimId === mpClientId) {
             playerStats.health = 100;
             playerStats.armor = 50;
             switchMultiplayerMap(currentMpMap, true);
@@ -11557,14 +11999,15 @@
           if (vicOp) {
             vicOp.health = 100;
             vicOp.armor = 50;
-            updateOperativeNameplate(vicOp.labelSprite, vicOp.name, vicOp.role, vicOp.health, vicOp.armor);
+            const modelDef = CAR_MODELS.find(m => m.id === vicOp.carId) || CAR_MODELS[0];
+            updateOperativeNameplate(vicOp.labelSprite, vicOp.name, vicOp.role, vicOp.health, vicOp.armor, modelDef.name, vicOp.bodyColor);
           }
           if (mpOpen) renderMpPlayersList();
         } else if (msg.type === 'supply:claimed') {
           mpSupplyDrop = msg.nextDrop || null;
           updateSupplyDropUI();
           if (msg.chatMessage) appendMpChatMessage(msg.chatMessage);
-          if (msg.winnerId === mpSelfId) {
+          if (msg.winnerId === mpSelfId || msg.winnerId === mpClientId) {
             playerStats.cash += msg.reward || 2000;
             playerStats.respect = Math.min(100, playerStats.respect + 15);
             statsTracking.cashEarned += msg.reward || 2000;
@@ -11618,11 +12061,21 @@
   }
 
   function updateMultiplayer(dt) {
-    // 1. Broadcast local player state at ~15Hz
+    // 1. Broadcast local player state at ~15Hz over WS + periodic HTTP state reconciliation
     mpSyncTimer += dt;
     if (mpSyncTimer >= 0.068 && mpSocket && mpSocket.readyState === WebSocket.OPEN) {
       mpSyncTimer = 0;
       mpSocket.send(JSON.stringify(getLocalMpPayload('player:update')));
+    }
+    mpHttpSyncTimer += dt;
+    if (mpHttpSyncTimer >= (mpConnected ? 1.8 : 0.45)) {
+      mpHttpSyncTimer = 0;
+      syncMultiplayerViaHttp();
+    }
+    mpRosterHudTimer += dt;
+    if (mpRosterHudTimer >= 0.5) {
+      mpRosterHudTimer = 0;
+      renderLiveRosterHud();
     }
 
     // 2. Map-Specific Live Gameplay Logic (F1 Circuits, Pit Stops, 5-Light Start, Firing Range, Derby Bowl)
@@ -11794,6 +12247,7 @@
     // 4. Smoothly interpolate & animate all remote 3D operatives
     mpRamCooldown = Math.max(0, mpRamCooldown - dt);
     const lerpFactor = Math.min(1, dt * 12);
+    const bobOffset = Math.sin(performance.now() * 0.006) * 0.18;
     remoteOperatives.forEach(op => {
       if (!op.rootGroup) return;
       if (op.mode === 'interior') {
@@ -11812,17 +12266,22 @@
       op.rootGroup.position.set(op.x, 0, op.z);
       op.rootGroup.rotation.y = op.heading;
 
+      if (op.pointerCone) {
+        op.pointerCone.position.y = 2.15 + bobOffset;
+        op.pointerCone.rotation.y += dt * 2.5;
+      }
+
       if (op.mode === 'drive') {
         op.carMesh.visible = true;
         op.charMesh.visible = false;
-        op.labelSprite.position.set(0, 2.85, 0);
+        op.labelSprite.position.set(0, 3.35, 0);
         if (op.carMesh.userData && op.carMesh.userData.wheels) {
           op.carMesh.userData.wheels.forEach(w => { w.rotation.x += op.speed * dt * 2; });
         }
       } else {
         op.carMesh.visible = false;
         op.charMesh.visible = true;
-        op.labelSprite.position.set(0, 2.45, 0);
+        op.labelSprite.position.set(0, 2.75, 0);
         const swing = Math.sin(performance.now() * 0.008) * Math.min(1, Math.abs(op.speed) / 4.0) * 0.55;
         if (op.charMesh.userData && op.charMesh.userData.legs) {
           op.charMesh.userData.legs[0].rotation.x = swing;
@@ -11842,6 +12301,9 @@
         }
       }
     });
+
+    // 5. Project 2D screen-space floating name & car tags + off-screen edge arrows
+    updateScreenSpaceDriverTags();
   }
 
   function openMp() {
@@ -11850,6 +12312,7 @@
     if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
       mpSocket.send(JSON.stringify({ type: 'rooms:request' }));
     }
+    syncMultiplayerViaHttp();
     renderF1PaddockUI();
     renderMpPlayersList();
     renderMpRoomsList();
@@ -11873,6 +12336,7 @@
     f1SelfReady = !f1SelfReady;
     renderF1PaddockUI();
     updateF1HudWidgets();
+    renderLiveRosterHud();
     if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
       mpSocket.send(JSON.stringify({
         type: 'race:toggle_ready',
@@ -11883,7 +12347,7 @@
       // Offline fallback: start 5-light countdown locally
       f1RaceStatus = 'countdown';
       f1CountdownStartMs = performance.now();
-      positionOnF1StartingGrid(0);
+      positionOnF1StartingGrid(mpMyGridSlot);
       const gantryHud = document.getElementById('f1StartLightsHud');
       if (gantryHud) gantryHud.classList.add('open');
       setTimeout(() => {
@@ -11891,6 +12355,7 @@
         if (gantryHud) gantryHud.classList.remove('open');
       }, 4500);
     }
+    sendImmediateMpUpdate();
   }
 
   function forceStartF1Race() {
@@ -11908,6 +12373,34 @@
         totalLaps: f1TotalLaps
       }));
     }
+  }
+
+  // Real-time Driver Name & Role synchronization as you type
+  function handleDriverNameChange(newNameRaw) {
+    const cleaned = (newNameRaw || '').trim().slice(0, 18);
+    if (!cleaned) return;
+    mpCallsign = cleaned;
+    try { localStorage.setItem('karachi_mp_callsign', mpCallsign); } catch (_e) {}
+    if (mpNameInputEl && document.activeElement !== mpNameInputEl) mpNameInputEl.value = mpCallsign;
+    if (f1DriverNameInputEl && document.activeElement !== f1DriverNameInputEl) f1DriverNameInputEl.value = mpCallsign;
+    renderF1PaddockUI();
+    renderLiveRosterHud();
+    if (mpOpen) renderMpPlayersList();
+    sendImmediateMpUpdate();
+  }
+  if (mpNameInputEl) {
+    mpNameInputEl.addEventListener('input', () => handleDriverNameChange(mpNameInputEl.value));
+  }
+  if (f1DriverNameInputEl) {
+    f1DriverNameInputEl.addEventListener('input', () => handleDriverNameChange(f1DriverNameInputEl.value));
+  }
+  if (mpRoleSelectEl) {
+    mpRoleSelectEl.addEventListener('change', () => {
+      mpRole = mpRoleSelectEl.value || 'IB Deep-Cover (Hamza)';
+      renderLiveRosterHud();
+      if (mpOpen) renderMpPlayersList();
+      sendImmediateMpUpdate();
+    });
   }
 
   document.getElementById('mpBtn').addEventListener('click', () => { if (!pauseOpen) mpOpen ? closeMp() : openMp(); });
@@ -11964,12 +12457,13 @@
       } else {
         switchMultiplayerMap(chosenMap, false);
       }
+      syncMultiplayerViaHttp();
     });
   });
 
   // Create New Shareable Room & Code
   document.getElementById('mpCreateRoomBtn').addEventListener('click', () => {
-    mpCallsign = (mpNameInputEl.value || 'Hamza-IB').trim().slice(0, 18) || 'Hamza-IB';
+    if (mpNameInputEl && mpNameInputEl.value.trim()) handleDriverNameChange(mpNameInputEl.value);
     mpRole = mpRoleSelectEl.value || 'IB Deep-Cover (Hamza)';
     if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
       mpSocket.send(JSON.stringify(getLocalMpPayload('room:create', { mapId: mpSelectedMapForCreate })));
@@ -12004,7 +12498,7 @@
   });
 
   document.getElementById('mpJoinRoomBtn').addEventListener('click', () => {
-    mpCallsign = (mpNameInputEl.value || 'Hamza-IB').trim().slice(0, 18) || 'Hamza-IB';
+    if (mpNameInputEl && mpNameInputEl.value.trim()) handleDriverNameChange(mpNameInputEl.value);
     mpRole = mpRoleSelectEl.value || 'IB Deep-Cover (Hamza)';
     const nextRoom = (mpRoomInputEl.value || 'KARACHI-1').trim().toUpperCase().slice(0, 16) || 'KARACHI-1';
     mpRoomId = nextRoom;
@@ -12014,6 +12508,7 @@
     } else {
       connectMultiplayerSocket();
     }
+    syncMultiplayerViaHttp();
   });
 
   function sendMpChatFromInput() {
@@ -12032,7 +12527,7 @@
     ev.stopPropagation();
     if (ev.key === 'Enter') sendMpChatFromInput();
   });
-  [mpNameInputEl, mpRoomInputEl].forEach(el => {
+  [mpNameInputEl, f1DriverNameInputEl, mpRoomInputEl].forEach(el => {
     if (el) el.addEventListener('keydown', ev => ev.stopPropagation());
   });
 
@@ -12063,9 +12558,6 @@
     }
   });
 
-  renderF1PaddockUI();
-  connectMultiplayerSocket();
-
   // ===================================================================
   // Initialization & Campaign / Free Roam / Multiplayer Launchers
   // ===================================================================
@@ -12078,6 +12570,18 @@
   updateChapterHud();
   document.getElementById('loading').style.display = 'none';
 
+  // Connect multiplayer AFTER initial car is selected so F1/arena car overrides are never clobbered
+  renderF1PaddockUI();
+  renderLiveRosterHud();
+  connectMultiplayerSocket();
+  syncMultiplayerViaHttp();
+  // Keep multiplayer room/player roster synced even if player is still on the Title Screen or Paddock modal
+  setInterval(() => {
+    if (!loopStarted) {
+      syncMultiplayerViaHttp();
+    }
+  }, 1500);
+
   function beginGame(withPrologueStory) {
     document.getElementById('titleScreen').style.display = 'none';
     ensureAudio();
@@ -12085,6 +12589,7 @@
       loopStarted = true;
       animate();
     }
+    sendImmediateMpUpdate();
     if (withPrologueStory) {
       character.visible = true;
       character.position.set(-0.8, 0, 14.2);
@@ -12142,6 +12647,12 @@
       beginGame(false);
       openMp();
     });
+  }
+
+  // If player opened an invite link with ?room= or ?map=, jump straight into the 3D world & Multiplayer Hub!
+  if (urlParams.get('room') || urlParams.get('map')) {
+    beginGame(false);
+    openMp();
   }
 })();
 </script>

@@ -224,6 +224,12 @@ function triggerRaceCountdown(room: RoomState, initiatorName?: string) {
   let slot = 0;
   for (const [, p] of room.players) {
     p.gridIndex = slot++;
+    const sp = getSpawnForMapAndSlot(room.mapId, p.gridIndex);
+    p.x = sp.x;
+    p.z = sp.z;
+    p.heading = sp.heading;
+    p.mode = sp.mode;
+    p.speed = 0;
     p.raceLap = 1;
     p.raceGate = 0;
     p.pitCount = 0;
@@ -298,19 +304,78 @@ function getPublicRoomsList() {
     mapLabel: string;
     hostName: string;
     playerCount: number;
+    playerNames: string[];
   }> = [];
   for (const [, r] of rooms) {
     if (r.players.size > 0 || r.code === 'KARACHI-1') {
+      const names = Array.from(r.players.values()).map((p) => `${p.name} (${p.carId})`);
       list.push({
         code: r.code,
         mapId: r.mapId,
         mapLabel: MAP_LABELS[r.mapId],
-        hostName: r.hostName || 'Operative',
+        hostName: r.hostName || (names[0] ? names[0] : 'Operative'),
         playerCount: r.players.size,
+        playerNames: names,
       });
     }
   }
   return list.slice(0, 25);
+}
+
+function getSpawnForMapAndSlot(mapId: MapId, slotIndex: number): { x: number; z: number; heading: number; mode: 'drive' | 'walk' } {
+  const idx = Math.max(0, slotIndex || 0);
+  const row = Math.floor(idx / 2);
+  const col = idx % 2 === 0 ? -1 : 1;
+  const staggerZ = idx % 2 === 1 ? -3.5 : 0;
+  if (mapId === 'f1_circuit') {
+    return {
+      x: Number((145 + col * 4.2).toFixed(2)),
+      z: Number((12 + row * 9.5 + staggerZ).toFixed(2)),
+      heading: Math.PI,
+      mode: 'drive',
+    };
+  }
+  if (mapId === 'f1_marina') {
+    return {
+      x: Number((-12 - row * 9.5 - staggerZ).toFixed(2)),
+      z: Number((96 + col * 4.2).toFixed(2)),
+      heading: Number((Math.PI / 2).toFixed(3)),
+      mode: 'drive',
+    };
+  }
+  if (mapId === 'firing_range') {
+    return {
+      x: Number((col * (3.5 + row * 3)).toFixed(2)),
+      z: 15.5,
+      heading: Math.PI,
+      mode: 'walk',
+    };
+  }
+  if (mapId === 'kemari_docks') {
+    const ang = (idx * Math.PI) / 3;
+    return {
+      x: Number((Math.cos(ang) * 28).toFixed(2)),
+      z: Number((Math.sin(ang) * 28).toFixed(2)),
+      heading: Number((ang + Math.PI).toFixed(3)),
+      mode: 'walk',
+    };
+  }
+  if (mapId === 'derby_dome') {
+    const ang = (idx * Math.PI) / 3;
+    return {
+      x: Number((Math.cos(ang) * 38).toFixed(2)),
+      z: Number((Math.sin(ang) * 38).toFixed(2)),
+      heading: Number((ang + Math.PI).toFixed(3)),
+      mode: 'drive',
+    };
+  }
+  // Default: karachi_city side-by-side spawn
+  return {
+    x: Number((col * (3.2 + row * 2.5)).toFixed(2)),
+    z: Number((16 + row * 6).toFixed(2)),
+    heading: 0,
+    mode: 'drive',
+  };
 }
 
 function broadcastToRoom(roomCode: string, payload: unknown, excludeId?: string) {
@@ -353,20 +418,162 @@ async function startServer() {
     res.json({ rooms: getPublicRoomsList() });
   });
 
+  // Hybrid HTTP Real-Time Sync Endpoint (guarantees multiplayer visibility even across HTTP proxies or when WS reconnects)
+  app.post('/api/mp/sync', (req, res) => {
+    try {
+      const body = req.body || {};
+      const pid = String(body.selfId || '').trim();
+      if (!pid) {
+        res.status(400).json({ error: 'Missing selfId' });
+        return;
+      }
+      const targetCode = normalizeRoomCode(body.room || 'KARACHI-1');
+      const callsign = String(body.name || 'Hamza-IB').trim().slice(0, 20) || 'Hamza-IB';
+      const room = getOrCreateRoom(targetCode, body.mapId ? sanitizeMapId(body.mapId) : undefined, pid, callsign);
+
+      // Remove from any other room if player switched rooms
+      for (const [rCode, r] of rooms) {
+        if (rCode !== room.code && r.players.has(pid)) {
+          r.players.delete(pid);
+          broadcastToRoom(rCode, { type: 'player:left', id: pid }, pid);
+        }
+      }
+
+      let p = room.players.get(pid);
+      const isF1 = room.mapId === 'f1_circuit' || room.mapId === 'f1_marina';
+      if (!p) {
+        const slot = room.players.size;
+        const sp = getSpawnForMapAndSlot(room.mapId, slot);
+        p = {
+          id: pid,
+          name: callsign,
+          role: String(body.role || 'IB Deep-Cover (Hamza)').slice(0, 32),
+          room: room.code,
+          mode: body.mode === 'walk' || body.mode === 'interior' ? body.mode : sp.mode,
+          x: typeof body.x === 'number' && !Number.isNaN(body.x) ? body.x : sp.x,
+          y: 0,
+          z: typeof body.z === 'number' && !Number.isNaN(body.z) ? body.z : sp.z,
+          heading: typeof body.heading === 'number' && !Number.isNaN(body.heading) ? body.heading : sp.heading,
+          speed: Number(body.speed) || 0,
+          steerAngle: Number(body.steerAngle) || 0,
+          carId: String(body.carId || (isF1 ? 'f1' : 'speedster')).slice(0, 24),
+          teamId: String(body.teamId || 'ferrari_corsa').slice(0, 24),
+          teamName: String(body.teamName || 'Scuderia Corsa Rossa').slice(0, 36),
+          bodyColor: String(body.bodyColor || '#dc2626').slice(0, 16),
+          stripeColor: String(body.stripeColor || '#ffffff').slice(0, 16),
+          rimColor: String(body.rimColor || '#facc15').slice(0, 16),
+          underglowColor: String(body.underglowColor || '#38bdf8').slice(0, 16),
+          tireCompound: sanitizeTireCompound(body.tireCompound),
+          ready: Boolean(body.ready),
+          gridIndex: slot,
+          raceLap: Number(body.raceLap) || 1,
+          raceGate: Number(body.raceGate) || 0,
+          pitCount: Number(body.pitCount) || 0,
+          outfitColor: String(body.outfitColor || '#1e242b').slice(0, 16),
+          weapon: String(body.weapon || 'pistol').slice(0, 20),
+          health: Math.max(1, Math.min(100, Number(body.health) || 100)),
+          armor: Math.max(0, Math.min(100, Number(body.armor) || 50)),
+          kills: 0,
+          deaths: 0,
+          bounty: 0,
+          bestLapMs: 0,
+          rangeScore: 0,
+          lastSeen: Date.now(),
+        };
+        room.players.set(pid, p);
+        broadcastToRoom(room.code, { type: 'player:joined', player: p }, pid);
+      } else {
+        p.name = callsign;
+        if (typeof body.role === 'string' && body.role.trim()) p.role = body.role.trim().slice(0, 32);
+        if (typeof body.x === 'number' && !Number.isNaN(body.x)) p.x = body.x;
+        if (typeof body.z === 'number' && !Number.isNaN(body.z)) p.z = body.z;
+        if (typeof body.heading === 'number' && !Number.isNaN(body.heading)) p.heading = body.heading;
+        if (typeof body.speed === 'number' && !Number.isNaN(body.speed)) p.speed = body.speed;
+        if (typeof body.steerAngle === 'number' && !Number.isNaN(body.steerAngle)) p.steerAngle = body.steerAngle;
+        if (body.mode === 'drive' || body.mode === 'walk' || body.mode === 'interior') p.mode = body.mode;
+        if (typeof body.carId === 'string' && body.carId) p.carId = body.carId.slice(0, 24);
+        if (typeof body.teamId === 'string' && body.teamId) p.teamId = body.teamId.slice(0, 24);
+        if (typeof body.teamName === 'string' && body.teamName) p.teamName = body.teamName.slice(0, 36);
+        if (typeof body.bodyColor === 'string' && body.bodyColor) p.bodyColor = body.bodyColor.slice(0, 16);
+        if (typeof body.stripeColor === 'string' && body.stripeColor) p.stripeColor = body.stripeColor.slice(0, 16);
+        if (typeof body.rimColor === 'string' && body.rimColor) p.rimColor = body.rimColor.slice(0, 16);
+        if (typeof body.underglowColor === 'string' && body.underglowColor) p.underglowColor = body.underglowColor.slice(0, 16);
+        if (body.tireCompound) p.tireCompound = sanitizeTireCompound(body.tireCompound);
+        if (typeof body.ready === 'boolean') p.ready = body.ready;
+        if (typeof body.outfitColor === 'string' && body.outfitColor) p.outfitColor = body.outfitColor.slice(0, 16);
+        if (typeof body.health === 'number') p.health = Math.max(0, Math.min(100, body.health));
+        if (typeof body.armor === 'number') p.armor = Math.max(0, Math.min(100, body.armor));
+        p.lastSeen = Date.now();
+
+        // Also push to any WebSocket peers in the room if this client has no open WS
+        const wsSock = clientSockets.get(pid);
+        if (!wsSock || wsSock.readyState !== WebSocket.OPEN) {
+          broadcastToRoom(
+            room.code,
+            {
+              type: 'player:moved',
+              ...p,
+            },
+            pid
+          );
+        }
+      }
+
+      // Prune stale HTTP-only players inactive for >15s
+      const now = Date.now();
+      for (const [otherId, otherP] of room.players) {
+        const otherSock = clientSockets.get(otherId);
+        const wsAlive = otherSock && otherSock.readyState === WebSocket.OPEN;
+        if (!wsAlive && now - otherP.lastSeen > 15000) {
+          room.players.delete(otherId);
+          broadcastToRoom(room.code, { type: 'player:left', id: otherId });
+        }
+      }
+
+      res.json({
+        selfId: pid,
+        room: room.code,
+        mapId: room.mapId,
+        raceStatus: room.raceStatus,
+        raceTotalLaps: room.raceTotalLaps,
+        finishOrder: room.finishOrder,
+        players: Array.from(room.players.values()),
+        chat: room.chat.slice(-25),
+        supplyDrop: room.supplyDrop,
+        roomsList: getPublicRoomsList(),
+      });
+    } catch (_e) {
+      res.status(500).json({ error: 'sync error' });
+    }
+  });
+
   const wss = new WebSocketServer({ server, path: '/ws' });
 
   wss.on('connection', (ws: WebSocket) => {
-    const playerId = 'op-' + Math.random().toString(36).slice(2, 9) + '-' + Date.now().toString(36).slice(-3);
+    let playerId = 'op-' + Math.random().toString(36).slice(2, 9) + '-' + Date.now().toString(36).slice(-3);
     let currentRoomCode = 'KARACHI-1';
 
     clientSockets.set(playerId, ws);
 
+    function adoptClientId(rawClientId: unknown) {
+      if (typeof rawClientId === 'string' && rawClientId.trim().length >= 4) {
+        const cleanId = rawClientId.trim().slice(0, 32);
+        if (cleanId !== playerId) {
+          clientSockets.delete(playerId);
+          playerId = cleanId;
+          clientSockets.set(playerId, ws);
+        }
+      }
+    }
+
     function joinPlayerToRoom(targetCode: string, msg: Record<string, unknown>, forceMapId?: MapId) {
+      adoptClientId(msg.clientId);
       // Leave previous room if any
-      const prevRoom = rooms.get(currentRoomCode);
-      if (prevRoom && prevRoom.players.has(playerId)) {
-        prevRoom.players.delete(playerId);
-        broadcastToRoom(currentRoomCode, { type: 'player:left', id: playerId }, playerId);
+      for (const [rCode, r] of rooms) {
+        if (rCode !== normalizeRoomCode(targetCode) && r.players.has(playerId)) {
+          r.players.delete(playerId);
+          broadcastToRoom(rCode, { type: 'player:left', id: playerId, roomsList: getPublicRoomsList() }, playerId);
+        }
       }
 
       const cleanCode = normalizeRoomCode(targetCode);
@@ -383,16 +590,20 @@ async function startServer() {
       }
 
       const isF1Map = room.mapId === 'f1_circuit' || room.mapId === 'f1_marina';
+      const assignedSlot = room.players.size;
+      const defaultSpawn = getSpawnForMapAndSlot(room.mapId, assignedSlot);
+      const clientMapMatches = msg.mapId === room.mapId;
+
       const newPlayer: PlayerState = {
         id: playerId,
         name: callsign,
         role: String(msg.role || 'IB Deep-Cover (Hamza)').slice(0, 32),
         room: cleanCode,
-        mode: msg.mode === 'walk' ? 'walk' : 'drive',
-        x: Number(msg.x) || 0,
+        mode: clientMapMatches && (msg.mode === 'walk' || msg.mode === 'drive') ? msg.mode : defaultSpawn.mode,
+        x: clientMapMatches && typeof msg.x === 'number' && (msg.x !== 0 || msg.z !== 16) ? Number(msg.x) : defaultSpawn.x,
         y: Number(msg.y) || 0,
-        z: Number(msg.z) || 0,
-        heading: Number(msg.heading) || 0,
+        z: clientMapMatches && typeof msg.z === 'number' && (msg.x !== 0 || msg.z !== 16) ? Number(msg.z) : defaultSpawn.z,
+        heading: clientMapMatches && typeof msg.heading === 'number' ? Number(msg.heading) : defaultSpawn.heading,
         speed: Number(msg.speed) || 0,
         steerAngle: Number(msg.steerAngle) || 0,
         carId: String(msg.carId || (isF1Map ? 'f1' : 'speedster')).slice(0, 24),
@@ -404,7 +615,7 @@ async function startServer() {
         underglowColor: String(msg.underglowColor || '#38bdf8').slice(0, 16),
         tireCompound: sanitizeTireCompound(msg.tireCompound),
         ready: Boolean(msg.ready),
-        gridIndex: room.players.size,
+        gridIndex: assignedSlot,
         raceLap: 1,
         raceGate: 0,
         pitCount: 0,
@@ -481,11 +692,22 @@ async function startServer() {
           room.mapId = nextMap;
           room.raceStatus = 'lobby';
           room.finishOrder = [];
+          let slot = 0;
           for (const [, rp] of room.players) {
+            rp.gridIndex = slot++;
+            const sp = getSpawnForMapAndSlot(nextMap, rp.gridIndex);
+            rp.x = sp.x;
+            rp.z = sp.z;
+            rp.heading = sp.heading;
+            rp.mode = sp.mode;
+            rp.speed = 0;
             rp.ready = false;
             rp.raceLap = 1;
             rp.raceGate = 0;
             rp.pitCount = 0;
+            if ((nextMap === 'f1_circuit' || nextMap === 'f1_marina') && rp.carId === 'speedster') {
+              rp.carId = 'f1';
+            }
           }
           room.supplyDrop = createSupplyDrop(nextMap);
           const p = room.players.get(playerId);
