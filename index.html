@@ -1546,6 +1546,7 @@
             <label style="font-size:10.5px;font-weight:800;color:#6ee7b7;display:flex;align-items:center;gap:5px;">
               👤 Driver Name:
               <input id="f1DriverNameInput" class="mpInput" style="width:135px;padding:4px 8px;font-weight:800;border-color:#10b981;" type="text" maxlength="18" placeholder="Your Driver Name">
+              <button id="f1SaveNameBtn" class="buyBtn" style="padding:4px 9px;font-size:10.5px;background:#10b981;color:#052e16;" type="button">✓ Save</button>
             </label>
             <span style="font-size:10.5px;font-weight:800;color:#cbd5e1;">Pirelli Tires:</span>
             <button class="f1TireChip active" data-tire="soft" style="color:#fca5a5;">🔴 SOFT</button>
@@ -1582,8 +1583,11 @@
           <div style="font-size:11px;font-weight:800;color:#38bdf8;letter-spacing:0.8px;text-transform:uppercase;">1. Join Friend's Room Code &amp; Identity</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
             <label style="font-size:11px;color:#cbd5e1;display:flex;flex-direction:column;gap:4px;">
-              Callsign
-              <input id="mpNameInput" class="mpInput" type="text" maxlength="18" value="Hamza-IB" placeholder="Your Callsign">
+              Your Driver Name / Callsign
+              <div style="display:flex;gap:5px;">
+                <input id="mpNameInput" class="mpInput" style="flex:1;min-width:0;" type="text" maxlength="18" value="Hamza-IB" placeholder="Your Callsign">
+                <button id="mpSaveNameBtn" class="buyBtn" style="padding:6px 10px;font-size:11px;background:#10b981;color:#052e16;" type="button">✓ Save</button>
+              </div>
             </label>
             <label style="font-size:11px;color:#cbd5e1;display:flex;flex-direction:column;gap:4px;">
               Faction Role
@@ -9980,7 +9984,9 @@
   let mpRoomId = (urlParams.get('room') || 'KARACHI-1').trim().toUpperCase();
   let mpSelectedMapForCreate = urlParams.get('map') || 'karachi_city';
   let savedCallsign = '';
-  try { savedCallsign = localStorage.getItem('dhurandhar_callsign') || ''; } catch (_e) {}
+  try {
+    savedCallsign = localStorage.getItem('karachi_mp_callsign') || localStorage.getItem('dhurandhar_callsign') || '';
+  } catch (_e) {}
   let mpCallsign = savedCallsign || ('Driver-' + Math.floor(100 + Math.random() * 899));
   let mpRole = 'IB Deep-Cover (Hamza)';
   let mpSyncTimer = 0;
@@ -11248,13 +11254,16 @@
   }
 
   function upsertRemoteOperative(data) {
-    if (!data || !data.id || data.id === mpSelfId || data.id === mpClientId) return;
-    let op = remoteOperatives.get(data.id);
+    const remoteId = data && (data.id || data.selfId || data.clientId);
+    if (!data || !remoteId || remoteId === mpSelfId || remoteId === mpClientId) return;
+    let op = remoteOperatives.get(remoteId);
     if (!op) {
       op = {
-        id: data.id,
+        id: remoteId,
         name: data.name || 'Driver',
         role: data.role || 'IB Operative',
+        room: data.room || mpRoomId,
+        mapId: data.mapId || currentMpMap,
         mode: data.mode || 'drive',
         x: Number(data.x) || 0,
         y: Number(data.y) || 0,
@@ -11284,14 +11293,19 @@
         kills: data.kills || 0,
         bounty: data.bounty || 0,
         bestLapMs: data.bestLapMs || 0,
-        rangeScore: data.rangeScore || 0
+        rangeScore: data.rangeScore || 0,
+        lastUpdated: performance.now()
       };
       rebuildRemoteOperativeMeshes(op);
-      remoteOperatives.set(data.id, op);
+      remoteOperatives.set(remoteId, op);
       renderLiveRosterHud();
+      updateMpLiveBadge();
     } else {
+      op.lastUpdated = performance.now();
       op.name = data.name || op.name;
       op.role = data.role || op.role;
+      if (data.room) op.room = data.room;
+      if (data.mapId) op.mapId = data.mapId;
       op.mode = data.mode || op.mode;
       if (typeof data.x === 'number' && !Number.isNaN(data.x)) {
         const jumpDist = Math.hypot(data.x - op.x, (typeof data.z === 'number' ? data.z : op.z) - op.z);
@@ -11400,33 +11414,62 @@
       remoteOperatives.forEach(op => {
         const opCar = (CAR_MODELS.find(m => m.id === op.carId) || CAR_MODELS[0]).name;
         const distM = Math.round(Math.hypot(op.x - px, op.z - pz));
+        const opMapMeta = op.mapId && MP_MAP_META[op.mapId] ? MP_MAP_META[op.mapId] : null;
+        const diffMapTag = (op.mapId && op.mapId !== currentMpMap && opMapMeta)
+          ? ` · <span style="color:#fde047;">${opMapMeta.short}</span>`
+          : '';
         const row = document.createElement('div');
         row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:6px;padding:3px 6px;border-radius:5px;background:rgba(30,41,59,0.75);border-left:3px solid ' + (op.bodyColor || '#38bdf8') + ';';
         row.innerHTML = `
           <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
             <b style="color:#ffffff;">🏎️ ${op.name}</b> <span style="color:#fde047;font-size:9.5px;">(${distM}m)</span>
-            <div style="font-size:9.5px;color:#93c5fd;">${opCar}${onF1 && op.teamName ? ' · ' + op.teamName.split(' ')[0] : ''}</div>
+            <div style="font-size:9.5px;color:#93c5fd;">${opCar}${onF1 && op.teamName ? ' · ' + op.teamName.split(' ')[0] : ''}${diffMapTag}</div>
           </div>
         `;
         const warpBtn = document.createElement('button');
         warpBtn.className = 'mpQuickBtn';
         warpBtn.style.cssText = 'padding:2px 6px;font-size:9.5px;background:#10b981;color:#052e16;border:none;font-weight:900;flex-shrink:0;';
-        warpBtn.textContent = '⚡ Warp';
+        warpBtn.textContent = (op.mapId && op.mapId !== currentMpMap) ? '⚡ Join Map' : '⚡ Warp';
         warpBtn.title = 'Teleport right next to ' + op.name;
         warpBtn.addEventListener('click', () => {
-          warpToCoordinates(op.x + 3.8, op.z, `⚡ Teleported beside ${op.name} (${opCar})!`);
+          if (op.room && op.room.toUpperCase() !== mpRoomId.toUpperCase()) {
+            mpRoomId = op.room.toUpperCase();
+            if (mpRoomInputEl) mpRoomInputEl.value = mpRoomId;
+          }
+          if (op.mapId && op.mapId !== currentMpMap) {
+            switchMultiplayerMap(op.mapId, true);
+          }
+          warpToCoordinates(op.x + 3.8, op.z, `⚡ Joined ${op.name} (${opCar})!`);
+          sendImmediateMpUpdate();
         });
         row.appendChild(warpBtn);
         rowsEl.appendChild(row);
       });
     }
 
-    // Check if player is alone in current room while another room on the server has active players
+    // Check if another player is on a different map or room and show a 1-click Join & Teleport banner
     if (otherBannerEl && otherTextEl) {
+      let diffMapOp = null;
+      remoteOperatives.forEach(op => {
+        if (!diffMapOp && op.mapId && op.mapId !== currentMpMap) diffMapOp = op;
+      });
       const otherActiveRoom = (mpPublicRooms || []).find(
         r => r.code.toUpperCase() !== mpRoomId.toUpperCase() && r.playerCount > 0
       );
-      if (remoteOperatives.size === 0 && otherActiveRoom) {
+      if (diffMapOp) {
+        const mLabel = MP_MAP_META[diffMapOp.mapId] ? MP_MAP_META[diffMapOp.mapId].label : diffMapOp.mapId;
+        otherBannerEl.style.display = 'flex';
+        otherTextEl.textContent = `🏎️ ${diffMapOp.name} is racing on ${mLabel} — Click Here to Join & Teleport!`;
+        otherBannerEl.onclick = () => {
+          if (diffMapOp.room) {
+            mpRoomId = diffMapOp.room.toUpperCase();
+            if (mpRoomInputEl) mpRoomInputEl.value = mpRoomId;
+          }
+          switchMultiplayerMap(diffMapOp.mapId, true);
+          warpToCoordinates(diffMapOp.x + 3.8, diffMapOp.z, `⚡ Joined ${diffMapOp.name} on ${mLabel}!`);
+          sendImmediateMpUpdate();
+        };
+      } else if (remoteOperatives.size === 0 && otherActiveRoom) {
         otherBannerEl.style.display = 'flex';
         const who = (otherActiveRoom.playerNames && otherActiveRoom.playerNames.length > 0)
           ? otherActiveRoom.playerNames.join(', ')
@@ -11435,6 +11478,9 @@
         otherBannerEl.onclick = () => {
           mpRoomId = otherActiveRoom.code.toUpperCase();
           if (mpRoomInputEl) mpRoomInputEl.value = mpRoomId;
+          if (otherActiveRoom.mapId && otherActiveRoom.mapId !== currentMpMap) {
+            switchMultiplayerMap(otherActiveRoom.mapId, false);
+          }
           if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
             mpSocket.send(JSON.stringify(getLocalMpPayload('room:switch')));
           }
@@ -11694,24 +11740,260 @@
     }, extra || {});
   }
 
-  function sendImmediateMpUpdate() {
+  // ===================================================================
+  // Browser-Direct Global MQTT-over-WebSocket Relay + BroadcastChannel
+  // Connects players across ais-dev, ais-pre, different Cloud Run instances, and tabs
+  // ===================================================================
+  const MP_RELAY_TOPIC = 'dhurandhar/mp/3c7ec51f/v3';
+  const MP_RELAY_BROKERS = [
+    'wss://broker.emqx.io:8084/mqtt',
+    'wss://broker.hivemq.com:8884/mqtt'
+  ];
+  let mpRelayBrokerIdx = 0;
+  let mpRelayWs = null;
+  let mpRelayReady = false;
+  let mpBroadcastChan = null;
+  try {
+    if (typeof BroadcastChannel !== 'undefined') {
+      mpBroadcastChan = new BroadcastChannel('dhurandhar_mp_3c7ec51f');
+      mpBroadcastChan.onmessage = (ev) => {
+        if (ev && ev.data) handleIncomingRelayPacket(ev.data);
+      };
+    }
+  } catch (_e) {}
+
+  const _mqttEnc = new TextEncoder();
+  const _mqttDec = new TextDecoder();
+
+  function _mqttEncodeLen(len) {
+    const out = [];
+    do {
+      let b = len % 128;
+      len = Math.floor(len / 128);
+      if (len > 0) b |= 128;
+      out.push(b);
+    } while (len > 0);
+    return out;
+  }
+
+  function _mqttBuildConnect(cid) {
+    const idB = _mqttEnc.encode(cid);
+    const remLen = 10 + 2 + idB.length;
+    const rem = _mqttEncodeLen(remLen);
+    const pkt = new Uint8Array(1 + rem.length + remLen);
+    let p = 0;
+    pkt[p++] = 0x10;
+    rem.forEach(b => { pkt[p++] = b; });
+    pkt.set([0x00, 0x04, 0x4d, 0x51, 0x54, 0x54, 0x04, 0x02, 0x00, 0x3c], p);
+    p += 10;
+    pkt[p++] = (idB.length >> 8) & 0xff;
+    pkt[p++] = idB.length & 0xff;
+    pkt.set(idB, p);
+    return pkt;
+  }
+
+  function _mqttBuildSub(topic) {
+    const tB = _mqttEnc.encode(topic);
+    const remLen = 2 + 2 + tB.length + 1;
+    const rem = _mqttEncodeLen(remLen);
+    const pkt = new Uint8Array(1 + rem.length + remLen);
+    let p = 0;
+    pkt[p++] = 0x82;
+    rem.forEach(b => { pkt[p++] = b; });
+    pkt[p++] = 0x00;
+    pkt[p++] = 0x01;
+    pkt[p++] = (tB.length >> 8) & 0xff;
+    pkt[p++] = tB.length & 0xff;
+    pkt.set(tB, p);
+    p += tB.length;
+    pkt[p++] = 0x00;
+    return pkt;
+  }
+
+  function _mqttBuildPub(topic, obj) {
+    const tB = _mqttEnc.encode(topic);
+    const mB = _mqttEnc.encode(JSON.stringify(obj));
+    const remLen = 2 + tB.length + mB.length;
+    const rem = _mqttEncodeLen(remLen);
+    const pkt = new Uint8Array(1 + rem.length + remLen);
+    let p = 0;
+    pkt[p++] = 0x30;
+    rem.forEach(b => { pkt[p++] = b; });
+    pkt[p++] = (tB.length >> 8) & 0xff;
+    pkt[p++] = tB.length & 0xff;
+    pkt.set(tB, p);
+    p += tB.length;
+    pkt.set(mB, p);
+    return pkt;
+  }
+
+  function _mqttParseMessages(u8) {
+    const results = [];
+    let offset = 0;
+    while (offset < u8.length) {
+      const header = u8[offset];
+      let mult = 1, remLen = 0, idx = offset + 1;
+      while (idx < u8.length) {
+        const b = u8[idx++];
+        remLen += (b & 127) * mult;
+        mult *= 128;
+        if ((b & 128) === 0) break;
+      }
+      const pktEnd = idx + remLen;
+      if (pktEnd > u8.length) break;
+      if ((header & 0xf0) === 0x30) {
+        const tLen = (u8[idx] << 8) | u8[idx + 1];
+        const payloadStart = idx + 2 + tLen;
+        if (payloadStart <= pktEnd) {
+          try {
+            results.push(JSON.parse(_mqttDec.decode(u8.subarray(payloadStart, pktEnd))));
+          } catch (_e) {}
+        }
+      }
+      offset = pktEnd;
+    }
+    return results;
+  }
+
+  function publishToBrowserRelay(payloadObj) {
+    try {
+      if (mpBroadcastChan) mpBroadcastChan.postMessage(payloadObj);
+    } catch (_e) {}
+    if (mpRelayWs && mpRelayWs.readyState === WebSocket.OPEN && mpRelayReady) {
+      try {
+        mpRelayWs.send(_mqttBuildPub(MP_RELAY_TOPIC, payloadObj));
+      } catch (_e) {}
+    }
+  }
+
+  function handleIncomingRelayPacket(msg) {
+    if (!msg || typeof msg !== 'object') return;
+    const senderId = msg.id || msg.selfId || msg.clientId;
+    if (senderId === mpClientId || senderId === mpSelfId) return;
+
+    mpConnected = true;
+    const t = msg.type;
+    if (t === 'peer:hello') {
+      upsertRemoteOperative(msg);
+      // Reply immediately so the new peer sees our car, name, and map right away
+      publishToBrowserRelay(getLocalMpPayload('player:moved', { id: mpClientId }));
+      updateMpLiveBadge();
+    } else if (t === 'player:moved' || t === 'player:update' || t === 'http:sync' || t === 'player:joined') {
+      const pData = msg.player || msg;
+      const isNew = pData && (pData.id || pData.selfId || pData.clientId) && !remoteOperatives.has(pData.id || pData.selfId || pData.clientId);
+      upsertRemoteOperative(pData);
+      if (isNew) {
+        publishToBrowserRelay(getLocalMpPayload('player:moved', { id: mpClientId }));
+      }
+      if (mpOpen) renderMpPlayersList();
+      updateMpLiveBadge();
+    } else if (t === 'room:map_changed' && msg.mapId) {
+      if (msg.mapId !== currentMpMap) {
+        switchMultiplayerMap(msg.mapId, false);
+      }
+      if (msg.chatMessage) appendMpChatMessage(msg.chatMessage);
+    } else if (t === 'race:countdown_start') {
+      f1RaceStatus = 'countdown';
+      f1TotalLaps = msg.totalLaps || 3;
+      f1CountdownStartMs = performance.now();
+      f1LastBeepLight = -1;
+      if (mpOpen) closeMp();
+      positionOnF1StartingGrid(mpMyGridSlot);
+      const gantryHud = document.getElementById('f1StartLightsHud');
+      if (gantryHud) gantryHud.classList.add('open');
+      updateF1HudWidgets();
+    } else if (t === 'race:lights_out') {
+      f1RaceStatus = 'racing';
+      f1LapCount = 1;
+      f1GateIdx = 0;
+      f1LapStartMs = performance.now();
+      playerStats.nitro = 100;
+      playSfx('fanfare');
+      for (let i = 0; i < 5; i++) {
+        const pod = document.getElementById('f1Light' + i);
+        if (pod) { pod.classList.remove('red'); pod.classList.add('green'); }
+      }
+      setTimeout(() => {
+        const gantryHud = document.getElementById('f1StartLightsHud');
+        if (gantryHud && f1RaceStatus === 'racing') gantryHud.classList.remove('open');
+      }, 1800);
+      updateF1HudWidgets();
+    } else if (t === 'chat:message' && msg.chatMessage) {
+      appendMpChatMessage(msg.chatMessage);
+    }
+  }
+
+  function connectBrowserMqttRelay() {
+    const url = MP_RELAY_BROKERS[mpRelayBrokerIdx % MP_RELAY_BROKERS.length];
+    try {
+      const ws = new WebSocket(url, 'mqtt');
+      ws.binaryType = 'arraybuffer';
+      mpRelayWs = ws;
+      mpRelayReady = false;
+
+      ws.addEventListener('open', () => {
+        ws.send(_mqttBuildConnect('web-' + mpClientId));
+      });
+
+      ws.addEventListener('message', (ev) => {
+        const u8 = new Uint8Array(ev.data);
+        if (u8.length >= 2 && (u8[0] & 0xf0) === 0x20) {
+          mpRelayReady = true;
+          mpConnected = true;
+          ws.send(_mqttBuildSub(MP_RELAY_TOPIC));
+          setTimeout(() => {
+            publishToBrowserRelay(getLocalMpPayload('peer:hello', { id: mpClientId }));
+          }, 120);
+          updateMpLiveBadge();
+          return;
+        }
+        const packets = _mqttParseMessages(u8);
+        packets.forEach(pkt => handleIncomingRelayPacket(pkt));
+      });
+
+      ws.addEventListener('close', () => {
+        mpRelayReady = false;
+        mpRelayBrokerIdx++;
+        setTimeout(connectBrowserMqttRelay, 2500);
+      });
+
+      ws.addEventListener('error', () => {
+        try { ws.close(); } catch (_e) {}
+      });
+    } catch (_e) {
+      mpRelayBrokerIdx++;
+      setTimeout(connectBrowserMqttRelay, 3000);
+    }
+  }
+
+  setInterval(() => {
+    if (mpRelayWs && mpRelayWs.readyState === WebSocket.OPEN && mpRelayReady) {
+      try { mpRelayWs.send(new Uint8Array([0xc0, 0x00])); } catch (_e) {}
+    }
+  }, 20000);
+
+  function sendImmediateMpUpdate(extraFields) {
+    const payload = getLocalMpPayload('player:update', Object.assign({ id: mpClientId }, extraFields || {}));
+    publishToBrowserRelay(Object.assign({}, payload, { type: 'player:moved' }));
     if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
-      mpSocket.send(JSON.stringify(getLocalMpPayload('player:update')));
+      mpSocket.send(JSON.stringify(payload));
     } else {
-      syncMultiplayerViaHttp();
+      syncMultiplayerViaHttp(extraFields);
     }
   }
 
   let mpRosterHudTimer = 0;
 
-  async function syncMultiplayerViaHttp() {
+  async function syncMultiplayerViaHttp(extraFields) {
     if (mpHttpSyncInFlight) return;
     mpHttpSyncInFlight = true;
     try {
+      const syncPayload = getLocalMpPayload('http:sync', Object.assign({ id: mpClientId }, extraFields || {}));
+      publishToBrowserRelay(Object.assign({}, syncPayload, { type: 'player:moved' }));
       const res = await fetch('/api/mp/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(getLocalMpPayload('http:sync'))
+        body: JSON.stringify(syncPayload)
       });
       if (!res.ok) return;
       const data = await res.json();
@@ -11719,9 +12001,6 @@
       mpConnected = true;
       if (Array.isArray(data.roomsList)) {
         mpPublicRooms = data.roomsList;
-      }
-      if (data.mapId && data.mapId !== currentMpMap) {
-        switchMultiplayerMap(data.mapId, false);
       }
       if (Array.isArray(data.players)) {
         const seenIds = new Set();
@@ -11734,9 +12013,12 @@
             upsertRemoteOperative(p);
           }
         });
-        // Remove any stale remote operatives who left the room
-        remoteOperatives.forEach((_op, id) => {
-          if (!seenIds.has(id)) removeRemoteOperative(id);
+        // Only remove remote operatives if they haven't updated via WS, HTTP, or MQTT relay for >16s
+        const nowPerf = performance.now();
+        remoteOperatives.forEach((op, id) => {
+          if (!seenIds.has(id) && nowPerf - (op.lastUpdated || 0) > 16000) {
+            removeRemoteOperative(id);
+          }
         });
       }
       updateMpLiveBadge();
@@ -12061,14 +12343,18 @@
   }
 
   function updateMultiplayer(dt) {
-    // 1. Broadcast local player state at ~15Hz over WS + periodic HTTP state reconciliation
+    // 1. Broadcast local player state at ~15Hz over WS + Browser MQTT Relay + periodic HTTP state reconciliation
     mpSyncTimer += dt;
-    if (mpSyncTimer >= 0.068 && mpSocket && mpSocket.readyState === WebSocket.OPEN) {
+    if (mpSyncTimer >= 0.075) {
       mpSyncTimer = 0;
-      mpSocket.send(JSON.stringify(getLocalMpPayload('player:update')));
+      const movePayload = getLocalMpPayload('player:update', { id: mpClientId });
+      publishToBrowserRelay(Object.assign({}, movePayload, { type: 'player:moved' }));
+      if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
+        mpSocket.send(JSON.stringify(movePayload));
+      }
     }
     mpHttpSyncTimer += dt;
-    if (mpHttpSyncTimer >= (mpConnected ? 1.8 : 0.45)) {
+    if (mpHttpSyncTimer >= (mpConnected ? 1.5 : 0.45)) {
       mpHttpSyncTimer = 0;
       syncMultiplayerViaHttp();
     }
@@ -12360,39 +12646,82 @@
 
   function forceStartF1Race() {
     if (!isF1Map(currentMpMap)) {
+      switchMultiplayerMap('f1_circuit', false);
+      publishToBrowserRelay({ type: 'room:map_changed', room: mpRoomId, mapId: 'f1_circuit', id: mpClientId });
       if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
         mpSocket.send(JSON.stringify({ type: 'room:change_map', mapId: 'f1_circuit' }));
-      } else {
-        switchMultiplayerMap('f1_circuit', false);
       }
     }
     f1SelfReady = true;
+    publishToBrowserRelay({
+      type: 'race:countdown_start',
+      room: mpRoomId,
+      mapId: currentMpMap,
+      totalLaps: f1TotalLaps,
+      id: mpClientId
+    });
     if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
       mpSocket.send(JSON.stringify({
         type: 'race:force_start',
         totalLaps: f1TotalLaps
       }));
+    } else {
+      f1RaceStatus = 'countdown';
+      f1CountdownStartMs = performance.now();
+      positionOnF1StartingGrid(mpMyGridSlot);
+      const gantryHud = document.getElementById('f1StartLightsHud');
+      if (gantryHud) gantryHud.classList.add('open');
+      setTimeout(() => {
+        f1RaceStatus = 'racing';
+        if (gantryHud) gantryHud.classList.remove('open');
+        publishToBrowserRelay({ type: 'race:lights_out', room: mpRoomId, totalLaps: f1TotalLaps, id: mpClientId });
+      }, 5000);
     }
   }
 
   // Real-time Driver Name & Role synchronization as you type
-  function handleDriverNameChange(newNameRaw) {
+  function handleDriverNameChange(newNameRaw, showConfirmToast) {
     const cleaned = (newNameRaw || '').trim().slice(0, 18);
     if (!cleaned) return;
     mpCallsign = cleaned;
-    try { localStorage.setItem('karachi_mp_callsign', mpCallsign); } catch (_e) {}
+    try {
+      localStorage.setItem('karachi_mp_callsign', mpCallsign);
+      localStorage.setItem('dhurandhar_callsign', mpCallsign);
+    } catch (_e) {}
     if (mpNameInputEl && document.activeElement !== mpNameInputEl) mpNameInputEl.value = mpCallsign;
     if (f1DriverNameInputEl && document.activeElement !== f1DriverNameInputEl) f1DriverNameInputEl.value = mpCallsign;
     renderF1PaddockUI();
     renderLiveRosterHud();
     if (mpOpen) renderMpPlayersList();
     sendImmediateMpUpdate();
+    if (showConfirmToast) {
+      showBuildingToast(`✓ Driver Name saved as "${mpCallsign}" & synced to all players!`, '#10b981');
+    }
   }
   if (mpNameInputEl) {
-    mpNameInputEl.addEventListener('input', () => handleDriverNameChange(mpNameInputEl.value));
+    mpNameInputEl.addEventListener('input', () => handleDriverNameChange(mpNameInputEl.value, false));
   }
   if (f1DriverNameInputEl) {
-    f1DriverNameInputEl.addEventListener('input', () => handleDriverNameChange(f1DriverNameInputEl.value));
+    f1DriverNameInputEl.addEventListener('input', () => handleDriverNameChange(f1DriverNameInputEl.value, false));
+  }
+  const f1SaveNameBtnEl = document.getElementById('f1SaveNameBtn');
+  if (f1SaveNameBtnEl) {
+    f1SaveNameBtnEl.addEventListener('click', () => {
+      if (f1DriverNameInputEl) handleDriverNameChange(f1DriverNameInputEl.value, true);
+    });
+  }
+  const mpSaveNameBtnEl = document.getElementById('mpSaveNameBtn');
+  if (mpSaveNameBtnEl) {
+    mpSaveNameBtnEl.addEventListener('click', () => {
+      if (mpNameInputEl) handleDriverNameChange(mpNameInputEl.value, true);
+    });
+  }
+  const mpRosterEditBtnEl = document.getElementById('mpRosterEditBtn');
+  if (mpRosterEditBtnEl) {
+    mpRosterEditBtnEl.addEventListener('click', () => {
+      openMp();
+      if (f1DriverNameInputEl) f1DriverNameInputEl.focus();
+    });
   }
   if (mpRoleSelectEl) {
     mpRoleSelectEl.addEventListener('change', () => {
@@ -12452,12 +12781,12 @@
       const chosenMap = card.getAttribute('data-map') || 'karachi_city';
       mpSelectedMapForCreate = chosenMap;
       document.querySelectorAll('.mpMapCard').forEach(c => c.classList.toggle('active', c === card));
+      switchMultiplayerMap(chosenMap, false);
+      publishToBrowserRelay({ type: 'room:map_changed', room: mpRoomId, mapId: chosenMap, id: mpClientId });
       if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
         mpSocket.send(JSON.stringify({ type: 'room:change_map', mapId: chosenMap }));
-      } else {
-        switchMultiplayerMap(chosenMap, false);
       }
-      syncMultiplayerViaHttp();
+      syncMultiplayerViaHttp({ mapChanged: true, mapId: chosenMap });
     });
   });
 
@@ -12481,13 +12810,14 @@
     showBuildingToast(`📋 Room Code [${mpRoomId.toUpperCase()}] Copied! Send it to your friends!`, '#10b981');
   });
 
-  // Copy Direct Join Link
+  // Copy Direct Join Link (always use public Shared App URL ais-pre- so friends can open without developer login wall)
   document.getElementById('mpCopyLinkBtn').addEventListener('click', () => {
-    const shareUrl = `${window.location.origin}${window.location.pathname}?room=${encodeURIComponent(mpRoomId.toUpperCase())}&map=${encodeURIComponent(currentMpMap)}`;
+    const publicOrigin = window.location.origin.replace('//ais-dev-', '//ais-pre-');
+    const shareUrl = `${publicOrigin}${window.location.pathname}?room=${encodeURIComponent(mpRoomId.toUpperCase())}&map=${encodeURIComponent(currentMpMap)}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(shareUrl).catch(() => {});
     }
-    showBuildingToast(`🔗 Invite Link Copied for Room [${mpRoomId.toUpperCase()}]!`, '#38bdf8');
+    showBuildingToast(`🔗 Public Invite Link Copied for Room [${mpRoomId.toUpperCase()}]!`, '#38bdf8');
   });
 
   document.getElementById('mpWarpSupplyBtn').addEventListener('click', () => {
@@ -12498,27 +12828,49 @@
   });
 
   document.getElementById('mpJoinRoomBtn').addEventListener('click', () => {
-    if (mpNameInputEl && mpNameInputEl.value.trim()) handleDriverNameChange(mpNameInputEl.value);
+    const rawCodeInput = (mpRoomInputEl.value || '').trim();
+    // If user still has default Driver-XXX name and typed their name (like "SIDD") into the box, set their Driver Name too
+    if (rawCodeInput && /^Driver-\d+$/i.test(mpCallsign) && !rawCodeInput.includes('-') && rawCodeInput.toUpperCase() !== 'KARACHI') {
+      handleDriverNameChange(rawCodeInput, false);
+    } else if (mpNameInputEl && mpNameInputEl.value.trim()) {
+      handleDriverNameChange(mpNameInputEl.value, false);
+    }
     mpRole = mpRoleSelectEl.value || 'IB Deep-Cover (Hamza)';
-    const nextRoom = (mpRoomInputEl.value || 'KARACHI-1').trim().toUpperCase().slice(0, 16) || 'KARACHI-1';
+    const nextRoom = (rawCodeInput || 'KARACHI-1').toUpperCase().slice(0, 16) || 'KARACHI-1';
     mpRoomId = nextRoom;
     if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
       mpSocket.send(JSON.stringify(getLocalMpPayload('room:switch')));
-      showBuildingToast(`🌐 Joined Room [${mpRoomId}] as ${mpCallsign}!`, '#10b981');
     } else {
       connectMultiplayerSocket();
     }
+    publishToBrowserRelay(getLocalMpPayload('peer:hello', { id: mpClientId }));
     syncMultiplayerViaHttp();
+    showBuildingToast(`🌐 Synced Room [${mpRoomId}] as ${mpCallsign}!`, '#10b981');
   });
+
+  function transmitChatText(rawText) {
+    const text = (rawText || '').trim().slice(0, 160);
+    if (!text) return;
+    const chatMessage = {
+      id: 'msg-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+      senderId: mpClientId,
+      senderName: mpCallsign,
+      text,
+      timestamp: Date.now()
+    };
+    appendMpChatMessage(chatMessage);
+    publishToBrowserRelay({ type: 'chat:message', room: mpRoomId, id: mpClientId, chatMessage });
+    if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
+      mpSocket.send(JSON.stringify({ type: 'chat:send', text }));
+    }
+  }
 
   function sendMpChatFromInput() {
     const inputEl = document.getElementById('mpChatInput');
     if (!inputEl) return;
     const text = inputEl.value.trim();
     if (!text) return;
-    if (mpSocket && mpSocket.readyState === WebSocket.OPEN) {
-      mpSocket.send(JSON.stringify({ type: 'chat:send', text }));
-    }
+    transmitChatText(text);
     inputEl.value = '';
   }
 
@@ -12534,9 +12886,7 @@
   document.querySelectorAll('.mpQuickBtn[data-ping]').forEach(btn => {
     btn.addEventListener('click', () => {
       const ping = btn.getAttribute('data-ping');
-      if (ping && mpSocket && mpSocket.readyState === WebSocket.OPEN) {
-        mpSocket.send(JSON.stringify({ type: 'chat:send', text: ping }));
-      }
+      if (ping) transmitChatText(ping);
     });
   });
 
@@ -12574,13 +12924,15 @@
   renderF1PaddockUI();
   renderLiveRosterHud();
   connectMultiplayerSocket();
+  connectBrowserMqttRelay();
   syncMultiplayerViaHttp();
   // Keep multiplayer room/player roster synced even if player is still on the Title Screen or Paddock modal
   setInterval(() => {
     if (!loopStarted) {
+      publishToBrowserRelay(getLocalMpPayload('player:moved', { id: mpClientId }));
       syncMultiplayerViaHttp();
     }
-  }, 1500);
+  }, 1200);
 
   function beginGame(withPrologueStory) {
     document.getElementById('titleScreen').style.display = 'none';

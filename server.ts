@@ -378,16 +378,148 @@ function getSpawnForMapAndSlot(mapId: MapId, slotIndex: number): { x: number; z:
   };
 }
 
-function broadcastToRoom(roomCode: string, payload: unknown, excludeId?: string) {
-  const room = rooms.get(normalizeRoomCode(roomCode));
-  if (!room) return;
+const SERVER_INSTANCE_ID = 'srv-' + Math.random().toString(36).slice(2, 9);
+const MQTT_TOPIC = 'dhurandhar/mp/3c7ec51f/v3';
+const MQTT_BROKERS = [
+  'wss://broker.emqx.io:8084/mqtt',
+  'wss://broker.hivemq.com:8884/mqtt',
+];
+let mqttBrokerIdx = 0;
+let serverMqttWs: WebSocket | null = null;
+let serverMqttReady = false;
+const mqttEnc = new TextEncoder();
+const mqttDec = new TextDecoder();
+
+function mqttEncodeLen(len: number): number[] {
+  const out: number[] = [];
+  do {
+    let b = len % 128;
+    len = Math.floor(len / 128);
+    if (len > 0) b |= 128;
+    out.push(b);
+  } while (len > 0);
+  return out;
+}
+
+function mqttBuildConnect(clientId: string): Uint8Array {
+  const idB = mqttEnc.encode(clientId);
+  const remLen = 10 + 2 + idB.length;
+  const rem = mqttEncodeLen(remLen);
+  const pkt = new Uint8Array(1 + rem.length + remLen);
+  let p = 0;
+  pkt[p++] = 0x10;
+  rem.forEach((b) => (pkt[p++] = b));
+  pkt.set([0x00, 0x04, 0x4d, 0x51, 0x54, 0x54, 0x04, 0x02, 0x00, 0x3c], p);
+  p += 10;
+  pkt[p++] = (idB.length >> 8) & 0xff;
+  pkt[p++] = idB.length & 0xff;
+  pkt.set(idB, p);
+  return pkt;
+}
+
+function mqttBuildSubscribe(topic: string): Uint8Array {
+  const tB = mqttEnc.encode(topic);
+  const remLen = 2 + 2 + tB.length + 1;
+  const rem = mqttEncodeLen(remLen);
+  const pkt = new Uint8Array(1 + rem.length + remLen);
+  let p = 0;
+  pkt[p++] = 0x82;
+  rem.forEach((b) => (pkt[p++] = b));
+  pkt[p++] = 0x00;
+  pkt[p++] = 0x01;
+  pkt[p++] = (tB.length >> 8) & 0xff;
+  pkt[p++] = tB.length & 0xff;
+  pkt.set(tB, p);
+  p += tB.length;
+  pkt[p++] = 0x00;
+  return pkt;
+}
+
+function mqttBuildPublish(topic: string, obj: unknown): Uint8Array {
+  const tB = mqttEnc.encode(topic);
+  const mB = mqttEnc.encode(JSON.stringify(obj));
+  const remLen = 2 + tB.length + mB.length;
+  const rem = mqttEncodeLen(remLen);
+  const pkt = new Uint8Array(1 + rem.length + remLen);
+  let p = 0;
+  pkt[p++] = 0x30;
+  rem.forEach((b) => (pkt[p++] = b));
+  pkt[p++] = (tB.length >> 8) & 0xff;
+  pkt[p++] = tB.length & 0xff;
+  pkt.set(tB, p);
+  p += tB.length;
+  pkt.set(mB, p);
+  return pkt;
+}
+
+function mqttParsePayloads(u8: Uint8Array): Array<Record<string, unknown>> {
+  const results: Array<Record<string, unknown>> = [];
+  let offset = 0;
+  while (offset < u8.length) {
+    const header = u8[offset];
+    let mult = 1;
+    let remLen = 0;
+    let idx = offset + 1;
+    while (idx < u8.length) {
+      const b = u8[idx++];
+      remLen += (b & 127) * mult;
+      mult *= 128;
+      if ((b & 128) === 0) break;
+    }
+    const pktEnd = idx + remLen;
+    if (pktEnd > u8.length) break;
+    if ((header & 0xf0) === 0x30) {
+      const tLen = (u8[idx] << 8) | u8[idx + 1];
+      const payloadStart = idx + 2 + tLen;
+      if (payloadStart <= pktEnd) {
+        try {
+          const parsed = JSON.parse(mqttDec.decode(u8.subarray(payloadStart, pktEnd)));
+          if (parsed && typeof parsed === 'object') results.push(parsed);
+        } catch (_e) {}
+      }
+    }
+    offset = pktEnd;
+  }
+  return results;
+}
+
+function publishToGlobalRelay(payload: Record<string, unknown>) {
+  if (!serverMqttWs || serverMqttWs.readyState !== WebSocket.OPEN || !serverMqttReady) return;
+  try {
+    const out = { ...payload, _srvId: SERVER_INSTANCE_ID };
+    serverMqttWs.send(mqttBuildPublish(MQTT_TOPIC, out));
+  } catch (_e) {}
+}
+
+function pruneAndGetAllActivePlayers(): PlayerState[] {
+  const now = Date.now();
+  const all: Map<string, PlayerState> = new Map();
+  for (const [rCode, r] of rooms) {
+    for (const [pid, p] of r.players) {
+      const sock = clientSockets.get(pid);
+      const wsAlive = sock && sock.readyState === WebSocket.OPEN;
+      if (!wsAlive && now - p.lastSeen > 16000) {
+        r.players.delete(pid);
+        broadcastToRoom(rCode, { type: 'player:left', id: pid }, pid, true);
+      } else {
+        all.set(pid, p);
+      }
+    }
+  }
+  return Array.from(all.values());
+}
+
+function broadcastToRoom(roomCode: string, payload: unknown, excludeId?: string, fromRelay?: boolean) {
   const raw = JSON.stringify(payload);
-  for (const [pid] of room.players) {
+  // Broadcast to all connected sockets so players never miss each other even if in different room codes
+  for (const [pid, sock] of clientSockets) {
     if (excludeId && pid === excludeId) continue;
-    const sock = clientSockets.get(pid);
     if (sock && sock.readyState === WebSocket.OPEN) {
       sock.send(raw);
     }
+  }
+  if (!fromRelay && payload && typeof payload === 'object') {
+    publishToGlobalRelay({ ...(payload as Record<string, unknown>), room: normalizeRoomCode(roomCode) });
   }
 }
 
@@ -398,6 +530,117 @@ function sendToPlayer(playerId: string, payload: unknown) {
   }
 }
 
+function connectServerMqttBridge() {
+  const brokerUrl = MQTT_BROKERS[mqttBrokerIdx % MQTT_BROKERS.length];
+  try {
+    const ws = new WebSocket(brokerUrl, 'mqtt');
+    serverMqttWs = ws;
+    serverMqttReady = false;
+
+    ws.on('open', () => {
+      ws.send(mqttBuildConnect(SERVER_INSTANCE_ID));
+    });
+
+    ws.on('message', (data: Buffer) => {
+      const u8 = new Uint8Array(data);
+      if (u8.length >= 2 && (u8[0] & 0xf0) === 0x20) {
+        serverMqttReady = true;
+        ws.send(mqttBuildSubscribe(MQTT_TOPIC));
+        return;
+      }
+      const msgs = mqttParsePayloads(u8);
+      for (const msg of msgs) {
+        if (msg._srvId === SERVER_INSTANCE_ID) continue;
+        const pid = String(msg.id || msg.selfId || msg.clientId || '').trim();
+        const mType = String(msg.type || '');
+
+        if ((mType === 'player:moved' || mType === 'player:joined' || mType === 'player:update' || mType === 'http:sync') && pid) {
+          const srcPlayer = (msg.player && typeof msg.player === 'object' ? msg.player : msg) as Record<string, unknown>;
+          const rCode = normalizeRoomCode(String(srcPlayer.room || msg.room || 'KARACHI-1'));
+          const mapId = sanitizeMapId(srcPlayer.mapId || msg.mapId);
+          const callsign = String(srcPlayer.name || 'Operative').slice(0, 20);
+          const room = getOrCreateRoom(rCode, mapId, pid, callsign);
+
+          // Remove from other rooms if switched
+          for (const [otherCode, otherRoom] of rooms) {
+            if (otherCode !== room.code && otherRoom.players.has(pid)) {
+              otherRoom.players.delete(pid);
+            }
+          }
+
+          const existing = room.players.get(pid);
+          const slot = existing ? existing.gridIndex : room.players.size;
+          const sp = getSpawnForMapAndSlot(room.mapId, slot);
+          const updated: PlayerState = {
+            id: pid,
+            name: callsign,
+            role: String(srcPlayer.role || (existing ? existing.role : 'IB Deep-Cover (Hamza)')).slice(0, 32),
+            room: room.code,
+            mode: srcPlayer.mode === 'walk' || srcPlayer.mode === 'interior' ? srcPlayer.mode : 'drive',
+            x: typeof srcPlayer.x === 'number' && !Number.isNaN(srcPlayer.x) ? srcPlayer.x : (existing ? existing.x : sp.x),
+            y: 0,
+            z: typeof srcPlayer.z === 'number' && !Number.isNaN(srcPlayer.z) ? srcPlayer.z : (existing ? existing.z : sp.z),
+            heading: typeof srcPlayer.heading === 'number' && !Number.isNaN(srcPlayer.heading) ? srcPlayer.heading : (existing ? existing.heading : sp.heading),
+            speed: Number(srcPlayer.speed) || 0,
+            steerAngle: Number(srcPlayer.steerAngle) || 0,
+            carId: String(srcPlayer.carId || (existing ? existing.carId : 'f1')).slice(0, 24),
+            teamId: String(srcPlayer.teamId || (existing ? existing.teamId : 'ferrari_corsa')).slice(0, 24),
+            teamName: String(srcPlayer.teamName || (existing ? existing.teamName : 'Scuderia Corsa Rossa')).slice(0, 36),
+            bodyColor: String(srcPlayer.bodyColor || (existing ? existing.bodyColor : '#dc2626')).slice(0, 16),
+            stripeColor: String(srcPlayer.stripeColor || (existing ? existing.stripeColor : '#ffffff')).slice(0, 16),
+            rimColor: String(srcPlayer.rimColor || (existing ? existing.rimColor : '#facc15')).slice(0, 16),
+            underglowColor: String(srcPlayer.underglowColor || (existing ? existing.underglowColor : '#38bdf8')).slice(0, 16),
+            tireCompound: sanitizeTireCompound(srcPlayer.tireCompound || (existing ? existing.tireCompound : 'soft')),
+            ready: typeof srcPlayer.ready === 'boolean' ? srcPlayer.ready : (existing ? existing.ready : false),
+            gridIndex: slot,
+            raceLap: Number(srcPlayer.raceLap || srcPlayer.currentLap) || 1,
+            raceGate: Number(srcPlayer.raceGate) || 0,
+            pitCount: Number(srcPlayer.pitCount) || 0,
+            outfitColor: String(srcPlayer.outfitColor || '#1e242b').slice(0, 16),
+            weapon: String(srcPlayer.weapon || 'pistol').slice(0, 20),
+            health: Math.max(1, Math.min(100, Number(srcPlayer.health) || 100)),
+            armor: Math.max(0, Math.min(100, Number(srcPlayer.armor) || 50)),
+            kills: Number(srcPlayer.kills) || 0,
+            deaths: 0,
+            bounty: Number(srcPlayer.bounty) || 0,
+            bestLapMs: Number(srcPlayer.bestLapMs) || 0,
+            rangeScore: Number(srcPlayer.rangeScore) || 0,
+            lastSeen: Date.now(),
+          };
+          room.players.set(pid, updated);
+          broadcastToRoom(room.code, { type: 'player:moved', ...updated, mapId: room.mapId }, pid, true);
+        } else if (mType === 'room:map_changed' || mType === 'race:countdown_start' || mType === 'race:lights_out' || mType === 'chat:message') {
+          const rCode = normalizeRoomCode(String(msg.room || 'KARACHI-1'));
+          const room = getOrCreateRoom(rCode);
+          if (msg.mapId) room.mapId = sanitizeMapId(msg.mapId);
+          broadcastToRoom(rCode, msg, undefined, true);
+        }
+      }
+    });
+
+    ws.on('close', () => {
+      serverMqttReady = false;
+      mqttBrokerIdx++;
+      setTimeout(connectServerMqttBridge, 2500);
+    });
+
+    ws.on('error', () => {
+      try { ws.close(); } catch (_e) {}
+    });
+  } catch (_e) {
+    mqttBrokerIdx++;
+    setTimeout(connectServerMqttBridge, 3000);
+  }
+}
+
+setInterval(() => {
+  if (serverMqttWs && serverMqttWs.readyState === WebSocket.OPEN && serverMqttReady) {
+    try {
+      serverMqttWs.send(new Uint8Array([0xc0, 0x00]));
+    } catch (_e) {}
+  }
+}, 20000);
+
 async function startServer() {
   const app = express();
   const server = http.createServer(app);
@@ -405,24 +648,24 @@ async function startServer() {
 
   app.use(express.json());
 
-  // Seed default lobby room
+  // Seed default lobby room & connect cross-instance MQTT bridge
   getOrCreateRoom('KARACHI-1', 'karachi_city', 'system', 'IB Control');
+  connectServerMqttBridge();
 
   app.get('/api/health', (_req, res) => {
-    let totalPlayers = 0;
-    for (const [, r] of rooms) totalPlayers += r.players.size;
-    res.json({ status: 'ok', totalPlayers, rooms: getPublicRoomsList() });
+    const allPlayers = pruneAndGetAllActivePlayers();
+    res.json({ status: 'ok', totalPlayers: allPlayers.length, players: allPlayers, rooms: getPublicRoomsList() });
   });
 
   app.get('/api/rooms', (_req, res) => {
-    res.json({ rooms: getPublicRoomsList() });
+    res.json({ rooms: getPublicRoomsList(), players: pruneAndGetAllActivePlayers() });
   });
 
   // Hybrid HTTP Real-Time Sync Endpoint (guarantees multiplayer visibility even across HTTP proxies or when WS reconnects)
   app.post('/api/mp/sync', (req, res) => {
     try {
       const body = req.body || {};
-      const pid = String(body.selfId || '').trim();
+      const pid = String(body.selfId || body.clientId || '').trim();
       if (!pid) {
         res.status(400).json({ error: 'Missing selfId' });
         return;
@@ -430,6 +673,10 @@ async function startServer() {
       const targetCode = normalizeRoomCode(body.room || 'KARACHI-1');
       const callsign = String(body.name || 'Hamza-IB').trim().slice(0, 20) || 'Hamza-IB';
       const room = getOrCreateRoom(targetCode, body.mapId ? sanitizeMapId(body.mapId) : undefined, pid, callsign);
+
+      if (body.mapChanged && body.mapId) {
+        room.mapId = sanitizeMapId(body.mapId);
+      }
 
       // Remove from any other room if player switched rooms
       for (const [rCode, r] of rooms) {
@@ -481,7 +728,7 @@ async function startServer() {
           lastSeen: Date.now(),
         };
         room.players.set(pid, p);
-        broadcastToRoom(room.code, { type: 'player:joined', player: p }, pid);
+        broadcastToRoom(room.code, { type: 'player:joined', player: p, mapId: room.mapId }, pid);
       } else {
         p.name = callsign;
         if (typeof body.role === 'string' && body.role.trim()) p.role = body.role.trim().slice(0, 32);
@@ -505,30 +752,19 @@ async function startServer() {
         if (typeof body.armor === 'number') p.armor = Math.max(0, Math.min(100, body.armor));
         p.lastSeen = Date.now();
 
-        // Also push to any WebSocket peers in the room if this client has no open WS
-        const wsSock = clientSockets.get(pid);
-        if (!wsSock || wsSock.readyState !== WebSocket.OPEN) {
-          broadcastToRoom(
-            room.code,
-            {
-              type: 'player:moved',
-              ...p,
-            },
-            pid
-          );
-        }
+        // Always broadcast via WS + Global MQTT Relay so peers across instances stay synced
+        broadcastToRoom(
+          room.code,
+          {
+            type: 'player:moved',
+            ...p,
+            mapId: room.mapId,
+          },
+          pid
+        );
       }
 
-      // Prune stale HTTP-only players inactive for >15s
-      const now = Date.now();
-      for (const [otherId, otherP] of room.players) {
-        const otherSock = clientSockets.get(otherId);
-        const wsAlive = otherSock && otherSock.readyState === WebSocket.OPEN;
-        if (!wsAlive && now - otherP.lastSeen > 15000) {
-          room.players.delete(otherId);
-          broadcastToRoom(room.code, { type: 'player:left', id: otherId });
-        }
-      }
+      const allOnline = pruneAndGetAllActivePlayers();
 
       res.json({
         selfId: pid,
@@ -537,7 +773,7 @@ async function startServer() {
         raceStatus: room.raceStatus,
         raceTotalLaps: room.raceTotalLaps,
         finishOrder: room.finishOrder,
-        players: Array.from(room.players.values()),
+        players: allOnline,
         chat: room.chat.slice(-25),
         supplyDrop: room.supplyDrop,
         roomsList: getPublicRoomsList(),
@@ -633,6 +869,8 @@ async function startServer() {
 
       room.players.set(playerId, newPlayer);
 
+      const allOnline = pruneAndGetAllActivePlayers();
+
       sendToPlayer(playerId, {
         type: 'room:init',
         selfId: playerId,
@@ -643,7 +881,7 @@ async function startServer() {
         raceStatus: room.raceStatus,
         raceTotalLaps: room.raceTotalLaps,
         finishOrder: room.finishOrder,
-        players: Array.from(room.players.values()),
+        players: allOnline,
         chat: room.chat.slice(-25),
         supplyDrop: room.supplyDrop,
         roomsList: getPublicRoomsList(),
